@@ -1,0 +1,16 @@
+compile_commands.json
+.*.sw?
+code.vim
+.cache
+.vscode
+.clangd
+deps/c2py
+deps/nda
+#c2py_src
+#c2py_test
+compile_commands*
+howto*
+*.cxx
+*.hxx
+*.so
+

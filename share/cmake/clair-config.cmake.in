@@ -1,0 +1,33 @@
+# Multiple inclusion guard
+if(NOT CLAIR_FOUND)
+
+ if (NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "@CMAKE_CXX_COMPILER_ID@")
+  MESSAGE(FATAL_ERROR "Clair plugins are only usable with clang")
+ endif()
+
+ if (NOT ${CMAKE_CXX_COMPILER_VERSION} STREQUAL "@CMAKE_CXX_COMPILER_VERSION@")
+    MESSAGE(FATAL_ERROR "LLVM version mismatch")
+ endif()
+
+ # Version
+ set(CLAIR_LLVM_VERSION @CMAKE_CXX_COMPILER_VERSION@)
+ set(CLAIR_VERSION @CLAIR_VERSION@)
+ set(CLAIR_GIT_HASH @CLAIR_GIT_HASH@)
+
+ # Root of the Clair installation
+ set(Clair_ROOT @CMAKE_INSTALL_PREFIX@ CACHE PATH "Root of Clair")
+
+ MESSAGE(STATUS "Found clair-config.cmake with version ${CLAIR_VERSION}, hash = ${CLAIR_GIT_HASH}, root = ${Clair_ROOT}")
+ set(CLAIR_FOUND True)
+ set_property(GLOBAL PROPERTY clair_FOUND TRUE)
+
+ # Mac specific
+ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  set(CMAKE_INSTALL_NAME_DIR "@CMAKE_INSTALL_PREFIX@/lib")
+  set(CMAKE_MACOSX_RPATH 1) # new for cmake 3.x
+ endif()
+
+ # include the exported targets of this project
+ include(@CMAKE_INSTALL_PREFIX@/lib/cmake/clair/clair-targets.cmake)
+
+endif()

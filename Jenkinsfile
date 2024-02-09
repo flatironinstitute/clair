@@ -49,7 +49,7 @@ for (int i = 0; i < dockerPlatforms.size(); i++) {
 
 /****************** osx builds (on host) */
 def osxPlatforms = [
-  ["clang", ['CC=$BREW/opt/llvm/bin/clang', 'CXX=$BREW/opt/llvm/bin/clang++', 'FC=gfortran-13', 'CXXFLAGS=-I$BREW/opt/llvm/include', 'LDFLAGS=-L$BREW/opt/llvm/lib']]
+  ["clang", ['CC=$BREW/opt/llvm/bin/clang', 'CXX=$BREW/opt/llvm/bin/clang++', 'FC=gfortran-13', 'CXXFLAGS=-I$BREW/opt/llvm/include', 'LDFLAGS=-L$BREW/opt/llvm/lib', 'CMAKE_PREFIX_PATH=$BREW/opt/llvm/lib/cmake']]
 ]
 for (int i = 0; i < osxPlatforms.size(); i++) {
   def platformEnv = osxPlatforms[i]
@@ -78,7 +78,6 @@ for (int i = 0; i < osxPlatforms.size(); i++) {
           "LIBRARY_PATH=$venv/lib:$hdf5/lib:${env.BREW}/lib",
           "LD_LIBRARY_PATH=$hdf5/lib",
           "PYTHONPATH=$installDir/lib/python3.11/site-packages",
-          "CMAKE_PREFIX_PATH=$venv/lib/cmake/triqs",
           "OMP_NUM_THREADS=2"]) {
         deleteDir()
         sh "python3 -m venv $venv"

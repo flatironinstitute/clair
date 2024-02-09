@@ -16,8 +16,6 @@ RUN apt-get update && apt-get install -y lsb-release wget software-properties-co
       libblas-dev \
       libboost-dev \
       libclang-${LLVM}-dev \
-      libc++-${LLVM}-dev \
-      libc++abi-${LLVM}-dev \
       libomp-${LLVM}-dev \
       libfftw3-dev \
       libgfortran5 \
@@ -45,5 +43,5 @@ RUN apt-get update && apt-get install -y lsb-release wget software-properties-co
       pip3 install sphinx==5.3.0 nbsphinx sphinx-rtd-theme
 
 ENV PYTHON_VERSION=3.10 \
-    CC=clang-${LLVM} CXX=clang++-${LLVM} CXXFLAGS="-stdlib=libc++"
+    CC=clang-${LLVM} CXX=clang++-${LLVM}
 RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${LLVM} 60 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-${LLVM} --slave /usr/bin/clang-cpp clang-cpp /usr/bin/clang-cpp-${LLVM}

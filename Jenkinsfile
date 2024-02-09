@@ -49,7 +49,7 @@ for (int i = 0; i < dockerPlatforms.size(); i++) {
 
 /****************** osx builds (on host) */
 def osxPlatforms = [
-  ["clang", ['CC=$BREW/opt/llvm/bin/clang', 'CXX=$BREW/opt/llvm/bin/clang++', 'FC=gfortran-13', 'CXXFLAGS=-I$BREW/opt/llvm/include', 'LDFLAGS=-L$BREW/opt/llvm/lib', 'CMAKE_PREFIX_PATH=$BREW/opt/llvm/lib/cmake']]
+  ["clang", ['CC=$BREW/opt/llvm/bin/clang', 'CXX=$BREW/opt/llvm/bin/clang++', 'FC=gfortran-13', 'CXXFLAGS=-I$BREW/opt/llvm/include', 'LDFLAGS=-L$BREW/opt/llvm/lib', 'CMAKE_PREFIX_PATH=$BREW/opt/llvm/lib/cmake:$BREW/lib/cmake']]
 ]
 for (int i = 0; i < osxPlatforms.size(); i++) {
   def platformEnv = osxPlatforms[i]

@@ -36,6 +36,7 @@ jobs:
         sudo apt-get install
         ccache
         clang-15
+        llvm-15-dev
         libblas-dev
         libc++-15-dev
         libc++abi-15-dev

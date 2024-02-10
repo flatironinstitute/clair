@@ -55,11 +55,6 @@ jobs:
         brew install llvm python@3.12 
         pip3 install numpy
 
-    - name: add clang cxxflags
-      if: ${{ contains(matrix.cxx, 'clang') }}
-      run:
-        #echo "CXXFLAGS=-stdlib=libc++" >> $GITHUB_ENV
-
     - name: Build clair
       env:
         CC: ${{ matrix.cc }}

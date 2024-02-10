@@ -22,13 +22,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - uses: actions/cache/restore@v3
-      with:
-        path: ${{ env.CCACHE_DIR }}
-        key: ccache-${{ matrix.os }}-${{ matrix.cc }}-${{ github.run_id }}
-        restore-keys:
-          ccache-${{ matrix.os }}-${{ matrix.cc }}-
-
     - name: Install ubuntu dependencies
       if: matrix.os == 'ubuntu-22.04'
       run: >
@@ -38,8 +31,6 @@ jobs:
         clang-15
         libclang-15-dev
         libblas-dev
-        #libc++-15-dev
-        #libc++abi-15-dev
         libomp-15-dev
         python3
         python3-dev
@@ -49,7 +40,6 @@ jobs:
         python3-sphinx-rtd-theme
         &&
         pip3 install myst-parser linkify-it-py &&
-        #pip3 install sphinx==5.3.0 sphinx-rtd-theme
 
     - name: Install homebrew dependencies
       if: matrix.os == 'macos-14'

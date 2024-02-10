@@ -1,5 +1,5 @@
 .. _about:
 
-About clair/cpy2
+About clair/c2py
 ****************
 

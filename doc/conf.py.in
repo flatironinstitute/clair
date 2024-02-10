@@ -10,14 +10,15 @@ sys.path.insert(0, "@CMAKE_CURRENT_SOURCE_DIR@/sphinxext/numpydoc")
 exclude_patterns = ['_templates']
 
 extensions = ['sphinx.ext.autodoc',
-              'sphinx.ext.mathjax',
-              'sphinx.ext.intersphinx',
-              'sphinx.ext.doctest',
+              #'sphinx.ext.mathjax',
+              #'sphinx.ext.intersphinx',
+              #'sphinx.ext.doctest',
               'sphinx.ext.todo',
               'sphinx.ext.viewcode',
               'sphinx.ext.autosummary',
               'sphinx.ext.githubpages',
-              #'nbsphinx',
+              # 'nbsphinx',
+               'myst_parser',
               ]
 
 # The name of the Pygments (syntax highlighting) style to use.

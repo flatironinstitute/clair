@@ -1,6 +1,6 @@
 .. _customize:
 
-Configuration
+Customization
 *************
 
 Many customization options of the bindings generation are available, 

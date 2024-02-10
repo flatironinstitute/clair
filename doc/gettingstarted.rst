@@ -17,10 +17,10 @@ We just compile the C++ file with `clang` using the ``clair`` plugin as
 .. code-block:: bash
    
    # OS X
-   clang++ -fplugin=clair_c2py.dylib `c2py_flags` my_module.cpp -std=c++20 -shared -o my_module.so
+   clang++ -fplugin=clair_c2py.dylib  my_module.cpp -std=c++20 -shared -o my_module.so `c2py_flags`
    
    # Linux
-   clang++ -fplugin=clair_c2py.so    `c2py_flags` my_module.cpp -std=c++20 -shared -o my_module.so
+   clang++ -fplugin=clair_c2py.so     my_module.cpp -std=c++20 -shared -o my_module.so `c2py_flags`
 
 
 That is it. The Python module is ready to use:
@@ -80,7 +80,7 @@ they can reused with any `C++20` compiler. For example, with ``gcc``.
 
 .. code-block:: bash
 
-   g++ `c2py_flags` my_module.wrap.cxx -std=c++20 -shared -o my_module.so
+   g++  my_module.wrap.cxx -std=c++20 -shared -o my_module.so `c2py_flags`
 
 
 (the bindings automatically include the original source file `my_module.cpp`).

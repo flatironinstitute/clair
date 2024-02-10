@@ -6,7 +6,7 @@ Reference documentation
 .. toctree::
    :maxdepth: 2
 
-   reference/config
+   reference/customize
    reference/fnt_basic
    reference/classes
    reference/enums

@@ -14,7 +14,12 @@ Experimental packages of ``c2py`` and ``clair`` are::
 
 They are built from source from the GitHub parcollet/ccq repository.
 
-.. warning::
+.. note::
 
-   RECHECK it works
+   The DYLD_LIBRARY_PATH must be set e.g.::
+
+     export DYLD_LIBRARY_PATH=/opt/homebrew/lib/:$DYLD_LIBRARY_PATH
+
+   for clang to find its plugins in brew directory as in the documentation examples.
+   
 

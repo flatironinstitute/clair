@@ -17,7 +17,7 @@ clair
 
 #. Download the source code of the latest stable version by cloning the ``c2py`` repository from GitHub::
 
-     $ git clone https://github.com/TRIQS/clair clair.src
+     $ git clone https://github.com/flatironinstitute/clair clair.src
 
 #. If you want a particular version, check it out, e.g. (use `git tag` go to see the available version)::
 
@@ -45,7 +45,7 @@ To install ``c2py``, follow the same procedure as for ``clair``, replacing ``cla
 
 #. Download the source code of the latest stable version by cloning the ``c2py`` repository from GitHub::
 
-     $ git clone https://github.com/TRIQS/c2py c2py.src
+     $ git clone https://github.com/flatironinstitute/c2py c2py.src
 
 #. If you want a particular version, check it out, e.g. (use `git tag` go to see the available version)::
 

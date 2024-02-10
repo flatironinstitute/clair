@@ -1,4 +1,4 @@
-[![build](https://github.com/TRIQS/clair/workflows/build/badge.svg)](https://github.com/TRIQS/clair/actions?query=workflow%3Abuild)
+[![build](https://github.com/flatironinstitute/clair/workflows/build/badge.svg)](https://github.com/flatironinstitute/clair/actions?query=workflow%3Abuild)
 
 # Clair - **Cla**ng **I**ntrospection and **R**eflection tools
 

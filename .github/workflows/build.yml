@@ -58,7 +58,7 @@ jobs:
         CXX: ${{ matrix.cxx }}
         LIBRARY_PATH: /usr/local/opt/llvm/lib
       run: |
-        cmake -B build -S. -DCMAKE_INSTALL_PREFIX=$HOME/install -DBuild_Documentation=${{ matrix.doc }}
+        cmake -B build -S. -DLLVM_CONFIG=/usr/bin/llvm-config-15 -DCMAKE_INSTALL_PREFIX=$HOME/install -DBuild_Documentation=${{ matrix.doc }}
         cd build && make -j2 || make -j1 VERBOSE=1
 
     - name: Test clair

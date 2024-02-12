@@ -37,8 +37,9 @@ jobs:
         python3-numpy
         python3-pip
         python3-sphinx
-        python3-sphinx-rtd-theme &&
-        pip3 install myst-parser linkify-it-py 
+        python3-sphinx-rtd-theme 
+        python3-myst-parser &&
+        pip3 install linkify-it-py 
 
     - name: Install homebrew dependencies
       if: matrix.os == 'macos-14'

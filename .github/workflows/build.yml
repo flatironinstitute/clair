@@ -2,9 +2,12 @@ name: build
 
 on:
   push:
-    branches: [ unstable ]
+    branches: [ unstable, CI ]
   pull_request:
     branches: [ unstable ]
+
+env:
+  LLVM: 15 
 
 jobs:
   build:
@@ -22,6 +25,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+         
     - name: Install ubuntu dependencies
       if: matrix.os == 'ubuntu-22.04'
       run: >
@@ -29,6 +33,7 @@ jobs:
         sudo apt-get install
         ccache
         clang-15
+        llvm-15-dev
         libclang-15-dev
         libblas-dev
         libomp-15-dev

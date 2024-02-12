@@ -2,7 +2,7 @@ name: build
 
 on:
   push:
-    branches: [ unstable ]
+    branches: [ unstable, CI ]
   pull_request:
     branches: [ unstable ]
 

@@ -54,7 +54,7 @@ jobs:
         LIBRARY_PATH: /usr/local/opt/llvm/lib
       run: |
         cmake -B build -S. -DCMAKE_INSTALL_PREFIX=$HOME/install -DBuild_Documentation=${{ matrix.doc }}
-        make -j2 || make -j1 VERBOSE=1
+        cd build && make -j2 || make -j1 VERBOSE=1
 
     - name: Test clair
       env:

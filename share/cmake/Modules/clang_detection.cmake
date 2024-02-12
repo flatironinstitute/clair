@@ -10,7 +10,9 @@ set(LLVM_ROOT_DIR "${LLVM_ROOT_DIR_DEFAULT}") #CACHE PATH "LLVM installation dir
 
 # Add the location of ClangConfig.cmake to CMake search paths (so that
 # find_package can locate it)
-list(APPEND CMAKE_PREFIX_PATH "${LLVM_ROOT_DIR}/lib/cmake/clang/")
+list(PREPEND CMAKE_PREFIX_PATH "${LLVM_ROOT_DIR}/lib/cmake/clang/") 
+list(PREPEND CMAKE_PREFIX_PATH "${LLVM_ROOT_DIR}/lib/cmake/llvm/") 
+# We must find the proper LLVM config
 
 find_package(LLVM REQUIRED CONFIG)
 find_package(Clang REQUIRED CONFIG)

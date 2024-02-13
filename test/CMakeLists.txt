@@ -13,7 +13,7 @@ FetchContent_MakeAvailable(c2py)
 FILE(COPY ${CMAKE_SOURCE_DIR}/.clang-format DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # We add the tests back to the ALL to have them run
-add_custom_target(c2py_make_all_tests ALL DEPENDS ${c2py_all_full_tests} ${c2py_all_low_level_tests} pyembed)
+add_custom_target(c2py_make_all_tests ALL DEPENDS ${c2py_all_full_tests} ${c2py_all_low_level_tests} )
 
 
 

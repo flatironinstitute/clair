@@ -14,6 +14,7 @@ Experimental packages of ``c2py`` and ``clair`` are::
 
 They are built from source from the GitHub parcollet/ccq repository.
 
+
 .. note::
 
    To use the plugin as in the example below, 
@@ -24,5 +25,12 @@ They are built from source from the GitHub parcollet/ccq repository.
    for clang to find its plugins in brew directory as in the documentation examples.
    Alternatively, you can provide the full path to the plugin.
    This setup is not necessary to use the CMake targets.
-   
+
+Uninstalling
+............
+
+In order to uninstall all formulas from the `parcollet/ccq` tap, you can use::
+
+        brew uninstall `brew list --full-name -1|grep ccq`
+
 

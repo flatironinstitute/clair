@@ -10,7 +10,6 @@ Let us begin with a simple example in file `my_module.cpp`.
 
 .. literalinclude:: examples/gs1.cpp
    :language: cpp
-   :linenos:
 
 We just compile the C++ file with `clang` using the ``clair`` plugin as 
 

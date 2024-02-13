@@ -45,6 +45,7 @@ jobs:
         python3-pip
         python3-sphinx
         python3-sphinx-rtd-theme 
+        python3-sphinx-copybutton
         python3-myst-parser &&
         pip3 install linkify-it-py 
 

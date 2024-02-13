@@ -17,9 +17,13 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.viewcode',
               'sphinx.ext.autosummary',
               'sphinx.ext.githubpages',
+              'sphinx_copybutton',
               # 'nbsphinx',
                'myst_parser',
               ]
+
+# Copy button options
+copybutton_exclude = '.linenos, .gp'
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'

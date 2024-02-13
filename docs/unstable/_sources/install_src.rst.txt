@@ -15,20 +15,21 @@ Compiling from source
 clair
 -----
 
-#. Download the source code of the latest stable version by cloning the ``c2py`` repository from GitHub::
+#. Download the source code of the latest stable version by cloning the ``clair`` repository from GitHub::
 
      $ git clone https://github.com/flatironinstitute/clair clair.src
 
-#. If you want a particular version, check it out, e.g. (use `git tag` go to see the available version)::
+#. [Optional] If you want a particular version, check it out, e.g. (use `git tag` go to see the available version)::
 
-     $ git checkout 1.1.0
+     $ git checkout v0.1
 
 #. Call cmake, including any additional custom CMake options, see below::
 
-     $ cmake -B clair.build -S clair.src -DCMAKE_INSTALL_PREFIX=path_to_install_dir 
+     $ cmake -B clair.build -S clair.src -DCMAKE_INSTALL_PREFIX=path_to_clair_install_dir 
 
 #. Compile the code, run the tests and install the application (here with 8 cores, change accordingly)::
 
+     $ cd clair.build
      $ make -j 8
      $ ctest -j 8
      $ make -j 8 install
@@ -47,41 +48,41 @@ To install ``c2py``, follow the same procedure as for ``clair``, replacing ``cla
 
      $ git clone https://github.com/flatironinstitute/c2py c2py.src
 
-#. If you want a particular version, check it out, e.g. (use `git tag` go to see the available version)::
+#. [Optional] If you want a particular version, check it out, e.g. (use `git tag` go to see the available version)::
 
-     $ git checkout 1.1.0
+     $ git checkout v0.1
 
 #. Call cmake, including any additional custom CMake options, see below::
 
-     $ cmake -B c2py.build -S c2py.src -DCMAKE_INSTALL_PREFIX=path_to_install_dir 
+     $ cmake -B c2py.build -S c2py.src -DCMAKE_INSTALL_PREFIX=path_to_c2py_install_dir 
 
 #. Compile the code, run the tests and install the application (here with 8 cores, change accordingly)::
 
+     $ cd clair.build
      $ make -j 8
      $ ctest -j 8
      $ make -j 8 install
 
+CMake options
+.............
 
-Set environment variables
--------------------------
-
-To the proper paths into your current shell environment with::
-
-     $ source path_to_install_dir/share/clair/clairvars.sh
-     $ source path_to_install_dir/share/c2py/c2pyvars.sh
-
-
-Custom CMake options
---------------------
-
-The compilation of ``clair`` can be configured using CMake-options::
+The following CMake-options are available for ``clair``::
 
     cmake ...  -DOPTION1=value1 -DOPTION2=value2
 
 +-----------------------------------------------------------------+-----------------------------------------------+
 | Options                                                         | Syntax                                        |
 +=================================================================+===============================================+
-| Specify an installation path                                    | -DCMAKE_INSTALL_PREFIX=path_to_clair          |
-+-----------------------------------------------------------------+-----------------------------------------------+
 | Build the documentation                                         | -DBuild_Documentation=ON                      |
 +-----------------------------------------------------------------+-----------------------------------------------+
+
+
+Set environment variables
+-------------------------
+
+To load the proper paths into your current shell environment with::
+
+     $ source path_to_clair_install_dir/share/clair/clairvars.sh
+     $ source path_to_c2py_install_dir/share/c2py/c2pyvars.sh
+
+

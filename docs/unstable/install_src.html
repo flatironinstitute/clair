@@ -7,11 +7,14 @@
   <title>Compiling from source &mdash; clair - Automatic Python/C++ bindings  documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
   
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -41,14 +44,19 @@
               <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="install.html">Installation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="install_packages.html">Packages</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="install_packages.html#os-x-brew">OS X (brew)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install_packages.html#os-x-brew">OS X (brew)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="install_packages.html#uninstalling">Uninstalling</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Compiling from source</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#clair">clair</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#c2py">c2py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#c2py">c2py</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#cmake-options">CMake options</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#set-environment-variables">Set environment variables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#custom-cmake-options">Custom CMake options</a></li>
 </ul>
 </li>
 </ul>
@@ -155,23 +163,24 @@ cf CMake section.</p>
 <section id="clair">
 <h2>clair<a class="headerlink" href="#clair" title="Permalink to this headline"></a></h2>
 <ol class="arabic">
-<li><p>Download the source code of the latest stable version by cloning the <code class="docutils literal notranslate"><span class="pre">c2py</span></code> repository from GitHub:</p>
+<li><p>Download the source code of the latest stable version by cloning the <code class="docutils literal notranslate"><span class="pre">clair</span></code> repository from GitHub:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/flatironinstitute/clair clair.src
 </pre></div>
 </div>
 </li>
-<li><p>If you want a particular version, check it out, e.g. (use <cite>git tag</cite> go to see the available version):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git checkout <span class="m">1</span>.1.0
+<li><p>[Optional] If you want a particular version, check it out, e.g. (use <cite>git tag</cite> go to see the available version):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git checkout v0.1
 </pre></div>
 </div>
 </li>
 <li><p>Call cmake, including any additional custom CMake options, see below:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ cmake -B clair.build -S clair.src -DCMAKE_INSTALL_PREFIX<span class="o">=</span>path_to_install_dir
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ cmake -B clair.build -S clair.src -DCMAKE_INSTALL_PREFIX<span class="o">=</span>path_to_clair_install_dir
 </pre></div>
 </div>
 </li>
 <li><p>Compile the code, run the tests and install the application (here with 8 cores, change accordingly):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ make -j <span class="m">8</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> clair.build
+$ make -j <span class="m">8</span>
 $ ctest -j <span class="m">8</span>
 $ make -j <span class="m">8</span> install
 </pre></div>
@@ -192,36 +201,28 @@ $ make -j <span class="m">8</span> install
 </pre></div>
 </div>
 </li>
-<li><p>If you want a particular version, check it out, e.g. (use <cite>git tag</cite> go to see the available version):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git checkout <span class="m">1</span>.1.0
+<li><p>[Optional] If you want a particular version, check it out, e.g. (use <cite>git tag</cite> go to see the available version):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git checkout v0.1
 </pre></div>
 </div>
 </li>
 <li><p>Call cmake, including any additional custom CMake options, see below:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ cmake -B c2py.build -S c2py.src -DCMAKE_INSTALL_PREFIX<span class="o">=</span>path_to_install_dir
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ cmake -B c2py.build -S c2py.src -DCMAKE_INSTALL_PREFIX<span class="o">=</span>path_to_c2py_install_dir
 </pre></div>
 </div>
 </li>
 <li><p>Compile the code, run the tests and install the application (here with 8 cores, change accordingly):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ make -j <span class="m">8</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> clair.build
+$ make -j <span class="m">8</span>
 $ ctest -j <span class="m">8</span>
 $ make -j <span class="m">8</span> install
 </pre></div>
 </div>
 </li>
 </ol>
-</section>
-<section id="set-environment-variables">
-<h2>Set environment variables<a class="headerlink" href="#set-environment-variables" title="Permalink to this headline"></a></h2>
-<p>To the proper paths into your current shell environment with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">source</span> path_to_install_dir/share/clair/clairvars.sh
-$ <span class="nb">source</span> path_to_install_dir/share/c2py/c2pyvars.sh
-</pre></div>
-</div>
-</section>
-<section id="custom-cmake-options">
-<h2>Custom CMake options<a class="headerlink" href="#custom-cmake-options" title="Permalink to this headline"></a></h2>
-<p>The compilation of <code class="docutils literal notranslate"><span class="pre">clair</span></code> can be configured using CMake-options:</p>
+<section id="cmake-options">
+<h3>CMake options<a class="headerlink" href="#cmake-options" title="Permalink to this headline"></a></h3>
+<p>The following CMake-options are available for <code class="docutils literal notranslate"><span class="pre">clair</span></code>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake ...  -DOPTION1<span class="o">=</span>value1 -DOPTION2<span class="o">=</span>value2
 </pre></div>
 </div>
@@ -236,14 +237,20 @@ $ <span class="nb">source</span> path_to_install_dir/share/c2py/c2pyvars.sh
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>Specify an installation path</p></td>
-<td><p>-DCMAKE_INSTALL_PREFIX=path_to_clair</p></td>
-</tr>
-<tr class="row-odd"><td><p>Build the documentation</p></td>
+<tr class="row-even"><td><p>Build the documentation</p></td>
 <td><p>-DBuild_Documentation=ON</p></td>
 </tr>
 </tbody>
 </table>
+</section>
+</section>
+<section id="set-environment-variables">
+<h2>Set environment variables<a class="headerlink" href="#set-environment-variables" title="Permalink to this headline"></a></h2>
+<p>To load the proper paths into your current shell environment with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">source</span> path_to_clair_install_dir/share/clair/clairvars.sh
+$ <span class="nb">source</span> path_to_c2py_install_dir/share/c2py/c2pyvars.sh
+</pre></div>
+</div>
 </section>
 </section>
 

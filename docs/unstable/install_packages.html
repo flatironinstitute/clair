@@ -7,11 +7,14 @@
   <title>Packages &mdash; clair - Automatic Python/C++ bindings  documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
   
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -41,14 +44,19 @@
               <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="install.html">Installation</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Packages</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#os-x-brew">OS X (brew)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#os-x-brew">OS X (brew)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#uninstalling">Uninstalling</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="install_src.html">Compiling from source</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="install_src.html#clair">clair</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install_src.html#c2py">c2py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install_src.html#c2py">c2py</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="install_src.html#cmake-options">CMake options</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="install_src.html#set-environment-variables">Set environment variables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install_src.html#custom-cmake-options">Custom CMake options</a></li>
 </ul>
 </li>
 </ul>
@@ -155,12 +163,22 @@
 <p>They are built from source from the GitHub parcollet/ccq repository.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The DYLD_LIBRARY_PATH must be set e.g.:</p>
+<p>To use the plugin as in the example below,
+the DYLD_LIBRARY_PATH must be set e.g.:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span>/opt/homebrew/lib/:<span class="nv">$DYLD_LIBRARY_PATH</span>
 </pre></div>
 </div>
-<p>for clang to find its plugins in brew directory as in the documentation examples.</p>
+<p>for clang to find its plugins in brew directory as in the documentation examples.
+Alternatively, you can provide the full path to the plugin.
+This setup is not necessary to use the CMake targets.</p>
 </div>
+<section id="uninstalling">
+<h3>Uninstalling<a class="headerlink" href="#uninstalling" title="Permalink to this headline"></a></h3>
+<p>In order to uninstall all formulas from the <cite>parcollet/ccq</cite> tap, you can use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>brew uninstall <span class="sb">`</span>brew list --full-name -1<span class="p">|</span>grep ccq<span class="sb">`</span>
+</pre></div>
+</div>
+</section>
 </section>
 </section>
 

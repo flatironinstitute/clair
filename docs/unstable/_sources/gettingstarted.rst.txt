@@ -10,7 +10,6 @@ Let us begin with a simple example in file `my_module.cpp`.
 
 .. literalinclude:: examples/gs1.cpp
    :language: cpp
-   :linenos:
 
 We just compile the C++ file with `clang` using the ``clair`` plugin as 
 
@@ -22,7 +21,10 @@ We just compile the C++ file with `clang` using the ``clair`` plugin as
    # Linux
    clang++ -fplugin=clair_c2py.so     my_module.cpp -std=c++20 -shared -o my_module.so `c2py_flags`
 
+.. note::
 
+   The compiler search for the plugin in DYLD_LIBRARY_PATH (OS X) or LD_LIBRARY_PATH (linux).
+ 
 That is it. The Python module is ready to use:
 
 .. code-block:: console
@@ -63,31 +65,32 @@ What happened ?
 ................
 
 In order to call C++ from Python, some **binding code** has to be generated.
-It is a piece of C++ code which "adapt" the C++ functions and classes to the C API of Python.
+It is a piece of C++ code which *adapts* the C++ functions and classes to the C API of Python.
 
 The ``clair_c2py``  **compiler plugin** automatizes this task, by modifying the compilation process of LLVM/clang:
-when compiling the C++ code `my_module.cpp`, it:
+when compiling the C++ code `my_module.cpp` with it, the compiler:
 
-#. parses `my_module.cpp` (the first step of compilation, checking syntax, grammar, ...).
-#. generates the C++/Python bindings write them into `my_module.wrap.cxx`.
-#. compiles the whole into a Python module `my_module.so`.
+#. parses `my_module.cpp` as usual (the first step of a compilation: check syntax and grammar, build the Abstract Syntax Tree or AST).
+#. generates the C++/Python bindings (by analyzing the AST) and write them into `my_module.wrap.cxx`.
+#. compiles the whole code (source + bindings) into a Python module `my_module.so`.
 
 Reusing the bindings without clang
 ..................................
 
 While the generation of the bindings requires  LLVM/clang and the clair plugin, 
-they can reused with any `C++20` compiler. For example, with ``gcc``.
+they can reused with any `C++20` compiler. For example, with ``gcc``:
 
 .. code-block:: bash
 
    g++  my_module.wrap.cxx -std=c++20 -shared -o my_module.so `c2py_flags`
 
 
-(the bindings automatically include the original source file `my_module.cpp`).
+(the binding file includes the original source file `my_module.cpp`).
 
 .. note::
 
-   On some machines (OS X), check that this c2py has been compiled with gcc too.
+   On some machines (OS X), beware that c2py must be compiled with gcc (in particular the same std C++ library).
+   For any project beyond a simple demo, it is recommended to use CMake setup, Cf :ref:`cmake`.
 
 A typical workflow is therefore:
 

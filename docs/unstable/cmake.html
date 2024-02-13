@@ -7,11 +7,14 @@
   <title>CMake integration &mdash; clair - Automatic Python/C++ bindings  documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
   
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -41,14 +44,19 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="install_packages.html">Packages</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="install_packages.html#os-x-brew">OS X (brew)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install_packages.html#os-x-brew">OS X (brew)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="install_packages.html#uninstalling">Uninstalling</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="install_src.html">Compiling from source</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="install_src.html#clair">clair</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install_src.html#c2py">c2py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install_src.html#c2py">c2py</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="install_src.html#cmake-options">CMake options</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="install_src.html#set-environment-variables">Set environment variables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install_src.html#custom-cmake-options">Custom CMake options</a></li>
 </ul>
 </li>
 </ul>
@@ -231,9 +239,8 @@ and basically an <cite>if</cite> expression in CMake.</p>
 <section id="a-variant-avoiding-the-installation-of-c2py">
 <h2>A variant avoiding the installation of c2py<a class="headerlink" href="#a-variant-avoiding-the-installation-of-c2py" title="Permalink to this headline"></a></h2>
 <p>It is often convenient to avoid the need to install the <cite>c2py</cite> library completely.
-As <cite>c2py</cite> is a very small library, the cost of recompiling it on the fly is negligeable,
-but it is often a good strategy to ensure it is compiled with the same compilers, standard libraries etc.
-(it is the recommended strategy for e.g. Google Test).</p>
+As <cite>c2py</cite> is a very small library, the cost of recompiling it in each project is negligeable,
+but it is often a good strategy to ensure it is compiled with the same compilers, standard libraries, etc.</p>
 <p>In order to do this, we can simply modify the <cite>CMakeLists.txt</cite> file as</p>
 <div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.20</span><span class="w"> </span><span class="s">FATAL_ERROR</span><span class="p">)</span>
 <span class="linenos"> 2</span><span class="nb">project</span><span class="p">(</span><span class="s">clairexample</span><span class="w"> </span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.2.0</span><span class="w"> </span><span class="s">LANGUAGES</span><span class="w"> </span><span class="s">C</span><span class="w"> </span><span class="s">CXX</span><span class="p">)</span>

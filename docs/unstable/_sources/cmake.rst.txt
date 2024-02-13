@@ -60,10 +60,9 @@ We introduce an option `GENERATE_PYTHON_BINDINGS` so that the code can not be us
 A variant avoiding the installation of c2py
 ...........................................
 
-It is often convenient to avoid the need to install the `c2py` library completely.
-As `c2py` is a very small library, the cost of recompiling it on the fly is negligeable, 
-but it is often a good strategy to ensure it is compiled with the same compilers, standard libraries etc.
-(it is the recommended strategy for e.g. Google Test).
+It is often convenient to avoid the need to install the `c2py` library completely. 
+As `c2py` is a very small library, the cost of recompiling it in each project is negligeable, 
+but it is often a good strategy to ensure it is compiled with the same compilers, standard libraries, etc.
 
 In order to do this, we can simply modify the `CMakeLists.txt` file as 
 

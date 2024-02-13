@@ -7,11 +7,14 @@
   <title>Getting started &mdash; clair - Automatic Python/C++ bindings  documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
   
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -41,14 +44,19 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="install_packages.html">Packages</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="install_packages.html#os-x-brew">OS X (brew)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install_packages.html#os-x-brew">OS X (brew)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="install_packages.html#uninstalling">Uninstalling</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="install_src.html">Compiling from source</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="install_src.html#clair">clair</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install_src.html#c2py">c2py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install_src.html#c2py">c2py</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="install_src.html#cmake-options">CMake options</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="install_src.html#set-environment-variables">Set environment variables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install_src.html#custom-cmake-options">Custom CMake options</a></li>
 </ul>
 </li>
 </ul>
@@ -148,15 +156,15 @@
 <section id="starting-example">
 <h2>Starting example<a class="headerlink" href="#starting-example" title="Permalink to this headline"></a></h2>
 <p>Let us begin with a simple example in file <cite>my_module.cpp</cite>.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span><span class="cp"></span>
-<span class="linenos">2</span>
-<span class="linenos">3</span><span class="cm">/** Some documentation</span>
-<span class="linenos">4</span><span class="cm"> *</span>
-<span class="linenos">5</span><span class="cm"> *  @param x First value</span>
-<span class="linenos">6</span><span class="cm"> *  @param y Second value</span>
-<span class="linenos">7</span><span class="cm"> *  @return The result</span>
-<span class="linenos">8</span><span class="cm"> */</span><span class="w"></span>
-<span class="linenos">9</span><span class="kt">int</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">y</span><span class="p">;}</span><span class="w"></span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span><span class="cp"></span>
+
+<span class="cm">/** Some documentation</span>
+<span class="cm"> *</span>
+<span class="cm"> *  @param x First value</span>
+<span class="cm"> *  @param y Second value</span>
+<span class="cm"> *  @return The result</span>
+<span class="cm"> */</span><span class="w"></span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">y</span><span class="p">;}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>We just compile the C++ file with <cite>clang</cite> using the <code class="docutils literal notranslate"><span class="pre">clair</span></code> plugin as</p>
@@ -166,6 +174,10 @@ clang++ -fplugin<span class="o">=</span>clair_c2py.dylib  my_module.cpp -std<spa
 <span class="c1"># Linux</span>
 clang++ -fplugin<span class="o">=</span>clair_c2py.so     my_module.cpp -std<span class="o">=</span>c++20 -shared -o my_module.so <span class="sb">`</span>c2py_flags<span class="sb">`</span>
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The compiler search for the plugin in DYLD_LIBRARY_PATH (OS X) or LD_LIBRARY_PATH (linux).</p>
 </div>
 <p>That is it. The Python module is ready to use:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt; import my_module as M</span>
@@ -200,26 +212,27 @@ by the clang compiler.</p>
 <section id="what-happened">
 <h3>What happened ?<a class="headerlink" href="#what-happened" title="Permalink to this headline"></a></h3>
 <p>In order to call C++ from Python, some <strong>binding code</strong> has to be generated.
-It is a piece of C++ code which “adapt” the C++ functions and classes to the C API of Python.</p>
+It is a piece of C++ code which <em>adapts</em> the C++ functions and classes to the C API of Python.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">clair_c2py</span></code>  <strong>compiler plugin</strong> automatizes this task, by modifying the compilation process of LLVM/clang:
-when compiling the C++ code <cite>my_module.cpp</cite>, it:</p>
+when compiling the C++ code <cite>my_module.cpp</cite> with it, the compiler:</p>
 <ol class="arabic simple">
-<li><p>parses <cite>my_module.cpp</cite> (the first step of compilation, checking syntax, grammar, …).</p></li>
-<li><p>generates the C++/Python bindings write them into <cite>my_module.wrap.cxx</cite>.</p></li>
-<li><p>compiles the whole into a Python module <cite>my_module.so</cite>.</p></li>
+<li><p>parses <cite>my_module.cpp</cite> as usual (the first step of a compilation: check syntax and grammar, build the Abstract Syntax Tree or AST).</p></li>
+<li><p>generates the C++/Python bindings (by analyzing the AST) and write them into <cite>my_module.wrap.cxx</cite>.</p></li>
+<li><p>compiles the whole code (source + bindings) into a Python module <cite>my_module.so</cite>.</p></li>
 </ol>
 </section>
 <section id="reusing-the-bindings-without-clang">
 <h3>Reusing the bindings without clang<a class="headerlink" href="#reusing-the-bindings-without-clang" title="Permalink to this headline"></a></h3>
 <p>While the generation of the bindings requires  LLVM/clang and the clair plugin,
-they can reused with any <cite>C++20</cite> compiler. For example, with <code class="docutils literal notranslate"><span class="pre">gcc</span></code>.</p>
+they can reused with any <cite>C++20</cite> compiler. For example, with <code class="docutils literal notranslate"><span class="pre">gcc</span></code>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g++  my_module.wrap.cxx -std<span class="o">=</span>c++20 -shared -o my_module.so <span class="sb">`</span>c2py_flags<span class="sb">`</span>
 </pre></div>
 </div>
-<p>(the bindings automatically include the original source file <cite>my_module.cpp</cite>).</p>
+<p>(the binding file includes the original source file <cite>my_module.cpp</cite>).</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>On some machines (OS X), check that this c2py has been compiled with gcc too.</p>
+<p>On some machines (OS X), beware that c2py must be compiled with gcc (in particular the same std C++ library).
+For any project beyond a simple demo, it is recommended to use CMake setup, Cf <a class="reference internal" href="cmake.html#cmake"><span class="std std-ref">CMake integration</span></a>.</p>
 </div>
 <p>A typical workflow is therefore:</p>
 <ul class="simple">

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Function &mdash; clair - Automatic Python/C++ bindings  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Classes" href="classes.html" />
+    <link rel="prev" title="API of the c2py_module" href="api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7E588A" >
+            <a href="../index.html" class="icon icon-home"> clair - Automatic Python/C++ bindings
+          </a>
+              <div class="version">
+                0.1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../install_packages.html">Packages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../install_packages.html#os-x-brew">OS X (brew)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../install_src.html">Compiling from source</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../install_src.html#clair">clair</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../install_src.html#c2py">c2py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../install_src.html#set-environment-variables">Set environment variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../install_src.html#custom-cmake-options">Custom CMake options</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted.html">Getting started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../gettingstarted.html#starting-example">Starting example</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../gettingstarted.html#what-happened">What happened ?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../gettingstarted.html#reusing-the-bindings-without-clang">Reusing the bindings without clang</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../cmake.html">CMake integration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../cmake.html#compiling-with-clang-and-the-clair-plugin">Compiling with clang and the clair plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cmake.html#a-more-general-setup">A more general setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cmake.html#a-variant-avoiding-the-installation-of-c2py">A variant avoiding the installation of c2py</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#function">Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#classes">Classes</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../reference.html">Reference documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="customize.html">Customization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="customize.html#code-annotations">Code annotations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="customize.html#filters">Filters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="customize.html#template-instantiation-explicitly-wrapping-a-function">Template instantiation. Explicitly wrapping a function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="customize.html#class-template-instantiation">Class template instantiation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="customize.html#modifying-classes">Modifying classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="customize.html#misc">Misc</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html">API of the c2py_module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#type-convertion">Type convertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamical-dispatch">Dynamical dispatch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#template-functions">Template functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="classes.html">Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="classes.html#constructors">Constructors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="classes.html#methods">Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="classes.html#static-methods">Static Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="classes.html#operator">Operator()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="classes.html#id1">Operator[]</a></li>
+<li class="toctree-l3"><a class="reference internal" href="classes.html#iterable-object">Iterable object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="classes.html#str-and-repr">str and repr</a></li>
+<li class="toctree-l3"><a class="reference internal" href="classes.html#copy">Copy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="classes.html#operators">Operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="classes.html#hdf5">hdf5</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="enums.html">Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="converters.html">Converters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="converters.html#default-converters">Default converters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="converters.html#py-converter">py_converter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="converters.html#a-case-example-nda">A case example: nda</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../notebook.html">Notebook integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../issues.html">Reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ChangeLog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About clair/c2py</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7E588A" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">clair - Automatic Python/C++ bindings</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../reference.html">Reference documentation</a> &raquo;</li>
+      <li>Function</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/reference/fnt_basic.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="function">
+<span id="fntref"></span><h1>Function<a class="headerlink" href="#function" title="Permalink to this headline"></a></h1>
+<section id="type-convertion">
+<h2>Type convertion<a class="headerlink" href="#type-convertion" title="Permalink to this headline"></a></h2>
+<p>Python and C++ types are different.
+For example, a <code class="docutils literal notranslate"><span class="pre">long</span></code> in C++ is converted from/to a Python integer.
+In order to call a C++ function from Python, it is necessary to:</p>
+<ul class="simple">
+<li><p>convert its arguments to C++</p></li>
+<li><p>call it</p></li>
+<li><p>convert its return value to Python</p></li>
+</ul>
+<p>Hence, only functions whose arguments and return value are of <strong>convertible types</strong> can be called across languages.
+Clair will report a compilation error for any attempt to wrap a function with at an inconvertible type.</p>
+</section>
+<section id="dynamical-dispatch">
+<h2>Dynamical dispatch<a class="headerlink" href="#dynamical-dispatch" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>In C++, objects are statically typed (one variable has one type fixed at compilation), and functions can be overloaded.</p></li>
+<li><p>In Python, objects are dynamically typed, and there is no overload.</p></li>
+</ul>
+<p>As a result, several functions in C++ will typically be gathered into one Python function.</p>
+<p>When the Python function is called, the number and types of its arguments are analyzed (at runtime),
+and the first C++ function for which the Python arguments can be converted to the C++ type is called.
+If none applies, a Python exception is raised.</p>
+<p>Let us illustrate this with a simple example.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span><span class="cp"></span>
+<span class="linenos">2</span>
+<span class="linenos">3</span><span class="kt">int</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">x</span><span class="p">;}</span><span class="w"></span>
+<span class="linenos">4</span><span class="kt">int</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">y</span><span class="p">;}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The compiler reports:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">-- Function: f</span>
+<span class="go">--         . f(int x)</span>
+<span class="go">--         . f(int x, int y)</span>
+</pre></div>
+</div>
+<p>meaning that the two overloads of <code class="docutils literal notranslate"><span class="pre">f</span></code> are “gathered” in one Python function <code class="docutils literal notranslate"><span class="pre">f</span></code>.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt; import fun1 as M</span>
+<span class="go">&gt;&gt;&gt; M.f(1)</span>
+<span class="go">-1</span>
+<span class="go">&gt;&gt;&gt; M.f(1,2)</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+<p>If no dispatch is possible for the arguments given, c2py reports a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>, e.g.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go"> &gt;&gt;&gt; M.f(1,2,3)</span>
+<span class="go">Traceback (most recent call last):</span>
+<span class="go">  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;</span>
+<span class="go">TypeError: [c2py] Can not call the function with the arguments</span>
+<span class="go">  - (1, 2, 3)</span>
+<span class="go">The dispatch to C++ failed with the following error(s):</span>
+<span class="go">[1] (x: int, y: int) -&gt; int</span>
+<span class="go">    Too many arguments. Expected at most 2 and got 3</span>
+<span class="go">[2] (x: int) -&gt; int</span>
+<span class="go">    Too many arguments. Expected at most 1 and got 3</span>
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go"> &gt;&gt;&gt; M.f(&quot;abc&quot;)</span>
+<span class="go">Traceback (most recent call last):</span>
+<span class="go">  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;</span>
+<span class="go">TypeError: [c2py] Can not call the function with the arguments</span>
+<span class="go">  - (&#39;abc&#39;,)</span>
+<span class="go">The dispatch to C++ failed with the following error(s):</span>
+<span class="go">[1] (x: int) -&gt; int</span>
+<span class="go">    x: Cannot convert abc to integer type</span>
+<span class="go">[2] (x: int, y: int) -&gt; int</span>
+<span class="go">    Too few arguments. Expected at least 2 and got 1</span>
+</pre></div>
+</div>
+</section>
+<section id="template-functions">
+<h2>Template functions<a class="headerlink" href="#template-functions" title="Permalink to this headline"></a></h2>
+<p>The instantiation of generic function in discussed in <a class="reference internal" href="customize.html#customize"><span class="std std-ref">Customization</span></a>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api.html" class="btn btn-neutral float-left" title="API of the c2py_module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="classes.html" class="btn btn-neutral float-right" title="Classes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, The Simons Foundation, author: O. Parcollet.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

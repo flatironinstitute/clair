@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting started &mdash; clair - Automatic Python/C++ bindings  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="CMake integration" href="cmake.html" />
+    <link rel="prev" title="Compiling from source" href="install_src.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7E588A" >
+            <a href="index.html" class="icon icon-home"> clair - Automatic Python/C++ bindings
+          </a>
+              <div class="version">
+                0.1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install_packages.html">Packages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install_packages.html#os-x-brew">OS X (brew)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="install_src.html">Compiling from source</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install_src.html#clair">clair</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install_src.html#c2py">c2py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install_src.html#set-environment-variables">Set environment variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install_src.html#custom-cmake-options">Custom CMake options</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#starting-example">Starting example</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#what-happened">What happened ?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reusing-the-bindings-without-clang">Reusing the bindings without clang</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cmake.html">CMake integration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cmake.html#compiling-with-clang-and-the-clair-plugin">Compiling with clang and the clair plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmake.html#a-more-general-setup">A more general setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmake.html#a-variant-avoiding-the-installation-of-c2py">A variant avoiding the installation of c2py</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#function">Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#classes">Classes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/customize.html">Customization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/customize.html#code-annotations">Code annotations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/customize.html#filters">Filters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/customize.html#template-instantiation-explicitly-wrapping-a-function">Template instantiation. Explicitly wrapping a function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/customize.html#class-template-instantiation">Class template instantiation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/customize.html#modifying-classes">Modifying classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/customize.html#misc">Misc</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="reference/api.html">API of the c2py_module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reference/fnt_basic.html">Function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/fnt_basic.html#type-convertion">Type convertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/fnt_basic.html#dynamical-dispatch">Dynamical dispatch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/fnt_basic.html#template-functions">Template functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reference/classes.html">Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/classes.html#constructors">Constructors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/classes.html#methods">Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/classes.html#static-methods">Static Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/classes.html#operator">Operator()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/classes.html#id1">Operator[]</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/classes.html#iterable-object">Iterable object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/classes.html#str-and-repr">str and repr</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/classes.html#copy">Copy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/classes.html#operators">Operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/classes.html#hdf5">hdf5</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reference/enums.html">Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/converters.html">Converters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/converters.html#default-converters">Default converters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/converters.html#py-converter">py_converter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/converters.html#a-case-example-nda">A case example: nda</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="notebook.html">Notebook integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="issues.html">Reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ChangeLog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About clair/c2py</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7E588A" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">clair - Automatic Python/C++ bindings</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Getting started</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/gettingstarted.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="getting-started">
+<span id="gettingstarted"></span><h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline"></a></h1>
+<section id="starting-example">
+<h2>Starting example<a class="headerlink" href="#starting-example" title="Permalink to this headline"></a></h2>
+<p>Let us begin with a simple example in file <cite>my_module.cpp</cite>.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span><span class="cp"></span>
+<span class="linenos">2</span>
+<span class="linenos">3</span><span class="cm">/** Some documentation</span>
+<span class="linenos">4</span><span class="cm"> *</span>
+<span class="linenos">5</span><span class="cm"> *  @param x First value</span>
+<span class="linenos">6</span><span class="cm"> *  @param y Second value</span>
+<span class="linenos">7</span><span class="cm"> *  @return The result</span>
+<span class="linenos">8</span><span class="cm"> */</span><span class="w"></span>
+<span class="linenos">9</span><span class="kt">int</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">y</span><span class="p">;}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>We just compile the C++ file with <cite>clang</cite> using the <code class="docutils literal notranslate"><span class="pre">clair</span></code> plugin as</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># OS X</span>
+clang++ -fplugin<span class="o">=</span>clair_c2py.dylib  my_module.cpp -std<span class="o">=</span>c++20 -shared -o my_module.so <span class="sb">`</span>c2py_flags<span class="sb">`</span>
+
+<span class="c1"># Linux</span>
+clang++ -fplugin<span class="o">=</span>clair_c2py.so     my_module.cpp -std<span class="o">=</span>c++20 -shared -o my_module.so <span class="sb">`</span>c2py_flags<span class="sb">`</span>
+</pre></div>
+</div>
+<p>That is it. The Python module is ready to use:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt; import my_module as M</span>
+<span class="go">&gt;&gt;&gt; M.add(1,2)</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+<p>The generation (and compilation) of the C++/Python binding code is <strong>automatically done</strong>
+by the clang compiler.</p>
+<p>The documentation is also automatically transformed in standard <cite>numpydoc</cite> format.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt; help(M.add)</span>
+<span class="go">    add(...)</span>
+<span class="go">        Dispatched C++ function</span>
+<span class="go">        [1]  (x: int, y: int) -&gt; int</span>
+
+<span class="go">           Some documentation</span>
+
+<span class="go">           Parameters</span>
+<span class="go">           ----------</span>
+
+<span class="go">           x:</span>
+<span class="go">              First value</span>
+<span class="go">           y:</span>
+<span class="go">              Second value</span>
+
+<span class="go">           Returns</span>
+<span class="go">           -------</span>
+
+<span class="go">           The result</span>
+</pre></div>
+</div>
+<section id="what-happened">
+<h3>What happened ?<a class="headerlink" href="#what-happened" title="Permalink to this headline"></a></h3>
+<p>In order to call C++ from Python, some <strong>binding code</strong> has to be generated.
+It is a piece of C++ code which “adapt” the C++ functions and classes to the C API of Python.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">clair_c2py</span></code>  <strong>compiler plugin</strong> automatizes this task, by modifying the compilation process of LLVM/clang:
+when compiling the C++ code <cite>my_module.cpp</cite>, it:</p>
+<ol class="arabic simple">
+<li><p>parses <cite>my_module.cpp</cite> (the first step of compilation, checking syntax, grammar, …).</p></li>
+<li><p>generates the C++/Python bindings write them into <cite>my_module.wrap.cxx</cite>.</p></li>
+<li><p>compiles the whole into a Python module <cite>my_module.so</cite>.</p></li>
+</ol>
+</section>
+<section id="reusing-the-bindings-without-clang">
+<h3>Reusing the bindings without clang<a class="headerlink" href="#reusing-the-bindings-without-clang" title="Permalink to this headline"></a></h3>
+<p>While the generation of the bindings requires  LLVM/clang and the clair plugin,
+they can reused with any <cite>C++20</cite> compiler. For example, with <code class="docutils literal notranslate"><span class="pre">gcc</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g++  my_module.wrap.cxx -std<span class="o">=</span>c++20 -shared -o my_module.so <span class="sb">`</span>c2py_flags<span class="sb">`</span>
+</pre></div>
+</div>
+<p>(the bindings automatically include the original source file <cite>my_module.cpp</cite>).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>On some machines (OS X), check that this c2py has been compiled with gcc too.</p>
+</div>
+<p>A typical workflow is therefore:</p>
+<ul class="simple">
+<li><p>As the developer of the code, use clang with the <code class="docutils literal notranslate"><span class="pre">clair</span></code> plugin. Bindings are automatically regenerated when the C++ API change.</p></li>
+<li><p>As a user of the code, just compile the bindings on any machine/compiler.</p></li>
+</ul>
+<p>Examples of CMake integration are provided in <a class="reference internal" href="cmake.html#cmake"><span class="std std-ref">CMake integration</span></a>,
+including an example with a simple option to regenerate the bindings or not.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Even though the bindings are readable C++ code, they are designed to be automatically generated, not written by hand.
+The c2py API is therefore not part of the user documentation.</p>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="install_src.html" class="btn btn-neutral float-left" title="Compiling from source" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cmake.html" class="btn btn-neutral float-right" title="CMake integration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, The Simons Foundation, author: O. Parcollet.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

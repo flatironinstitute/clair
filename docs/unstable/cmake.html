@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CMake integration &mdash; clair - Automatic Python/C++ bindings  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="prev" title="Getting started" href="gettingstarted.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7E588A" >
+            <a href="index.html" class="icon icon-home"> clair - Automatic Python/C++ bindings
+          </a>
+              <div class="version">
+                0.1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install_packages.html">Packages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install_packages.html#os-x-brew">OS X (brew)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="install_src.html">Compiling from source</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install_src.html#clair">clair</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install_src.html#c2py">c2py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install_src.html#set-environment-variables">Set environment variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install_src.html#custom-cmake-options">Custom CMake options</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gettingstarted.html">Getting started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#starting-example">Starting example</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gettingstarted.html#what-happened">What happened ?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gettingstarted.html#reusing-the-bindings-without-clang">Reusing the bindings without clang</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">CMake integration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#compiling-with-clang-and-the-clair-plugin">Compiling with clang and the clair plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#a-more-general-setup">A more general setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#a-variant-avoiding-the-installation-of-c2py">A variant avoiding the installation of c2py</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#function">Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#classes">Classes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/customize.html">Customization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/customize.html#code-annotations">Code annotations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/customize.html#filters">Filters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/customize.html#template-instantiation-explicitly-wrapping-a-function">Template instantiation. Explicitly wrapping a function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/customize.html#class-template-instantiation">Class template instantiation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/customize.html#modifying-classes">Modifying classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/customize.html#misc">Misc</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="reference/api.html">API of the c2py_module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reference/fnt_basic.html">Function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/fnt_basic.html#type-convertion">Type convertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/fnt_basic.html#dynamical-dispatch">Dynamical dispatch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/fnt_basic.html#template-functions">Template functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reference/classes.html">Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/classes.html#constructors">Constructors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/classes.html#methods">Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/classes.html#static-methods">Static Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/classes.html#operator">Operator()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/classes.html#id1">Operator[]</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/classes.html#iterable-object">Iterable object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/classes.html#str-and-repr">str and repr</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/classes.html#copy">Copy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/classes.html#operators">Operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/classes.html#hdf5">hdf5</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reference/enums.html">Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/converters.html">Converters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/converters.html#default-converters">Default converters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/converters.html#py-converter">py_converter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/converters.html#a-case-example-nda">A case example: nda</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="notebook.html">Notebook integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="issues.html">Reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ChangeLog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About clair/c2py</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7E588A" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">clair - Automatic Python/C++ bindings</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>CMake integration</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cmake.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cmake-integration">
+<span id="cmake"></span><h1>CMake integration<a class="headerlink" href="#cmake-integration" title="Permalink to this headline"></a></h1>
+<p>Let us consider a simple piece of C++ code and a <cite>CMakeLists</cite> file to compile it.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;c2py/c2py.hpp&quot;</span><span class="cp"></span>
+<span class="linenos">2</span>
+<span class="linenos">3</span><span class="c1">/// A wonderful little class</span>
+<span class="linenos">4</span><span class="k">class</span><span class="w"> </span><span class="nc">my_class</span><span class="p">{</span><span class="w"></span>
+<span class="linenos">5</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">6</span><span class="w">  </span><span class="k">public</span><span class="o">:</span><span class="w"></span>
+<span class="linenos">7</span><span class="w">    </span><span class="n">my_class</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a_</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b_</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">a</span><span class="p">(</span><span class="n">a_</span><span class="p">),</span><span class="w"> </span><span class="n">b</span><span class="p">(</span><span class="n">b_</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span><span class="w"></span>
+<span class="linenos">8</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">u</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">u</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">;}</span><span class="w"></span>
+<span class="linenos">9</span><span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+<section id="compiling-with-clang-and-the-clair-plugin">
+<h2>Compiling with clang and the clair plugin<a class="headerlink" href="#compiling-with-clang-and-the-clair-plugin" title="Permalink to this headline"></a></h2>
+<p>To use the clair plugin, we can use the following <cite>CMakeLists.txt</cite> file</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.20</span><span class="w"> </span><span class="s">FATAL_ERROR</span><span class="p">)</span>
+<span class="linenos"> 2</span><span class="nb">project</span><span class="p">(</span><span class="s">clairexample</span><span class="w"> </span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.2.0</span><span class="w"> </span><span class="s">LANGUAGES</span><span class="w"> </span><span class="s">C</span><span class="w"> </span><span class="s">CXX</span><span class="p">)</span>
+<span class="linenos"> 3</span><span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_CXX_STANDARD</span><span class="w"> </span><span class="s">20</span><span class="p">)</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="c"># Find Python, c2py and clair</span>
+<span class="linenos"> 6</span><span class="nb">find_package</span><span class="p">(</span><span class="s">Python</span><span class="w"> </span><span class="s">COMPONENTS</span><span class="w"> </span><span class="s">Interpreter</span><span class="w"> </span><span class="s">Development</span><span class="w"> </span><span class="s">NumPy</span><span class="p">)</span>
+<span class="linenos"> 7</span><span class="nb">find_package</span><span class="p">(</span><span class="s">c2py</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
+<span class="linenos"> 8</span><span class="nb">find_package</span><span class="p">(</span><span class="s">Clair</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
+<span class="linenos"> 9</span>
+<span class="linenos">10</span><span class="nb">Python_add_library</span><span class="p">(</span><span class="s">my_module</span><span class="w"> </span><span class="s">MODULE</span><span class="w"> </span><span class="s">my_module.cpp</span><span class="p">)</span>
+<span class="linenos">11</span>
+<span class="linenos">12</span><span class="c"># Link to low level c2py and add the -fplugin option using a cmake target. </span>
+<span class="linenos">13</span><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">my_module</span><span class="w"> </span><span class="s">PRIVATE</span><span class="w"> </span><span class="s">c2py::c2py</span><span class="w"> </span><span class="s">clair::c2py_plugin</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is a standard <code class="docutils literal notranslate"><span class="pre">CMake</span></code> configuration file.
+<cite>Python_add_library</cite> declares a C++ Python extension using the standard CMake
+<a class="reference external" href="https://cmake.org/cmake/help/latest/module/FindPython.html">FindPython</a> package.
+The additional steps required by <code class="docutils literal notranslate"><span class="pre">clair</span></code> are:</p>
+<ul class="simple">
+<li><p>[line 7-8] Require the cmake packages <cite>c2py</cite> and <cite>clair</cite>.</p></li>
+<li><p>[line 13] Compile against two targets:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">c2py::c2py</span></code>: compile and link against c2py</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">clair::c2py_plugin</span></code>: add the <cite>-fplugin</cite> instruction to <cite>clang</cite></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="a-more-general-setup">
+<h2>A more general setup<a class="headerlink" href="#a-more-general-setup" title="Permalink to this headline"></a></h2>
+<p>The previous example is fine to develop the project, but needs to be generalized
+if we want to deploy the code on more platforms, without clang or clair, i.e. just using the bindings without generating them.
+We assume that the bindings previously generated have been copied into the sources.
+The <cite>CMakeLists.txt</cite> reads:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.20</span><span class="w"> </span><span class="s">FATAL_ERROR</span><span class="p">)</span>
+<span class="linenos"> 2</span><span class="nb">project</span><span class="p">(</span><span class="s">clairexample</span><span class="w"> </span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.2.0</span><span class="w"> </span><span class="s">LANGUAGES</span><span class="w"> </span><span class="s">C</span><span class="w"> </span><span class="s">CXX</span><span class="p">)</span>
+<span class="linenos"> 3</span><span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_CXX_STANDARD</span><span class="w"> </span><span class="s">20</span><span class="p">)</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="nb">find_package</span><span class="p">(</span><span class="s">Python</span><span class="w"> </span><span class="s">COMPONENTS</span><span class="w"> </span><span class="s">Interpreter</span><span class="w"> </span><span class="s">Development</span><span class="w"> </span><span class="s">NumPy</span><span class="p">)</span>
+<span class="linenos"> 6</span><span class="nb">find_package</span><span class="p">(</span><span class="s">c2py</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span><span class="c"># We can compile with or without the Clair plugin</span>
+<span class="linenos"> 9</span><span class="nb">option</span><span class="p">(</span><span class="s">GENERATE_PYTHON_BINDINGS</span><span class="w"> </span><span class="s2">&quot;Use Clair python bindings generators&quot;</span><span class="w"> </span><span class="s">OFF</span><span class="p">)</span>
+<span class="linenos">10</span><span class="nb">if</span> <span class="p">(</span><span class="s">GENERATE_PYTHON_BINDINGS</span><span class="p">)</span>
+<span class="linenos">11</span><span class="w">  </span><span class="nb">find_package</span><span class="p">(</span><span class="s">Clair</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
+<span class="linenos">12</span><span class="nb">endif</span><span class="p">()</span>
+<span class="linenos">13</span>
+<span class="linenos">14</span><span class="c"># If GENERATE_PYTHON_BINDINGS, we compile my_module.cpp else the bindings my_module.wrap.cxx </span>
+<span class="linenos">15</span><span class="nb">Python_add_library</span><span class="p">(</span><span class="s">my_module</span><span class="w"> </span><span class="s">MODULE</span><span class="w"> </span><span class="s">my_module.</span><span class="o">$&lt;</span><span class="nv">IF:$&lt;BOOL:${GENERATE_PYTHON_BINDINGS}</span><span class="o">&gt;</span><span class="s">,cpp,wrap.cxx&gt;</span><span class="p">)</span>
+<span class="linenos">16</span>
+<span class="linenos">17</span><span class="c"># Link to low level c2py. </span>
+<span class="linenos">18</span><span class="c"># Use the clair plugin if we want to generated the bindings </span>
+<span class="linenos">19</span><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">my_module</span><span class="w"> </span><span class="s">PRIVATE</span><span class="w"> </span><span class="s">c2py::c2py</span><span class="w"> </span><span class="o">$&lt;</span><span class="nv">$&lt;BOOL:${GENERATE_PYTHON_BINDINGS}</span><span class="o">&gt;</span><span class="s">:clair::c2py_plugin&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We introduce an option <cite>GENERATE_PYTHON_BINDINGS</cite> so that the code can not be used in two ways:</p>
+<ul class="simple">
+<li><p>If <code class="docutils literal notranslate"><span class="pre">GENERATE_PYTHON_BINDINGS=ON</span></code>, it is the same as before.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">GENERATE_PYTHON_BINDINGS=OFF</span></code>, it simply compiles the bindings <cite>my_module.wrap.cxx</cite> from the sources, without any plugin.
+This compiles with any C++20 compiler (tested actually on clang &gt;=16, gcc &gt;= 12), and requires only Python and <cite>c2py</cite>.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The CMake syntax <em>$&lt;…&gt;</em>  are <a class="reference external" href="https://cmake.org/cmake/help/latest/manual/cmake-generator-expressions.7.html#conditional-expressions">expression generators</a>,
+and basically an <cite>if</cite> expression in CMake.</p>
+</div>
+</section>
+<section id="a-variant-avoiding-the-installation-of-c2py">
+<h2>A variant avoiding the installation of c2py<a class="headerlink" href="#a-variant-avoiding-the-installation-of-c2py" title="Permalink to this headline"></a></h2>
+<p>It is often convenient to avoid the need to install the <cite>c2py</cite> library completely.
+As <cite>c2py</cite> is a very small library, the cost of recompiling it on the fly is negligeable,
+but it is often a good strategy to ensure it is compiled with the same compilers, standard libraries etc.
+(it is the recommended strategy for e.g. Google Test).</p>
+<p>In order to do this, we can simply modify the <cite>CMakeLists.txt</cite> file as</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.20</span><span class="w"> </span><span class="s">FATAL_ERROR</span><span class="p">)</span>
+<span class="linenos"> 2</span><span class="nb">project</span><span class="p">(</span><span class="s">clairexample</span><span class="w"> </span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.2.0</span><span class="w"> </span><span class="s">LANGUAGES</span><span class="w"> </span><span class="s">C</span><span class="w"> </span><span class="s">CXX</span><span class="p">)</span>
+<span class="linenos"> 3</span><span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_CXX_STANDARD</span><span class="w"> </span><span class="s">20</span><span class="p">)</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="nb">find_package</span><span class="p">(</span><span class="s">Python</span><span class="w"> </span><span class="s">COMPONENTS</span><span class="w"> </span><span class="s">Interpreter</span><span class="w"> </span><span class="s">Development</span><span class="w"> </span><span class="s">NumPy</span><span class="p">)</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="nb">include</span><span class="p">(</span><span class="s">FetchContent</span><span class="p">)</span>
+<span class="linenos"> 8</span><span class="nb">FetchContent_Declare</span><span class="p">(</span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="s">c2py</span>
+<span class="linenos">10</span><span class="w">  </span><span class="s">GIT_REPOSITORY</span><span class="w"> </span><span class="s">https://github.com/flatironinstitute/c2py</span>
+<span class="linenos">11</span><span class="w">  </span><span class="s">GIT_TAG</span><span class="w">        </span><span class="s">unstable</span><span class="w"> </span>
+<span class="linenos">12</span><span class="w">  </span><span class="s">EXCLUDE_FROM_ALL</span>
+<span class="linenos">13</span><span class="p">)</span>
+<span class="linenos">14</span><span class="nb">FetchContent_MakeAvailable</span><span class="p">(</span><span class="s">c2py</span><span class="w"> </span><span class="p">)</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span><span class="c"># We can compile with or without the Clair plugin</span>
+<span class="linenos">17</span><span class="nb">option</span><span class="p">(</span><span class="s">GENERATE_PYTHON_BINDINGS</span><span class="w"> </span><span class="s2">&quot;Use Clair python bindings generators&quot;</span><span class="w"> </span><span class="s">OFF</span><span class="p">)</span>
+<span class="linenos">18</span><span class="nb">if</span> <span class="p">(</span><span class="s">GENERATE_PYTHON_BINDINGS</span><span class="p">)</span>
+<span class="linenos">19</span><span class="w">  </span><span class="nb">find_package</span><span class="p">(</span><span class="s">Clair</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
+<span class="linenos">20</span><span class="nb">endif</span><span class="p">()</span>
+<span class="linenos">21</span>
+<span class="linenos">22</span><span class="c"># If GENERATE_PYTHON_BINDINGS, we compile my_module.cpp (with the plugin) else the bindings my_module.wrap.cxx </span>
+<span class="linenos">23</span><span class="nb">Python_add_library</span><span class="p">(</span><span class="s">my_module</span><span class="w"> </span><span class="s">MODULE</span><span class="w"> </span><span class="s">my_module.</span><span class="o">$&lt;</span><span class="nv">IF:$&lt;BOOL:${GENERATE_PYTHON_BINDINGS}</span><span class="o">&gt;</span><span class="s">,cpp,wrap.cxx&gt;</span><span class="p">)</span>
+<span class="linenos">24</span>
+<span class="linenos">25</span><span class="c"># Link to low level c2py. </span>
+<span class="linenos">26</span><span class="c"># Use the clair plugin if we want to generated the bindings </span>
+<span class="linenos">27</span><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">my_module</span><span class="w"> </span><span class="s">PRIVATE</span><span class="w"> </span><span class="s">c2py::c2py</span><span class="w"> </span><span class="o">$&lt;</span><span class="nv">$&lt;BOOL:${GENERATE_PYTHON_BINDINGS}</span><span class="o">&gt;</span><span class="s">:clair::c2py_plugin&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In line 7-14, we use the <a class="reference external" href="https://cmake.org/cmake/help/latest/module/FetchContent.html">FetchContent</a> command of CMake
+to fetch the sources of c2py during the configuration.
+The rest of the script is unchanged.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="gettingstarted.html" class="btn btn-neutral float-left" title="Getting started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="examples.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, The Simons Foundation, author: O. Parcollet.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

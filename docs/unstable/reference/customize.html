@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customization &mdash; clair - Automatic Python/C++ bindings  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="API of the c2py_module" href="api.html" />
+    <link rel="prev" title="Reference documentation" href="../reference.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7E588A" >
+            <a href="../index.html" class="icon icon-home"> clair - Automatic Python/C++ bindings
+          </a>
+              <div class="version">
+                0.1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../install_packages.html">Packages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../install_packages.html#os-x-brew">OS X (brew)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../install_src.html">Compiling from source</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../install_src.html#clair">clair</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../install_src.html#c2py">c2py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../install_src.html#set-environment-variables">Set environment variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../install_src.html#custom-cmake-options">Custom CMake options</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted.html">Getting started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../gettingstarted.html#starting-example">Starting example</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../gettingstarted.html#what-happened">What happened ?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../gettingstarted.html#reusing-the-bindings-without-clang">Reusing the bindings without clang</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../cmake.html">CMake integration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../cmake.html#compiling-with-clang-and-the-clair-plugin">Compiling with clang and the clair plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cmake.html#a-more-general-setup">A more general setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cmake.html#a-variant-avoiding-the-installation-of-c2py">A variant avoiding the installation of c2py</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#function">Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#classes">Classes</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../reference.html">Reference documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Customization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#code-annotations">Code annotations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#filters">Filters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#template-instantiation-explicitly-wrapping-a-function">Template instantiation. Explicitly wrapping a function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#class-template-instantiation">Class template instantiation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#modifying-classes">Modifying classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#misc">Misc</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html">API of the c2py_module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="fnt_basic.html">Function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="fnt_basic.html#type-convertion">Type convertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fnt_basic.html#dynamical-dispatch">Dynamical dispatch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fnt_basic.html#template-functions">Template functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="classes.html">Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="classes.html#constructors">Constructors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="classes.html#methods">Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="classes.html#static-methods">Static Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="classes.html#operator">Operator()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="classes.html#id1">Operator[]</a></li>
+<li class="toctree-l3"><a class="reference internal" href="classes.html#iterable-object">Iterable object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="classes.html#str-and-repr">str and repr</a></li>
+<li class="toctree-l3"><a class="reference internal" href="classes.html#copy">Copy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="classes.html#operators">Operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="classes.html#hdf5">hdf5</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="enums.html">Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="converters.html">Converters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="converters.html#default-converters">Default converters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="converters.html#py-converter">py_converter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="converters.html#a-case-example-nda">A case example: nda</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../notebook.html">Notebook integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../issues.html">Reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ChangeLog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About clair/c2py</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7E588A" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">clair - Automatic Python/C++ bindings</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../reference.html">Reference documentation</a> &raquo;</li>
+      <li>Customization</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/reference/customize.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="customization">
+<span id="customize"></span><h1>Customization<a class="headerlink" href="#customization" title="Permalink to this headline"></a></h1>
+<p>Many customization options of the bindings generation are available,
+e.g. wrap only some functions and classes, choose template instantiation.
+This can be done:</p>
+<ul class="simple">
+<li><p>With code annotations</p></li>
+<li><p>With (compile time) declarations in the reserved namespace <code class="docutils literal notranslate"><span class="pre">c2py_module</span></code>.</p></li>
+</ul>
+<p>The choice between the two approaches depends on the project and needs. The latter is more general and non intrusive, but slighly more complex.</p>
+<section id="code-annotations">
+<h2>Code annotations<a class="headerlink" href="#code-annotations" title="Permalink to this headline"></a></h2>
+<p>Clair’s behaviour can be modified by simple annotations in the code.
+These annotations overrules any filter options in <code class="docutils literal notranslate"><span class="pre">c2py_module</span></code>.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">C2PY_IGNORE</span></code>: Placed before a function or a class, clair ignores it.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">C2PY_WRAP</span></code>: Placed before a function or a class, clair keeps it.  This can be used in combination with a <code class="docutils literal notranslate"><span class="pre">reject_names</span></code> filter “.*”.</p></li>
+</ul>
+</section>
+<section id="filters">
+<h2>Filters<a class="headerlink" href="#filters" title="Permalink to this headline"></a></h2>
+<p>By default, Clair will generate bindings for every non-template classes and functions,
+except those defined in <cite>system</cite> files, i.e. the standard library and more generally
+anything the compiler includes via <cite>-isystem</cite> options.
+In order to refine this behaviour, several filters can be used.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">match_names</span></code>, <code class="docutils literal notranslate"><span class="pre">reject_names</span></code>. These <strong>regular expressions</strong> control which functions/classes/enums are exposed to Python.</p>
+<blockquote>
+<div><p>The algorithm to determine if a element X of qualified name Xqname (i.e. the full name with the namespaces) should be exposed is:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>if <code class="docutils literal notranslate"><span class="pre">match_names</span></code> is defined and does not match Xqname then skip X</p></li>
+<li><p>if <code class="docutils literal notranslate"><span class="pre">reject_names</span></code> is defined and matches Xqname then skip X</p></li>
+<li><p>else expose X to Python.</p></li>
+</ol>
+</div></blockquote>
+</div></blockquote>
+</li>
+</ul>
+<p>Here is an example:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span><span class="cp"></span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="kt">int</span><span class="w"> </span><span class="nf">g</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mi">8</span><span class="p">;}</span><span class="w"></span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="k">namespace</span><span class="w"> </span><span class="nn">N</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">x</span><span class="p">;}</span><span class="w"></span>
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span><span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">a_class</span><span class="p">{</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="c1">// ...</span>
+<span class="linenos">10</span><span class="w">  </span><span class="p">};</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">  </span>
+<span class="linenos">12</span><span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">hidden</span><span class="p">{</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">    </span><span class="c1">//...</span>
+<span class="linenos">14</span><span class="w">  </span><span class="p">};</span><span class="w"></span>
+<span class="linenos">15</span><span class="p">}</span><span class="w"></span>
+<span class="linenos">16</span>
+<span class="linenos">17</span><span class="k">namespace</span><span class="w"> </span><span class="nn">c2py_module</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">match_names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;N::.*&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// only matches functions and names containing </span>
+<span class="linenos">19</span><span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">reject_names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;N::hidden&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">20</span><span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>In this example, the function <code class="docutils literal notranslate"><span class="pre">f</span></code> and the struct <code class="docutils literal notranslate"><span class="pre">a_class</span></code> are exposed to Python,
+while the function <code class="docutils literal notranslate"><span class="pre">g</span></code>, and the struct <code class="docutils literal notranslate"><span class="pre">N::hidden</span></code> are not.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Be careful that these strings are Regex. For example, <code class="docutils literal notranslate"><span class="pre">N::*</span></code> does not match <cite>N::f</cite>.
+Also note that the qualified name start with <cite>::</cite>, so to match the start of a name, use <cite>^::N::f</cite>.</p>
+</div>
+</section>
+<section id="template-instantiation-explicitly-wrapping-a-function">
+<h2>Template instantiation. Explicitly wrapping a function<a class="headerlink" href="#template-instantiation-explicitly-wrapping-a-function" title="Permalink to this headline"></a></h2>
+<p>In addition to the functions automatically detected by Clair,
+one can explicitly declare some functions to be wrapped in the <code class="docutils literal notranslate"><span class="pre">c2py_module::add</span></code> namespace
+using the <code class="docutils literal notranslate"><span class="pre">c2py::dispatch</span></code> type.
+This is specially useful for <strong>template instantiation</strong>.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span><span class="cp"></span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="kt">int</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="k">auto</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;}</span><span class="w"> </span><span class="c1">// a generic (template) function</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="k">namespace</span><span class="w"> </span><span class="nn">c2py_module</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="c1">// ...</span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="k">namespace</span><span class="w"> </span><span class="nn">add</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">      </span><span class="c1">// function f in python dispatching the 2 instantiations.</span>
+<span class="linenos"> 9</span><span class="w">      </span><span class="k">auto</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c2py</span><span class="o">::</span><span class="n">dispatch</span><span class="o">&lt;::</span><span class="n">f</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="o">::</span><span class="n">f</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">   </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">11</span><span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Since the function <code class="docutils literal notranslate"><span class="pre">f</span></code> is a template, no automatic wrapping will happen by default,
+as the compiler can not know which instantiations to use.
+The declaration <code class="docutils literal notranslate"><span class="pre">auto</span> <span class="pre">f</span> <span class="pre">=...</span></code> adds a Python function <cite>f</cite> (the name of the declaration)
+which consists in dispatching <cite>f&lt;int&gt;</cite> and <cite>f&lt;double&gt;</cite>.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">c2py::dispatch&lt;list</span> <span class="pre">of</span> <span class="pre">function</span> <span class="pre">pointers&gt;</span></code></p>
+<blockquote>
+<div><p>Declares a list of C++ functions to be dispatched together</p>
+</div></blockquote>
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><em>Any</em> function pointer can be used in <code class="docutils literal notranslate"><span class="pre">c2py::dispatch</span></code>, so the same technique can be used
+to regroup different functions into one dispatch, or rename a function.</p>
+</div>
+</section>
+<section id="class-template-instantiation">
+<h2>Class template instantiation<a class="headerlink" href="#class-template-instantiation" title="Permalink to this headline"></a></h2>
+<p>In a similar way to function, instantiation of class template should be declared
+and a Python name provided, with a <cite>using</cite> command in <code class="docutils literal notranslate"><span class="pre">c2py_module::add</span></code> namespace.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span><span class="cp"></span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"> </span>
+<span class="linenos"> 4</span><span class="k">struct</span><span class="w"> </span><span class="nc">A</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="n">T</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="p">};</span><span class="w"></span>
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span><span class="k">namespace</span><span class="w"> </span><span class="nn">c2py_module</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="c1">// ...</span>
+<span class="linenos">10</span><span class="w">    </span><span class="k">namespace</span><span class="w"> </span><span class="nn">add</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">      </span><span class="k">using</span><span class="w"> </span><span class="n">Ai</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">      </span><span class="k">using</span><span class="w"> </span><span class="n">Ad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">   </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">14</span><span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>In this example, the Python classes <code class="docutils literal notranslate"><span class="pre">Ai</span></code> and <code class="docutils literal notranslate"><span class="pre">Ad</span></code> wraps the C++ classes <code class="docutils literal notranslate"><span class="pre">A&lt;int&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">A&lt;double&gt;</span></code> respectively.</p>
+</section>
+<section id="modifying-classes">
+<h2>Modifying classes<a class="headerlink" href="#modifying-classes" title="Permalink to this headline"></a></h2>
+<p>To be documented.</p>
+</section>
+<section id="misc">
+<h2>Misc<a class="headerlink" href="#misc" title="Permalink to this headline"></a></h2>
+<p>Additional information can be provided:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">namespace</span><span class="w"> </span><span class="nn">c2py_module</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="w">  </span><span class="c1">// Name of the package if any. Default is &quot;&quot;</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">package_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Package&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// the module will be Package.MyModule</span>
+<span class="linenos"> 5</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="c1">// The documentation string of the module. Default = &quot;&quot;</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">documentation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Module documentation&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="c1">// An function (or lambda) `module_init` to be executed at the start of the module</span>
+<span class="linenos">10</span><span class="w">  </span><span class="c1">// Signature must be () -&gt; void</span>
+<span class="linenos">11</span><span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">module_init</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[]()</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
+<span class="linenos">12</span>
+<span class="linenos">13</span><span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API of the c2py_module</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../reference.html" class="btn btn-neutral float-left" title="Reference documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api.html" class="btn btn-neutral float-right" title="API of the c2py_module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, The Simons Foundation, author: O. Parcollet.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

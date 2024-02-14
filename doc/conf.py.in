@@ -18,7 +18,7 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.autosummary',
               'sphinx.ext.githubpages',
               'sphinx_copybutton',
-              # 'nbsphinx',
+              #'nbsphinx',
                'myst_parser',
               ]
 

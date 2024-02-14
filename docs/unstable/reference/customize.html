@@ -76,7 +76,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../examples.html#function">Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#functions">Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../examples.html#classes">Classes</a></li>
 </ul>
 </li>
@@ -94,7 +94,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="fnt_basic.html">Function</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="fnt_basic.html#type-convertion">Type convertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fnt_basic.html#type-conversion">Type conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fnt_basic.html#dynamical-dispatch">Dynamical dispatch</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fnt_basic.html#template-functions">Template functions</a></li>
 </ul>
@@ -155,32 +155,32 @@
   <section id="customization">
 <span id="customize"></span><h1>Customization<a class="headerlink" href="#customization" title="Permalink to this headline"></a></h1>
 <p>Many customization options of the bindings generation are available,
-e.g. wrap only some functions and classes, choose template instantiation.
-This can be done:</p>
+e.g. wrap only some functions and classes, choose template instantiation, and so on.
+This can be done</p>
 <ul class="simple">
-<li><p>With code annotations</p></li>
-<li><p>With (compile time) declarations in the reserved namespace <code class="docutils literal notranslate"><span class="pre">c2py_module</span></code>.</p></li>
+<li><p>with code annotations or</p></li>
+<li><p>with (compile time) declarations in the reserved namespace <code class="docutils literal notranslate"><span class="pre">c2py_module</span></code>.</p></li>
 </ul>
 <p>The choice between the two approaches depends on the project and needs. The latter is more general and non intrusive, but slighly more complex.</p>
 <section id="code-annotations">
 <h2>Code annotations<a class="headerlink" href="#code-annotations" title="Permalink to this headline"></a></h2>
-<p>Clair’s behaviour can be modified by simple annotations in the code.</p>
+<p><code class="docutils literal notranslate"><span class="pre">clair</span></code>’s behaviour can be modified by simple annotations in the code.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">C2PY_IGNORE</span></code>: Placed before a function or a class, clair ignores it.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">C2PY_WRAP</span></code>: Placed before a function or a class, clair keeps it.  This can be used in combination with a <code class="docutils literal notranslate"><span class="pre">reject_names</span></code> filter “.*”.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">C2PY_IGNORE</span></code>: Placed before a function or a class, <code class="docutils literal notranslate"><span class="pre">clair</span></code> ignores it.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">C2PY_WRAP</span></code>: Placed before a function or a class, <code class="docutils literal notranslate"><span class="pre">clair</span></code> keeps it.  This can be used in combination with a <code class="docutils literal notranslate"><span class="pre">reject_names</span></code> filter <code class="docutils literal notranslate"><span class="pre">.*</span></code>.</p></li>
 </ul>
 <p>These annotations overrule any filter options in <code class="docutils literal notranslate"><span class="pre">c2py_module</span></code>.</p>
 </section>
 <section id="filters">
 <h2>Filters<a class="headerlink" href="#filters" title="Permalink to this headline"></a></h2>
-<p>By default, Clair will generate bindings for every non-template classes and functions,
+<p>By default, <code class="docutils literal notranslate"><span class="pre">clair</span></code> will generate bindings for all non-template classes and functions,
 except those defined in <cite>system</cite> files, i.e. the standard library and more generally
 anything the compiler includes via <cite>-isystem</cite> options.
 In order to refine this behaviour, several filters can be used.</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">match_names</span></code>, <code class="docutils literal notranslate"><span class="pre">reject_names</span></code>. These <strong>regular expressions</strong> control which functions/classes/enums are exposed to Python.</p>
 <blockquote>
-<div><p>The algorithm to determine if a element X of qualified name Xqname (i.e. the full name with the namespaces) should be exposed is:</p>
+<div><p>The algorithm to determine if an element X of qualified name Xqname (i.e. the full name with the namespaces) should be exposed is:</p>
 <blockquote>
 <div><ol class="arabic simple">
 <li><p>if <code class="docutils literal notranslate"><span class="pre">match_names</span></code> is defined and does not match Xqname then skip X</p></li>
@@ -192,34 +192,34 @@ In order to refine this behaviour, several filters can be used.</p>
 </li>
 </ul>
 <p>Here is an example:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span><span class="cp"></span>
-<span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="kt">int</span><span class="w"> </span><span class="nf">g</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mi">8</span><span class="p">;}</span><span class="w"></span>
-<span class="linenos"> 4</span>
-<span class="linenos"> 5</span><span class="k">namespace</span><span class="w"> </span><span class="nn">N</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">x</span><span class="p">;}</span><span class="w"></span>
-<span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">a_class</span><span class="p">{</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">    </span><span class="c1">// ...</span>
-<span class="linenos">10</span><span class="w">  </span><span class="p">};</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">  </span>
-<span class="linenos">12</span><span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">hidden</span><span class="p">{</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">    </span><span class="c1">//...</span>
-<span class="linenos">14</span><span class="w">  </span><span class="p">};</span><span class="w"></span>
-<span class="linenos">15</span><span class="p">}</span><span class="w"></span>
-<span class="linenos">16</span>
-<span class="linenos">17</span><span class="k">namespace</span><span class="w"> </span><span class="nn">c2py_module</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">18</span><span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">match_names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;N::.*&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// only matches functions and names containing </span>
-<span class="linenos">19</span><span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">reject_names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;N::hidden&quot;</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">20</span><span class="p">}</span><span class="w"></span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">g</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mi">8</span><span class="p">;}</span><span class="w"></span>
+
+<span class="k">namespace</span><span class="w"> </span><span class="nn">N</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
+<span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">x</span><span class="p">;}</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">a_class</span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="w">  </span><span class="p">};</span><span class="w"></span>
+<span class="w">  </span>
+<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">hidden</span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">//...</span>
+<span class="w">  </span><span class="p">};</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">namespace</span><span class="w"> </span><span class="nn">c2py_module</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">match_names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;N::.*&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// match functions and names in namespace N</span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">reject_names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;N::hidden&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// reject the specific name &quot;hidden&quot; in namespace N</span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>In this example, the function <code class="docutils literal notranslate"><span class="pre">f</span></code> and the struct <code class="docutils literal notranslate"><span class="pre">a_class</span></code> are exposed to Python,
 while the function <code class="docutils literal notranslate"><span class="pre">g</span></code>, and the struct <code class="docutils literal notranslate"><span class="pre">N::hidden</span></code> are not.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Be careful that these strings are Regex. For example, <code class="docutils literal notranslate"><span class="pre">N::*</span></code> does not match <cite>N::f</cite>.
-Also note that the qualified name start with <cite>::</cite>, so to match the start of a name, use <cite>^::N::f</cite>.</p>
+<p>Be careful that these strings are Regex. For example, <code class="docutils literal notranslate"><span class="pre">N::*</span></code> does not match <code class="docutils literal notranslate"><span class="pre">N::f</span></code>.
+Also note that the qualified name starts with <code class="docutils literal notranslate"><span class="pre">::</span></code>. So to match the start of a name, use <code class="docutils literal notranslate"><span class="pre">^::N::f</span></code>.</p>
 </div>
 </section>
 <section id="template-instantiation-explicitly-wrapping-a-function">
@@ -228,17 +228,17 @@ Also note that the qualified name start with <cite>::</cite>, so to match the st
 one can explicitly declare some functions to be wrapped in the <code class="docutils literal notranslate"><span class="pre">c2py_module::add</span></code> namespace
 using the <code class="docutils literal notranslate"><span class="pre">c2py::dispatch</span></code> type.
 This is specially useful for <strong>template instantiation</strong>.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span><span class="cp"></span>
-<span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="kt">int</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="k">auto</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;}</span><span class="w"> </span><span class="c1">// a generic (template) function</span>
-<span class="linenos"> 4</span>
-<span class="linenos"> 5</span><span class="k">namespace</span><span class="w"> </span><span class="nn">c2py_module</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
-<span class="linenos"> 6</span><span class="w">    </span><span class="c1">// ...</span>
-<span class="linenos"> 7</span><span class="w">    </span><span class="k">namespace</span><span class="w"> </span><span class="nn">add</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">      </span><span class="c1">// function f in python dispatching the 2 instantiations.</span>
-<span class="linenos"> 9</span><span class="w">      </span><span class="k">auto</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c2py</span><span class="o">::</span><span class="n">dispatch</span><span class="o">&lt;::</span><span class="n">f</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="o">::</span><span class="n">f</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;&gt;</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">   </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">11</span><span class="p">}</span><span class="w"></span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="k">auto</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;}</span><span class="w"> </span><span class="c1">// a generic (template) function</span>
+
+<span class="k">namespace</span><span class="w"> </span><span class="nn">c2py_module</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="w">    </span><span class="k">namespace</span><span class="w"> </span><span class="nn">add</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="c1">// function f in python dispatching the 2 instantiations.</span>
+<span class="w">      </span><span class="k">auto</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c2py</span><span class="o">::</span><span class="n">dispatch</span><span class="o">&lt;::</span><span class="n">f</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="o">::</span><span class="n">f</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="w">   </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Since the function <code class="docutils literal notranslate"><span class="pre">f</span></code> is a template, no automatic wrapping will happen by default,
@@ -260,25 +260,25 @@ to regroup different functions into one dispatch, or rename a function.</p>
 </section>
 <section id="class-template-instantiation">
 <h2>Class template instantiation<a class="headerlink" href="#class-template-instantiation" title="Permalink to this headline"></a></h2>
-<p>In a similar way to function, instantiation of class template should be declared
-and a Python name provided, with a <cite>using</cite> command in <code class="docutils literal notranslate"><span class="pre">c2py_module::add</span></code> namespace.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span><span class="cp"></span>
-<span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"> </span>
-<span class="linenos"> 4</span><span class="k">struct</span><span class="w"> </span><span class="nc">A</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="n">T</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="p">};</span><span class="w"></span>
-<span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="k">namespace</span><span class="w"> </span><span class="nn">c2py_module</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
-<span class="linenos"> 9</span><span class="w">    </span><span class="c1">// ...</span>
-<span class="linenos">10</span><span class="w">    </span><span class="k">namespace</span><span class="w"> </span><span class="nn">add</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">      </span><span class="k">using</span><span class="w"> </span><span class="n">Ai</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">12</span><span class="w">      </span><span class="k">using</span><span class="w"> </span><span class="n">Ad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">   </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">14</span><span class="p">}</span><span class="w"></span>
+<p>Similar to functions, instantiations of class templates should be declared
+with a <cite>using</cite> command in the <code class="docutils literal notranslate"><span class="pre">c2py_module::add</span></code> namespace and a Python name should be provided:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span><span class="cp"></span>
+
+<span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"> </span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">A</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">T</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="k">namespace</span><span class="w"> </span><span class="nn">c2py_module</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="w">    </span><span class="k">namespace</span><span class="w"> </span><span class="nn">add</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="k">using</span><span class="w"> </span><span class="n">Ai</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="w">      </span><span class="k">using</span><span class="w"> </span><span class="n">Ad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="w">   </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
-<p>In this example, the Python classes <code class="docutils literal notranslate"><span class="pre">Ai</span></code> and <code class="docutils literal notranslate"><span class="pre">Ad</span></code> wraps the C++ classes <code class="docutils literal notranslate"><span class="pre">A&lt;int&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">A&lt;double&gt;</span></code> respectively.</p>
+<p>In this example, the Python classes <code class="docutils literal notranslate"><span class="pre">Ai</span></code> and <code class="docutils literal notranslate"><span class="pre">Ad</span></code> wrap the C++ classes <code class="docutils literal notranslate"><span class="pre">A&lt;int&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">A&lt;double&gt;</span></code>, respectively.</p>
 </section>
 <section id="modifying-classes">
 <h2>Modifying classes<a class="headerlink" href="#modifying-classes" title="Permalink to this headline"></a></h2>

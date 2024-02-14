@@ -76,7 +76,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="examples.html#function">Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#functions">Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#classes">Classes</a></li>
 </ul>
 </li>
@@ -94,7 +94,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="reference/fnt_basic.html">Function</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="reference/fnt_basic.html#type-convertion">Type convertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/fnt_basic.html#type-conversion">Type conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="reference/fnt_basic.html#dynamical-dispatch">Dynamical dispatch</a></li>
 <li class="toctree-l3"><a class="reference internal" href="reference/fnt_basic.html#template-functions">Template functions</a></li>
 </ul>
@@ -153,16 +153,18 @@
              
   <section id="cmake-integration">
 <span id="cmake"></span><h1>CMake integration<a class="headerlink" href="#cmake-integration" title="Permalink to this headline"></a></h1>
-<p>Let us consider a simple piece of C++ code and a <cite>CMakeLists</cite> file to compile it.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;c2py/c2py.hpp&quot;</span><span class="cp"></span>
-<span class="linenos">2</span>
-<span class="linenos">3</span><span class="c1">/// A wonderful little class</span>
-<span class="linenos">4</span><span class="k">class</span><span class="w"> </span><span class="nc">my_class</span><span class="p">{</span><span class="w"></span>
-<span class="linenos">5</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">6</span><span class="w">  </span><span class="k">public</span><span class="o">:</span><span class="w"></span>
-<span class="linenos">7</span><span class="w">    </span><span class="n">my_class</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a_</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b_</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">a</span><span class="p">(</span><span class="n">a_</span><span class="p">),</span><span class="w"> </span><span class="n">b</span><span class="p">(</span><span class="n">b_</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span><span class="w"></span>
-<span class="linenos">8</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">u</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">u</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">;}</span><span class="w"></span>
-<span class="linenos">9</span><span class="p">};</span><span class="w"></span>
+<p>Let us consider a simple piece of C++ code:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// my_module.cpp</span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;c2py/c2py.hpp&quot;</span><span class="cp"></span>
+
+<span class="c1">/// A wonderful little class</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">my_class</span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="k">public</span><span class="o">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">my_class</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a_</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b_</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">a</span><span class="p">(</span><span class="n">a_</span><span class="p">),</span><span class="w"> </span><span class="n">b</span><span class="p">(</span><span class="n">b_</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">u</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">u</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">;}</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
 </pre></div>
 </div>
 <section id="compiling-with-clang-and-the-clair-plugin">
@@ -183,15 +185,15 @@
 <span class="linenos">13</span><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">my_module</span><span class="w"> </span><span class="s">PRIVATE</span><span class="w"> </span><span class="s">c2py::c2py</span><span class="w"> </span><span class="s">clair::c2py_plugin</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This is a standard <code class="docutils literal notranslate"><span class="pre">CMake</span></code> configuration file.
-<cite>Python_add_library</cite> declares a C++ Python extension using the standard CMake
+<p>This is a standard CMake configuration file.
+<code class="docutils literal notranslate"><span class="pre">Python_add_library</span></code> declares a C++ Python extension using the standard CMake
 <a class="reference external" href="https://cmake.org/cmake/help/latest/module/FindPython.html">FindPython</a> package.
 The additional steps required by <code class="docutils literal notranslate"><span class="pre">clair</span></code> are:</p>
 <ul class="simple">
-<li><p>[line 7-8] Require the cmake packages <cite>c2py</cite> and <cite>clair</cite>.</p></li>
-<li><p>[line 13] Compile against two targets:</p>
+<li><p>[line 7-8] Finds the required cmake packages <code class="docutils literal notranslate"><span class="pre">c2py</span></code> and <code class="docutils literal notranslate"><span class="pre">clair</span></code>.</p></li>
+<li><p>[line 13] Compiles against two targets:</p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">c2py::c2py</span></code>: compile and link against c2py</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">c2py::c2py</span></code>: compile and link against <code class="docutils literal notranslate"><span class="pre">c2py</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">clair::c2py_plugin</span></code>: add the <cite>-fplugin</cite> instruction to <cite>clang</cite></p></li>
 </ul>
 </li>
@@ -200,8 +202,8 @@ The additional steps required by <code class="docutils literal notranslate"><spa
 <section id="a-more-general-setup">
 <h2>A more general setup<a class="headerlink" href="#a-more-general-setup" title="Permalink to this headline"></a></h2>
 <p>The previous example is fine to develop the project, but needs to be generalized
-if we want to deploy the code on more platforms, without clang or clair, i.e. just using the bindings without generating them.
-We assume that the bindings previously generated have been copied into the sources.
+if we want to deploy the code on more platforms, without clang or <code class="docutils literal notranslate"><span class="pre">clair</span></code>, i.e. just using the bindings without generating them.
+We assume that the bindings have already been generated and copied into the source directory.
 The <cite>CMakeLists.txt</cite> reads:</p>
 <div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.20</span><span class="w"> </span><span class="s">FATAL_ERROR</span><span class="p">)</span>
 <span class="linenos"> 2</span><span class="nb">project</span><span class="p">(</span><span class="s">clairexample</span><span class="w"> </span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.2.0</span><span class="w"> </span><span class="s">LANGUAGES</span><span class="w"> </span><span class="s">C</span><span class="w"> </span><span class="s">CXX</span><span class="p">)</span>
@@ -224,11 +226,11 @@ The <cite>CMakeLists.txt</cite> reads:</p>
 <span class="linenos">19</span><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">my_module</span><span class="w"> </span><span class="s">PRIVATE</span><span class="w"> </span><span class="s">c2py::c2py</span><span class="w"> </span><span class="o">$&lt;</span><span class="nv">$&lt;BOOL:${GENERATE_PYTHON_BINDINGS}</span><span class="o">&gt;</span><span class="s">:clair::c2py_plugin&gt;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>We introduce an option <cite>GENERATE_PYTHON_BINDINGS</cite> so that the code can not be used in two ways:</p>
+<p>We introduce an option <code class="docutils literal notranslate"><span class="pre">GENERATE_PYTHON_BINDINGS</span></code> so that the code can be used in two ways:</p>
 <ul class="simple">
 <li><p>If <code class="docutils literal notranslate"><span class="pre">GENERATE_PYTHON_BINDINGS=ON</span></code>, it is the same as before.</p></li>
 <li><p>If <code class="docutils literal notranslate"><span class="pre">GENERATE_PYTHON_BINDINGS=OFF</span></code>, it simply compiles the bindings <cite>my_module.wrap.cxx</cite> from the sources, without any plugin.
-This compiles with any C++20 compiler (tested actually on clang &gt;=16, gcc &gt;= 12), and requires only Python and <cite>c2py</cite>.</p></li>
+This compiles with any C++20 compiler (tested actually on clang &gt;=16, gcc &gt;= 12), and requires only Python and <code class="docutils literal notranslate"><span class="pre">c2py</span></code>.</p></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -238,8 +240,8 @@ and basically an <cite>if</cite> expression in CMake.</p>
 </section>
 <section id="a-variant-avoiding-the-installation-of-c2py">
 <h2>A variant avoiding the installation of c2py<a class="headerlink" href="#a-variant-avoiding-the-installation-of-c2py" title="Permalink to this headline"></a></h2>
-<p>It is often convenient to avoid the need to install the <cite>c2py</cite> library completely.
-As <cite>c2py</cite> is a very small library, the cost of recompiling it in each project is negligeable,
+<p>It is often convenient to avoid the need to install the <code class="docutils literal notranslate"><span class="pre">c2py</span></code> library completely.
+As <code class="docutils literal notranslate"><span class="pre">c2py</span></code> is a very small library, the cost of recompiling it in each project is negligible,
 but it is often a good strategy to ensure it is compiled with the same compilers, standard libraries, etc.</p>
 <p>In order to do this, we can simply modify the <cite>CMakeLists.txt</cite> file as</p>
 <div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.20</span><span class="w"> </span><span class="s">FATAL_ERROR</span><span class="p">)</span>
@@ -272,7 +274,7 @@ but it is often a good strategy to ensure it is compiled with the same compilers
 </pre></div>
 </div>
 <p>In line 7-14, we use the <a class="reference external" href="https://cmake.org/cmake/help/latest/module/FetchContent.html">FetchContent</a> command of CMake
-to fetch the sources of c2py during the configuration.
+to fetch the sources of <code class="docutils literal notranslate"><span class="pre">c2py</span></code> during the configuration.
 The rest of the script is unchanged.</p>
 </section>
 </section>

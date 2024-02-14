@@ -11,7 +11,7 @@ Clair/c2py is made of two components:
 * `c2py <https://github.com/flatironinstitute/c2py>`_
  
    Low level C++20 support library for the bindings.
-   It depends only on Python/Numpy C API and can be used with any C++20 compliant compilers (NB : currently tested on clang >=16 and gcc >=12). 
+   It depends only on the Python/Numpy C API and can be used with any C++20 compliant compilers (NB : currently tested on clang >=16 and gcc >=12). 
   
 * `Clair <https://github.com/flatironinstitute/clair>`_
   

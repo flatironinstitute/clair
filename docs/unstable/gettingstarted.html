@@ -76,7 +76,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="examples.html#function">Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#functions">Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#classes">Classes</a></li>
 </ul>
 </li>
@@ -94,7 +94,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="reference/fnt_basic.html">Function</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="reference/fnt_basic.html#type-convertion">Type convertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/fnt_basic.html#type-conversion">Type conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="reference/fnt_basic.html#dynamical-dispatch">Dynamical dispatch</a></li>
 <li class="toctree-l3"><a class="reference internal" href="reference/fnt_basic.html#template-functions">Template functions</a></li>
 </ul>
@@ -155,8 +155,10 @@
 <span id="gettingstarted"></span><h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline"></a></h1>
 <section id="starting-example">
 <h2>Starting example<a class="headerlink" href="#starting-example" title="Permalink to this headline"></a></h2>
-<p>Let us begin with a simple example in file <cite>my_module.cpp</cite>.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span><span class="cp"></span>
+<p>Let us begin with a simple example:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// my_module.cpp</span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span><span class="cp"></span>
 
 <span class="cm">/** Some documentation</span>
 <span class="cm"> *</span>
@@ -169,17 +171,17 @@
 </div>
 <p>We just compile the C++ file with <cite>clang</cite> using the <code class="docutils literal notranslate"><span class="pre">clair</span></code> plugin as</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># OS X</span>
-clang++ -fplugin<span class="o">=</span>clair_c2py.dylib  my_module.cpp -std<span class="o">=</span>c++20 -shared -o my_module.so <span class="sb">`</span>c2py_flags<span class="sb">`</span>
+$ clang++ -fplugin<span class="o">=</span>clair_c2py.dylib  my_module.cpp -std<span class="o">=</span>c++20 -shared -o my_module.so <span class="sb">`</span>c2py_flags<span class="sb">`</span>
 
 <span class="c1"># Linux</span>
-clang++ -fplugin<span class="o">=</span>clair_c2py.so     my_module.cpp -std<span class="o">=</span>c++20 -shared -o my_module.so <span class="sb">`</span>c2py_flags<span class="sb">`</span>
+$ clang++ -fplugin<span class="o">=</span>clair_c2py.so     my_module.cpp -std<span class="o">=</span>c++20 -shared -o my_module.so <span class="sb">`</span>c2py_flags<span class="sb">`</span>
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The compiler search for the plugin in DYLD_LIBRARY_PATH (OS X) or LD_LIBRARY_PATH (linux).</p>
+<p>The compiler searches for the plugin in <code class="docutils literal notranslate"><span class="pre">DYLD_LIBRARY_PATH</span></code> (OS X) or <code class="docutils literal notranslate"><span class="pre">LD_LIBRARY_PATH</span></code> (linux).</p>
 </div>
-<p>That is it. The Python module is ready to use:</p>
+<p>That is it. The Python module is ready to be used:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt; import my_module as M</span>
 <span class="go">&gt;&gt;&gt; M.add(1,2)</span>
 <span class="go">3</span>
@@ -187,7 +189,7 @@ clang++ -fplugin<span class="o">=</span>clair_c2py.so     my_module.cpp -std<spa
 </div>
 <p>The generation (and compilation) of the C++/Python binding code is <strong>automatically done</strong>
 by the clang compiler.</p>
-<p>The documentation is also automatically transformed in standard <cite>numpydoc</cite> format.</p>
+<p>The C++ documentation is also automatically transformed into standard <cite>numpydoc</cite> format.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt; help(M.add)</span>
 <span class="go">    add(...)</span>
 <span class="go">        Dispatched C++ function</span>
@@ -213,38 +215,38 @@ by the clang compiler.</p>
 <h3>What happened ?<a class="headerlink" href="#what-happened" title="Permalink to this headline"></a></h3>
 <p>In order to call C++ from Python, some <strong>binding code</strong> has to be generated.
 It is a piece of C++ code which <em>adapts</em> the C++ functions and classes to the C API of Python.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">clair_c2py</span></code>  <strong>compiler plugin</strong> automatizes this task, by modifying the compilation process of LLVM/clang:
-when compiling the C++ code <cite>my_module.cpp</cite> with it, the compiler:</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">clair_c2py</span></code>  <strong>compiler plugin</strong> automatizes this task, by modifying the compilation process of LLVM/clang.
+When compiling the C++ code <cite>my_module.cpp</cite> with it, the compiler</p>
 <ol class="arabic simple">
-<li><p>parses <cite>my_module.cpp</cite> as usual (the first step of a compilation: check syntax and grammar, build the Abstract Syntax Tree or AST).</p></li>
-<li><p>generates the C++/Python bindings (by analyzing the AST) and write them into <cite>my_module.wrap.cxx</cite>.</p></li>
+<li><p>parses <cite>my_module.cpp</cite> as usual (the first step of a compilation: check syntax and grammar, build the Abstract Syntax Tree or AST),</p></li>
+<li><p>generates the C++/Python bindings (by analyzing the AST) and writes them into <cite>my_module.wrap.cxx</cite> and</p></li>
 <li><p>compiles the whole code (source + bindings) into a Python module <cite>my_module.so</cite>.</p></li>
 </ol>
 </section>
 <section id="reusing-the-bindings-without-clang">
 <h3>Reusing the bindings without clang<a class="headerlink" href="#reusing-the-bindings-without-clang" title="Permalink to this headline"></a></h3>
-<p>While the generation of the bindings requires  LLVM/clang and the clair plugin,
-they can reused with any <cite>C++20</cite> compiler. For example, with <code class="docutils literal notranslate"><span class="pre">gcc</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g++  my_module.wrap.cxx -std<span class="o">=</span>c++20 -shared -o my_module.so <span class="sb">`</span>c2py_flags<span class="sb">`</span>
+<p>While the generation of the bindings requires LLVM/clang and the clair plugin,
+they can be reused with any <cite>C++20</cite> compiler. For example, with gcc:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ g++  my_module.wrap.cxx -std<span class="o">=</span>c++20 -shared -o my_module.so <span class="sb">`</span>c2py_flags<span class="sb">`</span>
 </pre></div>
 </div>
 <p>(the binding file includes the original source file <cite>my_module.cpp</cite>).</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>On some machines (OS X), beware that c2py must be compiled with gcc (in particular the same std C++ library).
-For any project beyond a simple demo, it is recommended to use CMake setup, Cf <a class="reference internal" href="cmake.html#cmake"><span class="std std-ref">CMake integration</span></a>.</p>
+<p>On some machines (OS X), beware that <code class="docutils literal notranslate"><span class="pre">c2py</span></code> must be compiled with gcc (in particular the same std C++ library).
+For any project beyond a simple demo, it is recommended to use <a class="reference internal" href="cmake.html#cmake"><span class="std std-ref">CMake integration</span></a>.</p>
 </div>
 <p>A typical workflow is therefore:</p>
 <ul class="simple">
 <li><p>As the developer of the code, use clang with the <code class="docutils literal notranslate"><span class="pre">clair</span></code> plugin. Bindings are automatically regenerated when the C++ API change.</p></li>
 <li><p>As a user of the code, just compile the bindings on any machine/compiler.</p></li>
 </ul>
-<p>Examples of CMake integration are provided in <a class="reference internal" href="cmake.html#cmake"><span class="std std-ref">CMake integration</span></a>,
+<p>Section <a class="reference internal" href="cmake.html#cmake"><span class="std std-ref">CMake integration</span></a> shows how to use <code class="docutils literal notranslate"><span class="pre">c2py</span></code> and <code class="docutils literal notranslate"><span class="pre">clair</span></code> in a CMake project,
 including an example with a simple option to regenerate the bindings or not.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Even though the bindings are readable C++ code, they are designed to be automatically generated, not written by hand.
-The c2py API is therefore not part of the user documentation.</p>
+The <code class="docutils literal notranslate"><span class="pre">c2py</span></code> API is therefore not part of the user documentation.</p>
 </div>
 </section>
 </section>

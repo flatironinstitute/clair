@@ -22,7 +22,7 @@ They are built from source from the GitHub parcollet/ccq repository.
 
      export DYLD_LIBRARY_PATH=/opt/homebrew/lib/:$DYLD_LIBRARY_PATH
 
-   for clang to find its plugins in brew directory as in the documentation examples.
+   for clang to find its plugins in the brew directory as in the documentation examples.
    Alternatively, you can provide the full path to the plugin.
    This setup is not necessary to use the CMake targets.
 

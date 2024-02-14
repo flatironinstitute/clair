@@ -8,13 +8,21 @@ Examples
    :hidden:
 
 
-Function
+Functions
 ========
 
+The following example shows a C++ function that takes a ``std::vector<double>`` and returns the sum of its elements:
 
 .. literalinclude:: examples/fun2.cpp
    :language: cpp
-   :linenos:
+
+We can then generate the Python bindings for this function and compile them with (assuming OS X and clang):
+
+.. code-block:: bash
+   
+   $ clang++ -fplugin=clair_c2py.dylib  fun2.cpp -std=c++20 -shared -o fun2.so `c2py_flags`
+
+Finally, we use the module in Python:
 
 .. code-block:: console
 
@@ -25,10 +33,18 @@ Function
 Classes
 =======
 
+The following example shows a simple C++ struct and how to make it printable in Python:
 
 .. literalinclude:: examples/struct1.cpp
    :language: cpp
-   :linenos:
+
+We can again generate the Python bindings for this function and compile them with (assuming OS X and clang):
+
+.. code-block:: bash
+   
+   $ clang++ -fplugin=clair_c2py.dylib  struct1.cpp -std=c++20 -shared -o struct1.so `c2py_flags`
+
+Finally, we use the module in Python:
 
 .. code-block:: console
 

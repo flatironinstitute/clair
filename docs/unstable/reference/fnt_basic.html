@@ -116,7 +116,7 @@
 <li class="toctree-l2"><a class="reference internal" href="converters.html">Converters</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="converters.html#default-converters">Default converters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="converters.html#py-converter">py_converter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="converters.html#a-case-example-nda">A case example: nda</a></li>
+<li class="toctree-l3"><a class="reference internal" href="converters.html#third-party-library-developer-corner">Third party library [developer corner]</a></li>
 </ul>
 </li>
 </ul>
@@ -180,8 +180,11 @@ If none applies, a Python exception is raised.</p>
 <p>Let us illustrate this with a simple example.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span><span class="cp"></span>
 <span class="linenos">2</span>
-<span class="linenos">3</span><span class="kt">int</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">x</span><span class="p">;}</span><span class="w"></span>
-<span class="linenos">4</span><span class="kt">int</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">y</span><span class="p">;}</span><span class="w"></span>
+<span class="linenos">3</span><span class="k">struct</span><span class="w"> </span><span class="nc">A</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">4</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">5</span><span class="w">  </span><span class="kt">double</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">6</span><span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">s</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">7</span><span class="p">};</span><span class="w"></span>
 </pre></div>
 </div>
 <p>The compiler reports:</p>

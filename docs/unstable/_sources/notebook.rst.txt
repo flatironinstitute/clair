@@ -7,7 +7,7 @@ Clair defines a IPython notebook magic cell ``%%c2py``
 to compile C++ code from a notebook cell.
 
 
-.... toctree::
+... toctree::
    ..:maxdepth: 2
    ..:caption: Contents:
 

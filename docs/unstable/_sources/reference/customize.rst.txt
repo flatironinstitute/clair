@@ -17,10 +17,11 @@ Code annotations
 ----------------
 
 Clair's behaviour can be modified by simple annotations in the code.
-These annotations overrules any filter options in ``c2py_module``.
 
 * ``C2PY_IGNORE``: Placed before a function or a class, clair ignores it.
 * ``C2PY_WRAP``: Placed before a function or a class, clair keeps it.  This can be used in combination with a ``reject_names`` filter ".*".
+
+These annotations overrule any filter options in ``c2py_module``.
 
 Filters
 -------

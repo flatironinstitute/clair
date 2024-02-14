@@ -164,12 +164,12 @@ This can be done:</p>
 <p>The choice between the two approaches depends on the project and needs. The latter is more general and non intrusive, but slighly more complex.</p>
 <section id="code-annotations">
 <h2>Code annotations<a class="headerlink" href="#code-annotations" title="Permalink to this headline"></a></h2>
-<p>Clair’s behaviour can be modified by simple annotations in the code.
-These annotations overrules any filter options in <code class="docutils literal notranslate"><span class="pre">c2py_module</span></code>.</p>
+<p>Clair’s behaviour can be modified by simple annotations in the code.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">C2PY_IGNORE</span></code>: Placed before a function or a class, clair ignores it.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">C2PY_WRAP</span></code>: Placed before a function or a class, clair keeps it.  This can be used in combination with a <code class="docutils literal notranslate"><span class="pre">reject_names</span></code> filter “.*”.</p></li>
 </ul>
+<p>These annotations overrule any filter options in <code class="docutils literal notranslate"><span class="pre">c2py_module</span></code>.</p>
 </section>
 <section id="filters">
 <h2>Filters<a class="headerlink" href="#filters" title="Permalink to this headline"></a></h2>

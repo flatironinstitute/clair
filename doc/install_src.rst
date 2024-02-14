@@ -9,7 +9,7 @@ Compiling from source
 
    It is not always necessary to install c2py, 
    as it can be fetched by an application using it as a dependency during its own compilation process, 
-   cf CMake section.
+   cf :ref:`cmake`.
 
 
 clair
@@ -19,7 +19,7 @@ clair
 
      $ git clone https://github.com/flatironinstitute/clair clair.src
 
-#. [Optional] If you want a particular version, check it out, e.g. (use `git tag` go to see the available version)::
+#. [Optional] If you want a particular version, check it out, e.g. (use `git tag` to see the available versions)::
 
      $ git checkout v0.1
 
@@ -48,7 +48,7 @@ To install ``c2py``, follow the same procedure as for ``clair``, replacing ``cla
 
      $ git clone https://github.com/flatironinstitute/c2py c2py.src
 
-#. [Optional] If you want a particular version, check it out, e.g. (use `git tag` go to see the available version)::
+#. [Optional] If you want a particular version, check it out, e.g. (use `git tag` to see the available versions)::
 
      $ git checkout v0.1
 
@@ -58,7 +58,7 @@ To install ``c2py``, follow the same procedure as for ``clair``, replacing ``cla
 
 #. Compile the code, run the tests and install the application (here with 8 cores, change accordingly)::
 
-     $ cd clair.build
+     $ cd c2py.build
      $ make -j 8
      $ ctest -j 8
      $ make -j 8 install
@@ -80,7 +80,7 @@ The following CMake-options are available for ``clair``::
 Set environment variables
 -------------------------
 
-To load the proper paths into your current shell environment with::
+To load the proper paths into your current shell environment use::
 
      $ source path_to_clair_install_dir/share/clair/clairvars.sh
      $ source path_to_c2py_install_dir/share/c2py/c2pyvars.sh

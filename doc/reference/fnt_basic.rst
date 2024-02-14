@@ -4,19 +4,19 @@ Function
 ********
 
 
-Type convertion
+Type conversion
 ---------------
 
 Python and C++ types are different. 
 For example, a ``long`` in C++ is converted from/to a Python integer.
-In order to call a C++ function from Python, it is necessary to:
+In order to call a C++ function from Python, it is necessary to
 
-* convert its arguments to C++
-* call it  
-* convert its return value to Python
+* convert its arguments to C++,
+* call it and
+* convert its return value to Python.
 
 Hence, only functions whose arguments and return value are of **convertible types** can be called across languages.
-Clair will report a compilation error for any attempt to wrap a function with at an inconvertible type.
+``clair`` will report a compilation error for any attempt to wrap a function with an inconvertible type.
 
 
 Dynamical dispatch
@@ -28,14 +28,13 @@ Dynamical dispatch
 As a result, several functions in C++ will typically be gathered into one Python function.
 
 When the Python function is called, the number and types of its arguments are analyzed (at runtime), 
-and the first C++ function for which the Python arguments can be converted to the C++ type is called.
+and the first C++ function for which the Python arguments can be converted to the C++ types is called.
 If none applies, a Python exception is raised.
 
 Let us illustrate this with a simple example.
 
 .. literalinclude:: ../examples/fun1.cpp
    :language: cpp
-   :linenos:
 
 The compiler reports:
 
@@ -45,7 +44,7 @@ The compiler reports:
     --         . f(int x)
     --         . f(int x, int y)
    
-meaning that the two overloads of ``f`` are "gathered" in one Python function ``f``.
+meaning that the two C++ overloads of ``f`` are "gathered" in one Python function ``f``.
 
 .. code-block:: console
 
@@ -55,7 +54,7 @@ meaning that the two overloads of ``f`` are "gathered" in one Python function ``
    >>> M.f(1,2)
    3
 
-If no dispatch is possible for the arguments given, c2py reports a ``TypeError``, e.g.
+If no dispatch is possible for the arguments given, ``c2py`` reports a ``TypeError``, e.g.
 
 .. code-block:: console
 
@@ -89,5 +88,5 @@ or
 Template functions
 ------------------
 
-The instantiation of generic function in discussed in :ref:`customize`.
+The instantiation of generic functions in discussed in :ref:`customize`.
 

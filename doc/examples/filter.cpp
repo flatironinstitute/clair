@@ -15,8 +15,8 @@ namespace N {
 }
 
 namespace c2py_module {
-  auto match_names = "N::.*"; // only matches functions and names containing 
-  auto reject_names = "N::hidden";
+  auto match_names = "N::.*"; // match functions and names in namespace N
+  auto reject_names = "N::hidden"; // reject the specific name "hidden" in namespace N
 }
 
 

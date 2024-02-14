@@ -1,3 +1,5 @@
+// struct1.cpp
+
 #include <c2py/c2py.hpp>
 
 struct S {

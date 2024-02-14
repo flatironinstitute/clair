@@ -3,7 +3,7 @@
 Notebook integration
 ********************
 
-Clair defines a IPython notebook magic cell ``%%c2py`` 
+Clair defines an IPython notebook magic cell ``%%c2py`` 
 to compile C++ code from a notebook cell.
 
 

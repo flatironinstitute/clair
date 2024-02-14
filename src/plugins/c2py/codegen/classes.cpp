@@ -123,8 +123,10 @@ void codegen_getter_setter(std::ostream &code, std::ostream &table, std::ostream
   // Put in the table
   auto m = prop.getter.as_method();
   EXPECTS(m);
-  auto cast_op = (m->isConst() ? "castmc<>" : "castm<>");
-  auto setter  = (has_setter ? fmt::format("(setter)prop_set_{0}", counter) : str_t{"nullptr"});
+  auto cast_op = fmt::format("cast{}<>", (m ? (m->isStatic() ? "" : (m->isConst() ? "mc" : "m")) : ""));
+  // static method -> cast, const method -> castmc, non const, non static method -> castm
+
+  auto setter = (has_setter ? fmt::format("(setter)prop_set_{0}", counter) : str_t{"nullptr"});
   table << fmt::format(R"RAW( {{"{1}", c2py::getter_from_method<c2py::{3}(&{2})>, {4}, prop_doc_{0}, nullptr}},)RAW", //
                        counter, prop_name, prop.getter.ptr->getQualifiedNameAsString(), cast_op, setter);
 

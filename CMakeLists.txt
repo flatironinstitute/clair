@@ -5,6 +5,8 @@ if(POLICY CMP0144)
 endif()
 include(FetchContent)
 
+set(C2PY_BRANCH "0.1.x")
+
 project(clair VERSION 0.1.0 LANGUAGES C CXX)
 get_directory_property(IS_SUBPROJECT PARENT_DIRECTORY)
 if (IS_SUBPROJECT)

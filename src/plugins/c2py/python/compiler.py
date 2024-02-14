@@ -2,6 +2,7 @@ import importlib, os, platform, sys, shutil, subprocess, hashlib, re, tempfile, 
 
 debug = True
 dylib_ext = "dylib" if platform.system() == "Darwin" else "so"
+env_lib_path = "DYLD_LIBRARY_PATH" if platform.system() == "Darwin" else "LD_LIBRARY_PATH"
 
 def print_out (m, out) :
    print(m + out)
@@ -27,10 +28,10 @@ class ClangInvocation:
     """
     def __init__(self, cpp_preamble = "", env_preamble = "", flags= "", command = None):
         # FIXME : should I expand clair_flags ?
-        self.command =  command or "clang++ -fplugin=clair_c2py.%s `c2py_flags` -std=c++20 -shared -o {m}.so {m}.cpp -fdiagnostics-color=always %s "%(dylib_ext, flags)
+        self.command =  command or "clang++ -fplugin=clair_c2py.%s -std=c++20 -shared -o {m}.so {m}.cpp `c2py_flags` -fdiagnostics-color=always %s "%(dylib_ext, flags)
         self.cpp_preamble = cpp_preamble
         # We export the (DY)LD_LIBRARY_PATH from the current shell to the subprocess...
-        self.env_preamble = "export DYLD_LIBRARY_PATH=%s:$DYLD_LIBRARY_PATH"%os.environ["DYLD_LIBRARY_PATH"] + "\n" + env_preamble
+        self.env_preamble = "export %s=%s:$%s"%(env_lib_path, os.environ[env_lib_path], env_lib_path) + "\n" + env_preamble
 
     def copy(self):
         copy.deepcopy(self)

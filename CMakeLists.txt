@@ -203,7 +203,7 @@ if(NOT IS_SUBPROJECT
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clairvars.sh.in ${CMAKE_CURRENT_BINARY_DIR}/clairvars.sh @ONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clair.modulefile.in ${CMAKE_CURRENT_BINARY_DIR}/clair.modulefile @ONLY)
 
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/clairvars.sh DESTINATION share/clair)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/clairvars.sh ${CMAKE_CURRENT_BINARY_DIR}/clair.modulefile DESTINATION share/clair)
   message(STATUS "***************************************************************")
   message(STATUS "* Use :                                                        ")
   message(STATUS "*   source ${CMAKE_INSTALL_PREFIX}/share/clair/clairvars.sh  ")

@@ -1,2 +1,2 @@
-pygmentize -f rtf -O "fontface=Courier Bold" ${1} | pbcopy
+pygmentize -f rtf -O "fontface=Courier Bold" -O "fontsize=50" ${1} | pbcopy
 

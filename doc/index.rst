@@ -15,6 +15,10 @@ clair/c2y
          :target: https://github.com/flatironinstitute/clair
 
 
+Automatic C++ to Python bindings generation.
+
+This project is in beta stage. Documentation in progress.
+
     
 .. toctree::
    :maxdepth: 2

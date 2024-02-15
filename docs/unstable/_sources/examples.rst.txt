@@ -9,7 +9,7 @@ Examples
 
 
 Functions
-========
+=========
 
 The following example shows a C++ function that takes a ``std::vector<double>`` and returns the sum of its elements:
 

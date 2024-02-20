@@ -4,6 +4,4 @@
 #include <vector>
 #include <numeric>
 
-double sum(std::vector<double> const & v){ return std::accumulate(begin(v), end(v), 0.0);}
-
-
+double sum(std::vector<double> const &v) { return std::accumulate(begin(v), end(v), 0.0); }

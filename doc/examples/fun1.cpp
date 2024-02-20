@@ -5,5 +5,3 @@ struct A {
   double x;
   std::string s;
 };
-
-

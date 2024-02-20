@@ -10,4 +10,4 @@ namespace c2py_module {
   // Signature must be () -> void
   auto module_init = []() {};
 
-}
+} // namespace c2py_module

@@ -45,7 +45,7 @@ namespace clu {
         llvm::raw_string_ostream out(res);
         targ.print(policy, out, true);
         return out.str();
-      };                                                                                   // end lambda
+      }; // end lambda
 
       return (t.isConstQualified() ? "const " : "")                                        // const or not
          + spe->getTemplateName().getAsTemplateDecl()->getQualifiedNameAsString()          // template name, qualified

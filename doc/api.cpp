@@ -69,13 +69,12 @@ namespace c2py_module {
     // ---------- Properties ----------------
 
     auto prop1 = c2py::property<x_getter, N::x_setter>;
-    // 
-    // Or tag a getter function with 
-    // C2PY_PROPERTY 
+    //
+    // Or tag a getter function with
+    // C2PY_PROPERTY
     // C2PY_PROPERTY_SET(NAME)
-    // 
+    //
     // getter_as_properties = "regex"; // for all classes matching the regex, the method () returning non void are transformed into a property
-   
 
     // ----------------------------------------------------------
     // List of struct/classes to be wrapped, in addition the ones automatically detected
@@ -87,24 +86,23 @@ namespace c2py_module {
     // .e.g ...
     using A  = N::A;
     using Bi = N::B<int>;
-  
+
   } // namespace add
 
-    /// Additional methods to add to the Python class
-    /// e.g. method template instantiation, or new injected function h
-    template <> struct add_methods_to<A> {
-      // NB : for some obscure reason, C++ requires the & for a template method, but it can be omitted for regular functions
-      static constexpr auto h = c2py::dispatch<&N::A<int>::h<int>, N::h<double>>;
+  /// Additional methods to add to the Python class
+  /// e.g. method template instantiation, or new injected function h
+  template <> struct add_methods_to<A> {
+    // NB : for some obscure reason, C++ requires the & for a template method, but it can be omitted for regular functions
+    static constexpr auto h = c2py::dispatch<&N::A<int>::h<int>, N::h<double>>;
 
-      // A static method.
-      // TODO : implement and test
-      static constexpr auto h1 = c2py::dispatch_static<&N::A<int>::h<int>, N::h<double>>;
-    };
+    // A static method.
+    // TODO : implement and test
+    static constexpr auto h1 = c2py::dispatch_static<&N::A<int>::h<int>, N::h<double>>;
+  };
 
-    // Note. One can also make a derived struct in C++
-    // with the additional methods, and wrap it, merging the parent methods by blacklisting the parent.
-    // TODO : improve the test/example
-
+  // Note. One can also make a derived struct in C++
+  // with the additional methods, and wrap it, merging the parent methods by blacklisting the parent.
+  // TODO : improve the test/example
 
   // ----------------------------------------------------------
   // Arithmetic

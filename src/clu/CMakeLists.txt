@@ -1,11 +1,13 @@
-add_library(clu misc.cpp concept.cpp fullqualifiedname.cpp compile.cpp 
-                doc_string.cpp cmd_line_arg.cpp)
+file(GLOB_RECURSE sources *.cpp)
+add_library(clu ${sources})
+add_library(clair::clu ALIAS clu)
 
-target_include_directories(clu PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(clu PRIVATE $<BUILD_INTERFACE:clang_plugin>)
+# Enable warnings
+target_link_libraries(clu PRIVATE $<BUILD_INTERFACE:clair_warnings>)
 
+# Configure target and compilation
 target_compile_features(clu PRIVATE cxx_std_20)
 set_target_properties(clu PROPERTIES POSITION_INDEPENDENT_CODE ON)
-
-target_compile_definitions(clu PRIVATE -DCLANG_RESOURCE_DIR="${LLVM_ROOT_DIR}/lib/clang/${LLVM_VERSION_MAJOR}")
-
+target_link_libraries(clu PRIVATE $<BUILD_INTERFACE:clang_plugin>)
+target_include_directories(clu PRIVATE ${PROJECT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_definitions(clu PRIVATE CLANG_RESOURCE_DIR="${LLVM_ROOT_DIR}/lib/clang/${LLVM_VERSION_MAJOR}")

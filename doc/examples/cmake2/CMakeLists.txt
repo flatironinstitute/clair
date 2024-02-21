@@ -5,10 +5,10 @@ set(CMAKE_CXX_STANDARD 20)
 find_package(Python COMPONENTS Interpreter Development NumPy)
 find_package(c2py REQUIRED)
 
-# We can compile with or without the Clair plugin
-option(GENERATE_PYTHON_BINDINGS "Use Clair python bindings generators" OFF)
+# We can compile with or without the clair plugin
+option(GENERATE_PYTHON_BINDINGS "Use clair python bindings generators" OFF)
 if (GENERATE_PYTHON_BINDINGS)
-  find_package(Clair REQUIRED)
+  find_package(clair REQUIRED)
 endif()
 
 # If GENERATE_PYTHON_BINDINGS, we compile my_module.cpp else the bindings my_module.wrap.cxx 

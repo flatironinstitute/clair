@@ -1,10 +1,14 @@
 set(SRC_FILES ast_consumer.cpp matchers.cpp worker.cpp main.cpp)
-add_executable(annotate_fnt ${SRC_FILES} )
+add_executable(annotate_fnt ${SRC_FILES})
 
-target_link_libraries(annotate_fnt clang_plugin clu fmt::fmt clangTooling clangFrontend clangAST clangSerialization clangRewrite clangASTMatchers clangBasic LLVMSupport)
+# Enable warnings
+target_link_libraries(annotate_fnt PRIVATE $<BUILD_INTERFACE:clair_warnings>)
 
-target_include_directories(annotate_fnt PRIVATE ${CMAKE_SOURCE_DIR}/c++ ${CMAKE_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR})
-set_property(TARGET annotate_fnt PROPERTY POSITION_INDEPENDENT_CODE ON)
+# Configure target and compilation
 target_compile_features(annotate_fnt PRIVATE cxx_std_20)
+set_property(TARGET annotate_fnt PROPERTY POSITION_INDEPENDENT_CODE ON)
+target_include_directories(annotate_fnt PRIVATE ${PROJECT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(annotate_fnt PRIVATE clang_plugin clu fmt::fmt clangTooling clangFrontend clangAST clangSerialization clangRewrite clangASTMatchers clangBasic LLVMSupport)
 
-install(TARGETS annotate_fnt DESTINATION bin)
+# Install the tool
+install(TARGETS annotate_fnt DESTINATION ${CMAKE_INSTALL_BINDIR})

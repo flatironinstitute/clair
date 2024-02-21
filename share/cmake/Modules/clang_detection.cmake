@@ -30,8 +30,6 @@ MESSAGE(STATUS "CLANG_EXECUTABLE : ${CLANG_EXECUTABLE}")
 #===============================================================================
 #  Find clang-format
 #===============================================================================
-# FIXME : keep only if we keep the system call to clang-format
-# FIXME
 find_program (CLANG_FORMAT NAMES clang-format clang-format-${LLVM_VERSION_MAJOR} PATHS ${CLANG_INSTALL_PREFIX})
 MESSAGE(STATUS "CLANG_FORMAT : ${CLANG_FORMAT}")
 
@@ -39,20 +37,11 @@ MESSAGE(STATUS "CLANG_FORMAT : ${CLANG_FORMAT}")
 # Create an Interface target for compiler plugins
 #===============================================================================
 add_library(clang_plugin INTERFACE)
-target_compile_options(clang_plugin
-  INTERFACE
-    -Wall
-    -Wextra
-    -Wpedantic
-    -Wno-sign-compare
-    -Wno-gcc-compat
-    -Wno-unused-parameter
-)
 target_include_directories(clang_plugin SYSTEM INTERFACE ${CLANG_INCLUDE_DIR} ${LLVM_INCLUDE_DIR})
 
 # Allow undefined symbols in shared objects on Darwin (this is the default behaviour on Linux)
 target_link_libraries(clang_plugin INTERFACE "$<$<PLATFORM_ID:Darwin>:-undefined dynamic_lookup>")
 
-if (NOT LLVM_ENABLE_RTTI)
+if(NOT LLVM_ENABLE_RTTI)
  target_compile_options(clang_plugin INTERFACE -fno-rtti)
 endif()

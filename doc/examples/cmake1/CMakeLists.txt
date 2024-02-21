@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 # Find Python, c2py and clair
 find_package(Python COMPONENTS Interpreter Development NumPy)
 find_package(c2py REQUIRED)
-find_package(Clair REQUIRED)
+find_package(clair REQUIRED)
 
 Python_add_library(my_module MODULE my_module.cpp)
 

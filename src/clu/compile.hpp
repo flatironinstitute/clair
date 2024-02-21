@@ -9,5 +9,6 @@
 namespace clu {
 
   // Clone the compiler and make  a fresh compilation of code
-  void compile(clang::CompilerInstance &ci, std::string const &code, std::string const &outfilename);
+  void compile(clang::CompilerInstance &ci, std::string const &code);
+
 } // namespace clu

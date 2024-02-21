@@ -196,9 +196,8 @@ void codegen_getsetitem(std::ostream &code, cls_info_t const &cls_info) {
 
 // ===================================================================
 
-void codegen_cls(std::ostream &code, std::ostream &doc_stream, str_t const &cls_py_name, cls_info_t const &cls_info, str_t const &full_module_name) {
+void codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const &cls_info, str_t const &full_module_name) {
 
-  //logs.cls(fmt::format("{0} [c++: {1}]", cls_py_name, cls_info.ptr->getQualifiedNameAsString()));
   logs.cls(fmt::format("{1} [Python: {0}]", cls_py_name, cls_info.ptr->getQualifiedNameAsString()));
 
   auto *cls     = cls_info.ptr;
@@ -223,7 +222,7 @@ void codegen_cls(std::ostream &code, std::ostream &doc_stream, str_t const &cls_
       // FIXME : check
       codegen_synth_constructor(MethodDecls, cls_info.ptr);
     } else
-      codegen::write_dispatch_constructors(MethodDecls, MethodDocs, cls_name, cls_info.constructors);
+      codegen::write_dispatch_constructors(MethodDecls, cls_name, cls_info.constructors);
 
     // ---- methods
     for (auto const &[fpyname, overloads] : cls_info.methods)

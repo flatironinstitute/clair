@@ -45,20 +45,17 @@ class custom_action : public clang::PluginASTAction {
 
   // --------------------------
 
-  ASTConsumerPointer CreateASTConsumer(clang::CompilerInstance &compiler, llvm::StringRef Filename) override {
-    // std::cout << "output = " << compiler.getInvocation().getFrontendOpts().OutputFile << std::endl;
-    //std::cout << "input = " << compiler.getInvocation().getFrontendOpts().Inputs[0].getFile().str() << std::endl;
+  ASTConsumerPointer CreateASTConsumer(clang::CompilerInstance &compiler, llvm::StringRef) override {
     worker = std::make_unique<worker_t>(&compiler);
     return std::make_unique<ast_consumer>(worker);
   }
 
   // --------------------------
 
-  bool ParseArgs(clang::CompilerInstance const &CI, const std::vector<std::string> &args) override { return true; }
+  bool ParseArgs(clang::CompilerInstance const &, const std::vector<std::string> &) override { return true; }
 
   // --------------------------
 
-  //PluginASTAction::ActionType getActionType() override { return AddBeforeMainAction; }
   PluginASTAction::ActionType getActionType() override { return ReplaceAction; }
 
   // --------------------------
@@ -86,7 +83,7 @@ class custom_action : public clang::PluginASTAction {
     code = util::read_txt_file(outfilename);
 
     std::cout << "Compiling Python module " << worker->module_info.module_name << ".so ..." << std::endl;
-    clu::compile(ci, code, outfilename);
+    clu::compile(ci, code);
     std::cout << "Done." << std::endl;
   }
 

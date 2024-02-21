@@ -12,5 +12,5 @@ namespace clu {
   // and add the -resource-dir argument as detected from cmake.
   // We MUST fix the resource_dir on OS X in particular, or the
   // include e.g. on stdlib will fail
-  clang::tooling::CommandLineArguments get_clang_additional_args_from_env_variables(bool is_verbose = true);
+  clang::tooling::CommandLineArguments get_clang_additional_args_from_env_variables();
 } // namespace clu

@@ -82,10 +82,10 @@ namespace clu {
 
         else if (auto *other = llvm::dyn_cast_or_null<clang::comments::BlockCommandComment>(b)) {
           auto command_name = other->getCommandName(ctx->getCommentCommandTraits()).str();
-          if (auto *verb = llvm::dyn_cast_or_null<clang::comments::VerbatimLineComment>(other)) {
-            misc.emplace(command_name, util::trim(verb->getText().str()));
-          } else if (auto *verb = llvm::dyn_cast_or_null<clang::comments::VerbatimBlockComment>(other)) {
-            misc.emplace(command_name, util::trim(verb->getText(0).str()));
+          if (auto *comment = llvm::dyn_cast_or_null<clang::comments::VerbatimLineComment>(other)) {
+            misc.emplace(command_name, util::trim(comment->getText().str()));
+          } else if (auto *block_comment = llvm::dyn_cast_or_null<clang::comments::VerbatimBlockComment>(other)) {
+            misc.emplace(command_name, util::trim(block_comment->getText(0).str()));
           } else
             misc.emplace(command_name, get_one_paragraph(other->getParagraph()));
         }

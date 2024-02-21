@@ -125,11 +125,11 @@ str_t codegen_module(module_info_t const &m) {
   }
 
   std::stringstream FunctionDecls, FunctionTable, FunctionDocs;
-  std::stringstream ClassesDecls, ClassesDocs, PyTypeReadyDecls, AddTypeObjectDecls;
+  std::stringstream ClassesDecls, PyTypeReadyDecls, AddTypeObjectDecls;
   std::stringstream Hdf5C2pyIncluder, Hdf5RegistrationInit, Hdf5Registration;
 
   for (auto const &[cls_py_name, cls_info] : m.classes) {
-    codegen_cls(ClassesDecls, ClassesDocs, cls_py_name, cls_info, full_module_name);
+    codegen_cls(ClassesDecls, cls_py_name, cls_info, full_module_name);
 
     auto cls_name = clu::get_fully_qualified_name(cls_info.ptr);
     if (cls_info.base != nullptr)

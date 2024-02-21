@@ -187,8 +187,7 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
 }
 // ===================================================================
 
-void codegen::write_dispatch_constructors(std::ostream &code, std::ostream &doc, std::string const &cls_cpp_name,
-                                          std::vector<fnt_info_t> const &flist) {
+void codegen::write_dispatch_constructors(std::ostream &code, std::string const &cls_cpp_name, std::vector<fnt_info_t> const &flist) {
 
   static long counter = 0;
   code << fmt::format(R"RAW( static auto init_{} = c2py::dispatcher_c_kw_t {{ )RAW", counter) << '\n';

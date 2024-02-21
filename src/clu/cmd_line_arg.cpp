@@ -13,7 +13,7 @@ const auto CLANG_RESOURCE_DIR = "";
 static const std::string resource_dir = CLANG_RESOURCE_DIR;
 
 namespace clu {
-  clang::tooling::CommandLineArguments get_clang_additional_args_from_env_variables(bool is_verbose) {
+  clang::tooling::CommandLineArguments get_clang_additional_args_from_env_variables() {
 
     clang::tooling::CommandLineArguments arguments;
 

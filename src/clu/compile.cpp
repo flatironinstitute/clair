@@ -10,7 +10,7 @@
 
 namespace fs = std::filesystem;
 
-void clu::compile(clang::CompilerInstance &ci, std::string const &code, std::string const &outfilename) {
+void clu::compile(clang::CompilerInstance &ci, std::string const &code) {
   auto &CodeGenOpts = ci.getCodeGenOpts();
   auto &Target      = ci.getTarget();
   auto &Diagnostics = ci.getDiagnostics();

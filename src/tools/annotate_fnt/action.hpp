@@ -17,7 +17,7 @@ class custom_action : public clang::ASTFrontendAction {
 
   custom_action(config_t config) : config{std::move(config)} {}
 
-  ASTConsumerPointer CreateASTConsumer(clang::CompilerInstance &compiler, llvm::StringRef Filename) override {
+  ASTConsumerPointer CreateASTConsumer(clang::CompilerInstance &compiler, llvm::StringRef) override {
     worker = std::make_unique<worker_t>(&compiler, config);
     return std::make_unique<ast_consumer>(worker);
   }

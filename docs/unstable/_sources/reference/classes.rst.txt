@@ -3,7 +3,7 @@
 Classes
 *******
 
-Classes are automatically wrapped by Clair (according to the filter rule in the configuration :ref:`customize`).
+Classes are automatically wrapped by clair (according to the filter rule in the configuration :ref:`customize`).
 
 
 Constructors

@@ -55,7 +55,7 @@ while the function ``g``, and the struct ``N::hidden`` are not.
 Template instantiation. Explicitly wrapping a function
 ------------------------------------------------------
 
-In addition to the functions automatically detected by Clair, 
+In addition to the functions automatically detected by clair, 
 one can explicitly declare some functions to be wrapped in the ``c2py_module::add`` namespace
 using the ``c2py::dispatch`` type.
 This is specially useful for **template instantiation**.

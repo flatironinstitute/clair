@@ -159,11 +159,12 @@
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;c2py/c2py.hpp&quot;</span><span class="cp"></span>
 
 <span class="c1">/// A wonderful little class</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">my_class</span><span class="p">{</span><span class="w"></span>
+<span class="k">class</span><span class="w"> </span><span class="nc">my_class</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
+
 <span class="w">  </span><span class="k">public</span><span class="o">:</span><span class="w"></span>
-<span class="w">    </span><span class="n">my_class</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a_</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b_</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">a</span><span class="p">(</span><span class="n">a_</span><span class="p">),</span><span class="w"> </span><span class="n">b</span><span class="p">(</span><span class="n">b_</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span><span class="w"></span>
-<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">u</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">u</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">;}</span><span class="w"></span>
+<span class="w">  </span><span class="n">my_class</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a_</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b_</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">a</span><span class="p">(</span><span class="n">a_</span><span class="p">),</span><span class="w"> </span><span class="n">b</span><span class="p">(</span><span class="n">b_</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span><span class="w"></span>
+<span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">u</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">u</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">;</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
 <span class="p">};</span><span class="w"></span>
 </pre></div>
 </div>
@@ -177,7 +178,7 @@
 <span class="linenos"> 5</span><span class="c"># Find Python, c2py and clair</span>
 <span class="linenos"> 6</span><span class="nb">find_package</span><span class="p">(</span><span class="s">Python</span><span class="w"> </span><span class="s">COMPONENTS</span><span class="w"> </span><span class="s">Interpreter</span><span class="w"> </span><span class="s">Development</span><span class="w"> </span><span class="s">NumPy</span><span class="p">)</span>
 <span class="linenos"> 7</span><span class="nb">find_package</span><span class="p">(</span><span class="s">c2py</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
-<span class="linenos"> 8</span><span class="nb">find_package</span><span class="p">(</span><span class="s">Clair</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
+<span class="linenos"> 8</span><span class="nb">find_package</span><span class="p">(</span><span class="s">clair</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
 <span class="linenos"> 9</span>
 <span class="linenos">10</span><span class="nb">Python_add_library</span><span class="p">(</span><span class="s">my_module</span><span class="w"> </span><span class="s">MODULE</span><span class="w"> </span><span class="s">my_module.cpp</span><span class="p">)</span>
 <span class="linenos">11</span>
@@ -212,10 +213,10 @@ The <cite>CMakeLists.txt</cite> reads:</p>
 <span class="linenos"> 5</span><span class="nb">find_package</span><span class="p">(</span><span class="s">Python</span><span class="w"> </span><span class="s">COMPONENTS</span><span class="w"> </span><span class="s">Interpreter</span><span class="w"> </span><span class="s">Development</span><span class="w"> </span><span class="s">NumPy</span><span class="p">)</span>
 <span class="linenos"> 6</span><span class="nb">find_package</span><span class="p">(</span><span class="s">c2py</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
 <span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="c"># We can compile with or without the Clair plugin</span>
-<span class="linenos"> 9</span><span class="nb">option</span><span class="p">(</span><span class="s">GENERATE_PYTHON_BINDINGS</span><span class="w"> </span><span class="s2">&quot;Use Clair python bindings generators&quot;</span><span class="w"> </span><span class="s">OFF</span><span class="p">)</span>
+<span class="linenos"> 8</span><span class="c"># We can compile with or without the clair plugin</span>
+<span class="linenos"> 9</span><span class="nb">option</span><span class="p">(</span><span class="s">GENERATE_PYTHON_BINDINGS</span><span class="w"> </span><span class="s2">&quot;Use clair python bindings generators&quot;</span><span class="w"> </span><span class="s">OFF</span><span class="p">)</span>
 <span class="linenos">10</span><span class="nb">if</span> <span class="p">(</span><span class="s">GENERATE_PYTHON_BINDINGS</span><span class="p">)</span>
-<span class="linenos">11</span><span class="w">  </span><span class="nb">find_package</span><span class="p">(</span><span class="s">Clair</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
+<span class="linenos">11</span><span class="w">  </span><span class="nb">find_package</span><span class="p">(</span><span class="s">clair</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
 <span class="linenos">12</span><span class="nb">endif</span><span class="p">()</span>
 <span class="linenos">13</span>
 <span class="linenos">14</span><span class="c"># If GENERATE_PYTHON_BINDINGS, we compile my_module.cpp else the bindings my_module.wrap.cxx </span>
@@ -259,10 +260,10 @@ but it is often a good strategy to ensure it is compiled with the same compilers
 <span class="linenos">13</span><span class="p">)</span>
 <span class="linenos">14</span><span class="nb">FetchContent_MakeAvailable</span><span class="p">(</span><span class="s">c2py</span><span class="w"> </span><span class="p">)</span>
 <span class="linenos">15</span>
-<span class="linenos">16</span><span class="c"># We can compile with or without the Clair plugin</span>
-<span class="linenos">17</span><span class="nb">option</span><span class="p">(</span><span class="s">GENERATE_PYTHON_BINDINGS</span><span class="w"> </span><span class="s2">&quot;Use Clair python bindings generators&quot;</span><span class="w"> </span><span class="s">OFF</span><span class="p">)</span>
+<span class="linenos">16</span><span class="c"># We can compile with or without the clair plugin</span>
+<span class="linenos">17</span><span class="nb">option</span><span class="p">(</span><span class="s">GENERATE_PYTHON_BINDINGS</span><span class="w"> </span><span class="s2">&quot;Use clair python bindings generators&quot;</span><span class="w"> </span><span class="s">OFF</span><span class="p">)</span>
 <span class="linenos">18</span><span class="nb">if</span> <span class="p">(</span><span class="s">GENERATE_PYTHON_BINDINGS</span><span class="p">)</span>
-<span class="linenos">19</span><span class="w">  </span><span class="nb">find_package</span><span class="p">(</span><span class="s">Clair</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
+<span class="linenos">19</span><span class="w">  </span><span class="nb">find_package</span><span class="p">(</span><span class="s">clair</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
 <span class="linenos">20</span><span class="nb">endif</span><span class="p">()</span>
 <span class="linenos">21</span>
 <span class="linenos">22</span><span class="c"># If GENERATE_PYTHON_BINDINGS, we compile my_module.cpp (with the plugin) else the bindings my_module.wrap.cxx </span>

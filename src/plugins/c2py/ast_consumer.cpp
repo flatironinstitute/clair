@@ -131,6 +131,7 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
   if (ctx.getDiagnostics().hasErrorOccurred()) return;
 
   // ------- Match the classes in c2py_module::add: in main file
+  // FIXME : rename in add_to
   {
     matchers::module_cls_info_t ma{worker};
     MatchFinder mf;

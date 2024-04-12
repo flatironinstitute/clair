@@ -11,4 +11,4 @@ target_include_directories(annotate_fnt PRIVATE ${PROJECT_SOURCE_DIR}/src ${CMAK
 target_link_libraries(annotate_fnt PRIVATE clang_plugin clu fmt::fmt clangTooling clangFrontend clangAST clangSerialization clangRewrite clangASTMatchers clangBasic LLVMSupport)
 
 # Install the tool
-install(TARGETS annotate_fnt DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(TARGETS annotate_fnt DESTINATION bin)

@@ -166,9 +166,14 @@ namespace matchers {
 
     // Filter some automatic instantiation from the compiler, and alike
     if (!cls->getSourceRange().isValid()) return;
-    if (!cls->isCompleteDefinition()) return;                                                             // skip forward declaration.
-    if (cls->isLambda()) return;                                                                          // no lambda
+    if (!cls->isCompleteDefinition()) return; // skip forward declaration.
+    if (cls->isLambda()) return;              // no lambda
+
+#if LLVM_VERSION_MAJOR < 18
     if (not((cls->getTagKind() == clang::TTK_Struct) or (cls->getTagKind() == clang::TTK_Class))) return; // just struct and class
+#else
+    if (not((cls->getTagKind() == clang::TagTypeKind::Struct) or (cls->getTagKind() == clang::TagTypeKind::Class))) return; // just struct and class
+#endif
 
     if (auto *s = llvm::dyn_cast_or_null<clang::ClassTemplateSpecializationDecl>(cls)) {
       if (!s->getTypeAsWritten()) return;

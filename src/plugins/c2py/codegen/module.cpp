@@ -76,7 +76,7 @@ static struct PyModuleDef module_def = {{
 
 extern "C" __attribute__((visibility("default"))) PyObject *PyInit_{modulename}() {{
 
-  if (not c2py::check_python_version()) return NULL;
+  if (not c2py::check_python_version("{modulename}")) return NULL;
 
   // import numpy iff 'numpy/arrayobject.h' included
 #ifdef Py_ARRAYOBJECT_H

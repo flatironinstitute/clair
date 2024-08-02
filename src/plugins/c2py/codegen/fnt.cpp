@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <numeric>
 #include "./fnt.hpp"
+#include "data.hpp"
 #include <fmt/core.h>
 #include <fmt/format.h>
 using namespace fmt::literals;
@@ -121,7 +122,7 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
                              static auto const fun_{} = c2py::dispatcher_f_kw_t{{ )RAW",
                       pyname, fun_counter);
 
-  auto l = [&enforce_method, parent_class](auto &f_info) {
+  auto l = [&enforce_method, parent_class](fnt_info_t const &f_info) {
     auto *f    = f_info.ptr;
     auto *m    = llvm::dyn_cast_or_null<clang::CXXMethodDecl>(f);
     auto args  = fnt_params_with_default(f);

@@ -15,6 +15,8 @@ namespace clu {
   // Extract the name of a TemplateArgument. It is a bit tricky, so worth a function
   //
   str_t get_name_of_TemplateArgument(clang::TemplateArgument const &a, clang::ASTContext const *ctx);
+
+  // ---------- get_source_range_as_string ---------------------------
   // Given a source range, grab it as a string
   inline str_t get_source_range_as_string(clang::SourceRange const &sr, clang::ASTContext const *ctx) {
     return clang::Lexer::getSourceText(clang::CharSourceRange::getTokenRange(sr), ctx->getSourceManager(), ctx->getLangOpts()).str();

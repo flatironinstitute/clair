@@ -11,13 +11,15 @@ namespace cl = llvm::cl;
 // ==========  Options of the program using LLVM ===================
 
 static const cl::extrahelp OurHelp(R"HELPDOC(
-  decorate_fnt matches all function in a namespace and add an annotation
+  For every call expression a(i,j,k) where a is a class of name nda::.*
+  and for which the operator() is annoted [[deprecated]]
+  it replaces the () by a [] call, i.e. a[i,k,l]
+  including in generic code that are instantiated for a
   Usage e.g. : 
-    ./decorate_fnt ess.cpp --annotation=__device__ -ns=nda -- -std=c++20
+    ./decorate_fnt ess.cpp  -ns=nda -- -std=c++20
 )HELPDOC");
 static cl::OptionCategory decorate_fun_tool_category(""); //NOLINT
 static const cl::opt<std::string> opt_ns("ns", cl::desc("Namespace to restrict the matching"), cl::cat(decorate_fun_tool_category));
-static const cl::opt<std::string> opt_annotate("annotation", cl::desc("Annotation to add to the function"), cl::cat(decorate_fun_tool_category));
 
 //====================   main    ==========================================
 
@@ -37,7 +39,7 @@ int main(int argc, const char **argv) try {
     return EXIT_FAILURE;
   }
 
-  auto config = config_t{opt_ns.c_str(), opt_annotate + " "};
+  auto config = config_t{opt_ns.c_str()};
 
   // ------- main tool
 

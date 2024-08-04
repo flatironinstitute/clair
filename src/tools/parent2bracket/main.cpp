@@ -48,6 +48,7 @@ int main(int argc, const char **argv) try {
   // Additional Command line arguments to be given to the compiler, after all other options
   // from e.g. CXXFLAGS and co, and the -resource-dir.
   auto args = clu::get_clang_additional_args_from_env_variables();
+  args.emplace_back("-Wno-deprecated-declarations");
   for (auto const &x : args) logs.report("Adding {}", x);
   main_tool.appendArgumentsAdjuster(getInsertArgumentAdjuster(args, clang::tooling::ArgumentInsertPosition::END));
 

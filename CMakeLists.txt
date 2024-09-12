@@ -6,7 +6,7 @@ endif()
 
 # ############
 # Define Project
-project(clair VERSION 0.1.0 LANGUAGES C CXX)
+project(clair VERSION 0.1.0 LANGUAGES CXX)
 get_directory_property(IS_SUBPROJECT PARENT_DIRECTORY)
 
 if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")

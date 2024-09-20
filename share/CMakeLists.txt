@@ -5,12 +5,6 @@ if(NOT IS_SUBPROJECT
   AND NOT CMAKE_INSTALL_PREFIX STREQUAL "/usr/local"
 )
 
-  if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-     set(LD_LIBRARY_PATH_PREFIX "DYLD")
-  else()
-     set(LD_LIBRARY_PATH_PREFIX "LD")
-  endif()
-
   configure_file(clair.modulefile.in ${PROJECT_NAME}.modulefile @ONLY)
   configure_file(clairvars.sh.in ${PROJECT_NAME}vars.sh @ONLY)
 

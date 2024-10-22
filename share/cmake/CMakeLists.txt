@@ -7,4 +7,4 @@ install(
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/clair
 )
 
-install(EXPORT clair-targets NAMESPACE c2py:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/clair)
+install(EXPORT clair-targets NAMESPACE clair:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/clair)

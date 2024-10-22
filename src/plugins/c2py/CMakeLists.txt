@@ -33,7 +33,7 @@ add_dependencies(c2py_plugin clair_c2py)
 target_compile_options(c2py_plugin
   INTERFACE
   $<BUILD_INTERFACE:-fplugin=${CMAKE_CURRENT_BINARY_DIR}/clair_c2py${CMAKE_SHARED_LIBRARY_SUFFIX}>
-  $<INSTALL_INTERFACE:-fplugin=${CMAKE_INSTALL_LIBDIR}/clair_c2py${CMAKE_SHARED_LIBRARY_SUFFIX}>
+  $<INSTALL_INTERFACE:-fplugin=${CMAKE_INSTALL_FULL_LIBDIR}/clair_c2py${CMAKE_SHARED_LIBRARY_SUFFIX}>
 )
 target_compile_definitions(c2py_plugin INTERFACE C2PY_INCLUDED)
 add_library(clair::c2py_plugin ALIAS c2py_plugin)

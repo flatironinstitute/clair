@@ -12,7 +12,7 @@ set(CLAIR_LLVM_VERSION @CMAKE_CXX_COMPILER_VERSION@)
 set(@PROJECT_NAME@_ROOT @CMAKE_INSTALL_PREFIX@ CACHE STRING "@PROJECT_NAME@ root directory")
 
 # Include the exported targets of this project
-include(@CMAKE_INSTALL_PREFIX@/lib/cmake/@PROJECT_NAME@/@PROJECT_NAME@-targets.cmake)
+include(@CMAKE_INSTALL_FULL_LIBDIR@/cmake/@PROJECT_NAME@/@PROJECT_NAME@-targets.cmake)
 
 if (NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "@CMAKE_CXX_COMPILER_ID@")
  MESSAGE(FATAL_ERROR "Clair plugins are only usable with clang")
@@ -26,11 +26,8 @@ message(STATUS "Found @PROJECT_NAME@-config.cmake with version @PROJECT_VERSION@
 
  # Mac specific
  if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  set(CMAKE_INSTALL_NAME_DIR "@CMAKE_INSTALL_PREFIX@/lib")
+  set(CMAKE_INSTALL_NAME_DIR "@CMAKE_INSTALL_FULL_LIBDIR@")
   set(CMAKE_MACOSX_RPATH 1) # new for cmake 3.x
  endif()
-
- # include the exported targets of this project
- include(@CMAKE_INSTALL_PREFIX@/lib/cmake/clair/clair-targets.cmake)
 
 endif()

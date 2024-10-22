@@ -176,7 +176,7 @@ namespace matchers {
 #endif
 
     if (auto *s = llvm::dyn_cast_or_null<clang::ClassTemplateSpecializationDecl>(cls)) {
-      if (!s->getTypeAsWritten()) return;
+      if (!s->isExplicitInstantiationOrSpecialization()) return;
     }
 
     // Reject the declaration of the template itself.

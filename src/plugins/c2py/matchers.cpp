@@ -95,6 +95,8 @@ template <> void matcher<mtch::Concept>::run(const MatchResult &Result) {
       worker->force_instantiation_add_methods = cpt;
     else if (cname == "HasSerializeLikeBoost")
       worker->HasSerializeLikeBoost = cpt;
+    else if (cname == "HasNonDeletedDefaultConstructor")
+      worker->HasNonDeletedDefaultConstructor = cpt;
     else if (cname == "Storable")
       worker->HasHdf5 = cpt;
     // else ignore the others concepts

@@ -134,11 +134,17 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
 
     logs.fun_c(fmt::format("{0}({1})", fname, fnt_param_with_types(f)));
 
-    if (f_info.rewrite)
-      return fmt::format(R"RAW( c2py::cfun([]({}) {{ return {}({}); }} {} {}))RAW", fnt_param_with_types(f), fname, fnt_params(f), comma_if(args),
-                         args);
-    else {
-      //if (f->isTemplateInstantiation())
+    if (f_info.rewrite) {
+      if (m and parent_class and not m->isStatic())
+        return fmt::format(R"RAW( c2py::cmethod([]({0} {6} & self {1} {2}) {{ return self.{3}({4}); }}, "self" {1} {5}))RAW", //
+                           clu::get_fully_qualified_name(parent_class), comma_if(args),                                       //
+                           fnt_param_with_types(f), f->getNameAsString(), fnt_params(f), args, (m->isConst() ? "const" : ""));
+      else
+        return fmt::format(R"RAW( c2py::cfun([]({}) {{ return {}({}); }} {} {}))RAW", //
+                           fnt_param_with_types(f), fname, fnt_params(f), comma_if(args), args);
+
+    } else {
+      // almost never used except in user defined dispatch ? ...
       if (f->getTemplateSpecializationArgs())
         return fmt::format(R"RAW( c2py::{}( &{}<{}> {} {}))RAW", cfun_or_cmethod, fname, fnt_tparams(f), comma_if(args), args);
       else
@@ -170,7 +176,7 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
   if (pyname == "__call__")
     code << '\n'
          << fmt::format(R"RAW(  template <> inline constexpr ternaryfunc c2py::tp_call<{0}> = c2py::pyfkw<fun_{1}>;  )RAW",
-                        parent_class->getQualifiedNameAsString(), fun_counter)
+                        clu::get_fully_qualified_name(parent_class), fun_counter)
          << '\n';
   else { // generic case
     // is one of the methods static ?

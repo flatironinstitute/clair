@@ -310,4 +310,11 @@ void worker_t::run() {
   this->remove_multiple_decl();
   this->separate_properties();
   this->check_convertibility();
+
+  // Checks
+  for (auto &[_, cls_info] : this->module_info.classes) {
+    if (cls_info.constructors.empty() and not cls_info.synthetize_dict_attribute()
+        and not clu::satisfy_concept(cls_info.ptr, this->HasNonDeletedDefaultConstructor, this->ci))
+      clu::emit_error(cls_info.ptr, "This class has no wrapped constructor and is not default constructible.");
+  }
 }

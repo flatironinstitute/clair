@@ -9,6 +9,7 @@ struct worker_t {
   clang::ConceptDecl const *force_instantiation_add_methods = nullptr;
   clang::ConceptDecl const *HasSerializeLikeBoost           = nullptr;
   clang::ConceptDecl const *HasHdf5                         = nullptr;
+  clang::ConceptDecl const *HasNonDeletedDefaultConstructor = nullptr;
 
   module_info_t module_info;
   clang::ClassTemplateDecl const *add_methods_to = nullptr;

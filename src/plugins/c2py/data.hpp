@@ -4,7 +4,6 @@
 #include <optional>
 #include "utility/string_tools.hpp"
 #include "utility/logger.hpp"
-//#include "clu/misc.hpp"
 #include "clang/AST/DeclCXX.h"
 
 using cls_ptr_t = clang::CXXRecordDecl const *;
@@ -13,8 +12,10 @@ using fnt_ptr_t = clang::FunctionDecl const *;
 // -----------------------------------------------------------
 
 struct fnt_info_t {
-  fnt_ptr_t ptr          = nullptr;
-  bool rewrite           = false; // (as_method() ? false : true); //false; // do we need to rewrite it with a lambda (e.g. friend)
+  fnt_ptr_t ptr = nullptr;
+  bool rewrite  = true;
+  // If true, we rewrite the function into a lambda instead of using its pointer.
+  // Must be true in general due to a few corner cases discovered after v0.1.
   cls_ptr_t parent_class = nullptr;
   //bool no_gil                              = clu::has_annotation(ptr, "c2py_nogil");
   [[nodiscard]] clang::CXXMethodDecl const *as_method() const { return llvm::dyn_cast_or_null<clang::CXXMethodDecl>(ptr); }

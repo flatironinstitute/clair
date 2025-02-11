@@ -18,6 +18,23 @@ static const struct {
 
 // ===================================================================
 
+// FIXME : move it up
+// Find the initializer of a FieldDecl
+// NB the case of a template class is specific, as the getInClassInitializer
+// would not work there.
+clang::Expr const *get_field_initializer(clang::FieldDecl const *f) {
+  if (clang::Expr const *init = f->getInClassInitializer()) return init; // non-template structs
+
+  // If f is from a template instantiation, find the original field in the primary template
+  if (auto const *cls = dyn_cast<clang::CXXRecordDecl>(f->getParent()))
+    if (auto const *tip = cls->getTemplateInstantiationPattern())
+      for (clang::FieldDecl const *f_tpl : tip->fields())
+        if (f_tpl->getName() == f->getName()) return f_tpl->getInClassInitializer(); // Retrieve from primary template
+  return nullptr;
+}
+
+// ===================================================================
+
 void codegen_synth_constructor(std::ostream &code, cls_info_t const &cls_info) {
   auto const *cls = cls_info.ptr;
   auto cls_name   = clu::get_fully_qualified_name(cls); //cls->getQualifiedNameAsString();
@@ -31,15 +48,10 @@ void codegen_synth_constructor(std::ostream &code, cls_info_t const &cls_info) {
   simple_fields.reserve(100); //NOLINT
 
   for (auto *f : cls_info.fields) {
-    // FIXME error is quite late. Move up
-    if (f->getAccess() != clang::AS_public) {
-      clu::emit_error(f, "c2py: Synthetizing constructor for pydict. Private fields not supported");
-      continue;
-    }
 
     // if f is a type, which has no default constructor and no defaut initializer is the class
     // we build it at the construction of the object, using designated initializer (as we skip other fields)
-    if (auto *clsf = f->getType()->getAsCXXRecordDecl(); clsf and not clsf->hasDefaultConstructor() and (f->getInClassInitializer() == nullptr)) {
+    if (auto *clsf = f->getType()->getAsCXXRecordDecl(); clsf and not clsf->hasDefaultConstructor() and (get_field_initializer(f) == nullptr)) {
       non_default_const_params.push_back(fmt::format(R"RAW(.{1} = de.get<{0}>("{1}"))RAW", clsf->getQualifiedNameAsString(), f->getNameAsString()));
     } else
       simple_fields.push_back(f);
@@ -60,10 +72,10 @@ void codegen_synth_constructor(std::ostream &code, cls_info_t const &cls_info) {
       }}
       auto & self_c = *(((c2py::wrap<{0}> *)self)->_c);
  )RAW",
-                      cls->getQualifiedNameAsString(), counter, join(non_default_const_params, ','));
+                      clu::get_fully_qualified_name(cls), counter, join(non_default_const_params, ','));
 
   for (auto *f : simple_fields)
-    code << fmt::format(R"RAW( de("{0}", self_c.{0}, {1}); )RAW", f->getNameAsString(), (f->getInClassInitializer() != nullptr));
+    code << fmt::format(R"RAW( de("{0}", self_c.{0}, {1}); )RAW", f->getNameAsString(), (get_field_initializer(f) != nullptr));
 
   code << fmt::format(R"RAW(
        return de.check();
@@ -71,7 +83,7 @@ void codegen_synth_constructor(std::ostream &code, cls_info_t const &cls_info) {
 
      template <> constexpr initproc c2py::tp_init<{}> = synth_constructor_{};
    )RAW",
-                      cls->getQualifiedNameAsString(), counter);
+                      clu::get_fully_qualified_name(cls), counter);
 
   ++counter;
 }
@@ -88,7 +100,7 @@ void codegen_synth___dict_attribute(std::ostream &code, std::ostream &table, cls
        << fmt::format(R"RAW( static PyObject *prop_get_dict_{0}(PyObject *self, void *) {{
                               auto & self_c = *(((c2py::wrap<{1}> *)self)->_c);
                               c2py::pydict dic; )RAW",
-                      counter, cls->getQualifiedNameAsString());
+                      counter, clu::get_fully_qualified_name(cls));
 
   for (auto *f : cls_info.fields) {
     //if (f->getAccess() != clang::AS_public) continue; // SHOULD BE USELESS
@@ -226,7 +238,6 @@ void codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const 
 
     // ---- constructor
     if (cls_info.synthetize_init_from_pydict()) {
-      // FIXME : check
       codegen_synth_constructor(MethodDecls, cls_info);
     } else
       codegen::write_dispatch_constructors(MethodDecls, cls_name, cls_info.constructors);

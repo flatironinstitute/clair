@@ -52,7 +52,8 @@ void codegen_synth_constructor(std::ostream &code, cls_info_t const &cls_info) {
     // if f is a type, which has no default constructor and no defaut initializer is the class
     // we build it at the construction of the object, using designated initializer (as we skip other fields)
     if (auto *clsf = f->getType()->getAsCXXRecordDecl(); clsf and not clsf->hasDefaultConstructor() and (get_field_initializer(f) == nullptr)) {
-      non_default_const_params.push_back(fmt::format(R"RAW(.{1} = de.get<{0}>("{1}"))RAW", clsf->getQualifiedNameAsString(), f->getNameAsString()));
+      non_default_const_params.push_back(
+         fmt::format(R"RAW(.{1} = de.get<{0}>("{1}"))RAW", clu::get_fully_qualified_name(clsf), f->getNameAsString()));
     } else
       simple_fields.push_back(f);
   }

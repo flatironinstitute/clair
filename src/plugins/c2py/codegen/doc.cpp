@@ -90,7 +90,7 @@ std::string doc_of_synthetized_constructor(cls_info_t const &cls_info) {
     //doc << "\n" << std::regex_replace(f[3], start, "   ");
     doc << "\n\n";
   }
-  llvm::errs() << doc.str();
+  //llvm::errs() << doc.str();
   return doc.str();
 }
 

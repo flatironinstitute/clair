@@ -36,7 +36,11 @@ void clu::compile(clang::CompilerInstance &ci, std::string const &code) {
   clang::CompilerInstance ciNew;
   ciNew.setInvocation(cinvNew);
   ciNew.setTarget(&Target);
+#if LLVM_VERSION_MAJOR >= 20
+  ciNew.createDiagnostics(*llvm::vfs::getRealFileSystem());
+#else
   ciNew.createDiagnostics();
+#endif
 
   // create rewrite buffer
   auto FileMemoryBuffer = llvm::MemoryBuffer::getMemBufferCopy(code);

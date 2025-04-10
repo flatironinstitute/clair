@@ -11,7 +11,7 @@ MESSAGE(STATUS "SPHINXBUILD_EXECUTABLE = ${SPHINXBUILD_EXECUTABLE}")
 # Sphinx has internal caching, always run it
 add_custom_target(clair_docs_sphinx ALL)
 add_custom_command(
-  TARGET clair_docs_sphinx
+  TARGET clair_docs_sphinx POST_BUILD
   COMMAND PYTHONPATH=${PROJECT_BINARY_DIR}/python:${h5_BINARY_DIR}/python:$ENV{PYTHONPATH} ${SPHINXBUILD_EXECUTABLE} -c . -j8 -b html ${CMAKE_CURRENT_SOURCE_DIR} html
 )
 

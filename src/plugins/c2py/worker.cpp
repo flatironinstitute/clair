@@ -61,8 +61,9 @@ void scan_class_elements(cls_info_t &cls_info, module_info_t &m_info, cls_ptr_t 
   const bool is_base_class = (cls != cls_info.ptr);
 
   // factor the treatment of method and template instantation method
-  auto treat_method = [&](clang::FunctionDecl const *decl) {
-    auto *m = llvm::dyn_cast<clang::CXXMethodDecl>(decl);
+  auto treat_method = [&](clang::FunctionDecl const *f) {
+    if (f->isDeleted()) return;
+    auto *m = llvm::dyn_cast<clang::CXXMethodDecl>(f);
     if (!m) return;
     if (llvm::isa<clang::CXXDestructorDecl>(m)) return;                   // no destructors
     if (m->isMoveAssignmentOperator()) return;                            // no move assign

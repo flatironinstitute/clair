@@ -140,7 +140,7 @@ template <> void matcher<mtch::ModuleClsWrap>::run(const MatchResult &Result) {
   auto *d = Result.Nodes.getNodeAs<clang::TypeAliasDecl>("decl");
   assert(d);
   if (auto *cls = d->getUnderlyingType()->getAsCXXRecordDecl()) {
-    if (auto *cls_i = llvm::dyn_cast<clang::ClassTemplateSpecializationDecl>(cls)) {
+    if (llvm::dyn_cast<clang::ClassTemplateSpecializationDecl>(cls)) {
       // probably useless ?
       if (not cls->hasDefinition()) { clu::emit_error(d, "c2py: The class template should be explicitly instantiated"); }
     }
@@ -224,15 +224,19 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
 
   auto *f = Result.Nodes.getNodeAs<clang::FunctionDecl>("func");
   if (!f) return;
-
   // ............. Discard some automatic instantiation from the compiler, and alike
 
   // f in e.g. operator new, internal function, not defined in the sources
   // function defined in std headers are already filtered by the AST Matching
   if (!f->getBeginLoc().isValid()) return;
 
-  // Skip automatic template instantiation by the compiler
-  if (f->isFunctionTemplateSpecialization()) return;
+  // Instantiation: accept only EXPLICIT instantiation
+  if (const auto *info = f->getTemplateSpecializationInfo(); info and not info->isExplicitInstantiationOrSpecialization()) return;
+  // We could also accept all instantiation on the main file ...
+  //auto &SM = worker->ci->getSourceManager();
+  //(SM.isInMainFile(f->getPointOfInstantiation()))
+  //fmt::println("Point of instantitation : {}", f->getPointOfInstantiation().printToString(SM));
+  //if (f->isFunctionTemplateSpecialization()) return;
 
   // Skip deleted function
   if (f->isDeleted()) return;

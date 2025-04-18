@@ -68,6 +68,7 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
   {
     matcher<mtch::Cls> ma{worker};
     MatchFinder mf;
+    //std::cout << "worker->module_info.match_names" << worker->module_info.match_names;
     if (auto const &s = worker->module_info.match_names; not s.empty())
       mf.addMatcher(cxxRecordDecl(matchesName(s), unless(isExpansionInSystemHeader())).bind("class"), &ma);
     //mf.addMatcher(namespaceDecl(unless(isExpansionInSystemHeader()), hasName(ns), forEach(cxxRecordDecl().bind("class"))), &ma);

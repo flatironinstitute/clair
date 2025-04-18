@@ -37,7 +37,7 @@ static constexpr auto module_code_tpl = R"RAW(
 #include "{sourcefile}"
 {Hdf5C2pyIncluder}
 
-using c2py::operator"" _a;
+using c2py::operator""_a;
 
 // ==================== Wrapped classes =====================
 

@@ -60,34 +60,47 @@ void scan_class_elements(cls_info_t &cls_info, module_info_t &m_info, cls_ptr_t 
 
   const bool is_base_class = (cls != cls_info.ptr);
 
+  // factor the treatment of method and template instantation method
+  auto treat_method = [&](clang::FunctionDecl const *decl) {
+    auto *m = llvm::dyn_cast<clang::CXXMethodDecl>(decl);
+    if (!m) return;
+    if (llvm::isa<clang::CXXDestructorDecl>(m)) return;                   // no destructors
+    if (m->isMoveAssignmentOperator()) return;                            // no move assign
+    if (auto *ctr = llvm::dyn_cast_or_null<clang::CXXConstructorDecl>(m); //
+        ctr and ctr->isCopyOrMoveConstructor())
+      return; // no move or copy constructor
+
+    // Operators : keep only [] and ()
+    static auto const re = std::regex{"operator(.*)"};
+    std::smatch ma;
+    str_t qname = m->getNameAsString();
+    if (std::regex_match(qname, ma, re)) {
+      static auto ok_ops = std::vector<str_t>{"[]", "()"};
+      if (llvm::find(ok_ops, ma[1].str()) == ok_ops.end()) return;
+    }
+
+    if (llvm::isa<clang::CXXConstructorDecl>(m)) {
+      if (not is_base_class) cls_info.constructors.push_back({m});
+      return;
+    }
+    // last case : general method
+    // Should be useless. Reject non explicit instantiation
+    // if (const auto *info = m->getTemplateSpecializationInfo(); info and not info->isExplicitInstantiationOrSpecialization()) { continue; }
+    cls_info.methods[m->getNameAsString()].push_back({m});
+  };
+  //------------
+
   for (clang::Decl *decl : cls->decls()) { // all declarations in the class
     if (decl->getAccess() != clang::AS_public) continue;
     if (is_rejected(decl, m_info.reject_names, &logs.rejected)) continue;
-
-    // -------- method
-    if (auto *m = llvm::dyn_cast<clang::CXXMethodDecl>(decl)) {
-
-      if (llvm::isa<clang::CXXDestructorDecl>(m)) continue;                 // no destructors
-      if (m->isMoveAssignmentOperator()) continue;                          // no move assign
-      if (auto *ctr = llvm::dyn_cast_or_null<clang::CXXConstructorDecl>(m); //
-          ctr and ctr->isCopyOrMoveConstructor())
-        continue; // no move or copy constructor
-
-      // Operators : keep only [] and ()
-      static auto const re = std::regex{"operator(.*)"};
-      std::smatch ma;
-      str_t qname = m->getNameAsString();
-      if (std::regex_match(qname, ma, re)) {
-        static auto ok_ops = std::vector<str_t>{"[]", "()"};
-        if (llvm::find(ok_ops, ma[1].str()) == ok_ops.end()) continue;
-      }
-
-      if (llvm::isa<clang::CXXConstructorDecl>(m)) {
-        if (not is_base_class) cls_info.constructors.push_back({m});
-      } else
-        cls_info.methods[m->getNameAsString()].push_back({m});
+    // --------  method
+    if (auto *m = llvm::dyn_cast<clang::FunctionDecl>(decl)) {
+      treat_method(m);
     }
-
+    // -------- templated method
+    else if (auto *m_tpl = llvm::dyn_cast<clang::FunctionTemplateDecl>(decl)) {
+      for (auto *spec : m_tpl->specializations()) treat_method(spec);
+    }
     // -------- fields
     else if (auto *f = llvm::dyn_cast<clang::FieldDecl>(decl)) {
       cls_info.fields.push_back(f);

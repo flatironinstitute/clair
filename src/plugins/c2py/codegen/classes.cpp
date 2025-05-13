@@ -162,18 +162,19 @@ void codegen_getsetitem(std::ostream &code, cls_info_t const &cls_info) {
   if ((not cls_info.has_size_method) and cls_info.getitems.empty()) return;
 
   auto const *cls = cls_info.ptr;
+  auto cls_name   = clu::get_fully_qualified_name(cls);
 
-  auto get_ovs = [cls](auto &f_info) {
+  auto get_ovs = [&cls_name](auto &f_info) {
     auto *m = llvm::dyn_cast_or_null<clang::CXXMethodDecl>(f_info.ptr);
-    return fmt::format(R"RAW( c2py::cfun2(c2py::getitem<{0}, {1}>))RAW", cls->getQualifiedNameAsString(), fnt_paramtypes(m));
+    return fmt::format(R"RAW( c2py::cfun2(c2py::getitem<{0}, {1}>))RAW", cls_name, fnt_paramtypes(m));
   };
 
-  auto set_ovs = [cls](auto &f_info) {
+  auto set_ovs = [&cls_name](auto &f_info) {
     auto *m = llvm::dyn_cast_or_null<clang::CXXMethodDecl>(f_info.ptr);
-    return fmt::format(R"RAW( c2py::cfun2(c2py::setitem<{0}, {1}>))RAW", cls->getQualifiedNameAsString(), fnt_paramtypes(m));
+    return fmt::format(R"RAW( c2py::cfun2(c2py::setitem<{0}, {1}>))RAW", cls_name, fnt_paramtypes(m));
   };
 
-  str_t size_code    = (cls_info.has_size_method ? fmt::format("c2py::tpxx_size<{}>", cls->getQualifiedNameAsString()) : "nullptr");
+  str_t size_code    = (cls_info.has_size_method ? fmt::format("c2py::tpxx_size<{}>", cls_name) : "nullptr");
   str_t getitem_code = "nullptr";
   str_t setitem_code = "nullptr";
 
@@ -209,7 +210,7 @@ void codegen_getsetitem(std::ostream &code, cls_info_t const &cls_info) {
   code << fmt::format(R"RAW(
            template <> PyMappingMethods c2py::tp_as_mapping<{0}> = {{ {1}, {2}, {3} }};
           )RAW",
-                      cls->getQualifiedNameAsString(), size_code, getitem_code, setitem_code);
+                      cls_name, size_code, getitem_code, setitem_code);
 
   counter++;
 }

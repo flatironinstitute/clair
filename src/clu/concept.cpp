@@ -40,8 +40,8 @@ bool clu::satisfy_concept(clang::QualType const &ty, clang::ConceptDecl const *c
 #else
   bool error = ci->getSema().CheckConstraintSatisfaction(cpt, constraint_exprs, targs, cpt->getSourceRange(), s);
 #endif
-  EXPECTS_WITH_MESSAGE(not error, "CheckConstraintSatisfaction : internal error");
+  //EXPECTS_WITH_MESSAGE(not error, "CheckConstraintSatisfaction : internal error");
 
   //if (not s.IsSatisfied) ci->getSema().DiagnoseUnsatisfiedConstraint(s);
-  return s.IsSatisfied;
+  return !error and s.IsSatisfied;
 }

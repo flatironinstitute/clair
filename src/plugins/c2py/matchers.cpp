@@ -174,6 +174,8 @@ template <> void matcher<mtch::Cls>::run(const clang::ast_matchers::MatchFinder:
   if (!cls->getSourceRange().isValid()) return;
   if (!cls->isCompleteDefinition()) return; // skip forward declaration.
   if (cls->isLambda()) return;              // no lambda
+  if (auto a = cls->getAccess(); a == clang::AccessSpecifier::AS_protected or a = clang::AccessSpecifier::AS_private)
+    return; // remove protected/private classes
 
 #if LLVM_VERSION_MAJOR < 18
   if (not((cls->getTagKind() == clang::TTK_Struct) or (cls->getTagKind() == clang::TTK_Class))) return; // just struct and class

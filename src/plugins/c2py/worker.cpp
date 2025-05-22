@@ -100,7 +100,8 @@ void scan_class_elements(cls_info_t &cls_info, module_info_t &m_info, cls_ptr_t 
     }
     // -------- templated method
     else if (auto *m_tpl = llvm::dyn_cast<clang::FunctionTemplateDecl>(decl)) {
-      for (auto *spec : m_tpl->specializations()) treat_method(spec);
+      for (auto *spec : m_tpl->specializations())
+        if (auto *info = spec->getTemplateSpecializationInfo(); info and info->isExplicitInstantiationOrSpecialization()) treat_method(spec);
     }
     // -------- fields
     else if (auto *f = llvm::dyn_cast<clang::FieldDecl>(decl)) {

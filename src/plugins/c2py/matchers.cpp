@@ -19,7 +19,10 @@ static const struct {
 // Gets the initializer of the VarDecl, removing the ImplicitCastExpr
 const clang::Expr *get_vardecl_initlalizer(clang::VarDecl const *decl) {
   auto *value = decl->getAnyInitializer();
-  auto *iexpr = llvm::dyn_cast_or_null<clang::ImplicitCastExpr>(value);
+
+  auto *ex = llvm::dyn_cast_or_null<clang::ExprWithCleanups>(value);
+  auto *ex2 = (ex ? *(ex-> children().begin()) : value);
+  auto *iexpr = llvm::dyn_cast_or_null<clang::ImplicitCastExpr>(ex2);
   while (iexpr) {
     value = iexpr->getSubExpr();
     iexpr = llvm::dyn_cast_or_null<clang::ImplicitCastExpr>(value);

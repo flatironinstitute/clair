@@ -42,11 +42,15 @@ str_t fnt_params_with_default(clang::FunctionDecl const *f) {
     }
   }
 
+  // if f is a template specialization, we take the original declaration (template)
+  if (auto *info = f->getTemplateSpecializationInfo(); info and info->isExplicitInstantiationOrSpecialization())
+    f = info->getTemplate()->getTemplatedDecl();
+
   // extract the default argument of a parameter declaration
   auto extract_default_argument = [](clang::ParmVarDecl const *p) -> str_t {
     clang::Expr const *defarg = p->getDefaultArg();
     EXPECTS(defarg);
-    if (not defarg) return {};
+    //if (not defarg) return {};
     clang::ASTContext *ctx = &p->getASTContext();
 
     // first if implicit conversion, remove this layer

@@ -2,9 +2,22 @@ name: build
 
 on:
   push:
-    branches: [ unstable ]
+    branches: [ unstable, '[0-9]+.[0-9]+.x' ]
   pull_request:
-    branches: [ unstable ]
+    branches: [ unstable, '[0-9]+.[0-9]+.x' ]
+  workflow_call:
+  workflow_dispatch:
+
+env:
+  CMAKE_C_COMPILER_LAUNCHER: ccache
+  CMAKE_CXX_COMPILER_LAUNCHER: ccache
+  CCACHE_COMPILERCHECK: content
+  CCACHE_BASEDIR: ${{ github.workspace }}
+  CCACHE_DIR: ${{ github.workspace }}/.ccache
+  CCACHE_MAXSIZE: 500M
+  CCACHE_SLOPPINESS: pch_defines,time_macros,include_file_mtime,include_file_ctime
+  CCACHE_COMPRESS: "1"
+  CCACHE_COMPRESSLEVEL: "1"
 
 jobs:
   build:
@@ -13,48 +26,75 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {os: ubuntu-22.04, llvm: 15, doc: ON}
-          - {os: ubuntu-22.04, llvm: 16, doc: OFF}
-          - {os: ubuntu-22.04, llvm: 17, doc: OFF}
-          - {os: ubuntu-22.04, llvm: 18, doc: OFF}
+          - {os: ubuntu-24.04, cc: clang, cxx: clang++}
+          - {os: macos-14, cc: clang, cxx: clang++}
 
     runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v4
-         
+
+    - uses: actions/cache/restore@v4
+      with:
+        path: ${{ env.CCACHE_DIR }}
+        key: ccache-${{ matrix.os }}-${{ matrix.cc }}-${{ github.run_id }}
+        restore-keys:
+          ccache-${{ matrix.os }}-${{ matrix.cc }}-
+
     - name: Install ubuntu dependencies
-      if: matrix.os == 'ubuntu-22.04'
+      if: ${{ contains(matrix.os, 'ubuntu') }}
       run: >
         sudo apt-get update &&
         sudo apt-get install lsb-release wget software-properties-common &&
-        wget -O /tmp/llvm.sh https://apt.llvm.org/llvm.sh &&
-        chmod +x /tmp/llvm.sh && sudo /tmp/llvm.sh ${{ matrix.llvm }} &&
         sudo apt-get install
         ccache
-        clang-${{ matrix.llvm }}
-        llvm-${{ matrix.llvm }}-dev
-        libclang-${{ matrix.llvm }}-dev
-        libblas-dev
-        libomp-${{ matrix.llvm }}-dev
-        clang-format-${{ matrix.llvm }}
-        python3
+        clang
+        g++
+        doxygen
+        llvm-dev
+        libclang-dev
+        libomp-dev
+        clang-format
+        libgmp-dev
+        libhdf5-dev
+        libopenblas-dev
+        libopenmpi-dev
+        openmpi-bin
+        openmpi-common
+        openmpi-doc
         python3-dev
+        python3-mako
+        python3-matplotlib
+        python3-mpi4py
         python3-numpy
-        python3-scipy
         python3-pip
-        python3-sphinx
-        python3-sphinx-rtd-theme 
-        python3-sphinx-copybutton
-        python3-myst-parser &&
-        pip3 install linkify-it-py 
+        python3-scipy
+        python3-ipython
+
+    - name: Set up virtualenv
+      run: |
+        mkdir $HOME/.venv
+        python3 -m venv --system-site-packages $HOME/.venv/my_python
+        source $HOME/.venv/my_python/bin/activate
+        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+        echo "PATH=$PATH" >> $GITHUB_ENV
+
+    - name: Install homebrew dependencies
+      if: ${{ contains(matrix.os, 'macos') }}
+      run: |
+        brew update
+        brew install ccache gcc llvm hdf5 open-mpi openblas doxygen
+        pip install mako numpy scipy mpi4py
+        pip install -r requirements.txt
+        echo "PATH=$(brew --prefix llvm)/bin:$(brew --prefix gcc)/bin:$PATH" >> $GITHUB_ENV
+        echo "PYTHONPATH=$(brew --prefix llvm)/lib/python3.13/site-packages" >> $GITHUB_ENV
 
     - name: Build clair
       env:
-        CC: clang-${{ matrix.llvm }}
-        CXX: clang++-${{ matrix.llvm }}
+        CC: ${{ matrix.cc }}
+        CXX: ${{ matrix.cxx }}
       run: |
-        cmake -B build -S. -DLLVM_CONFIG=/usr/bin/llvm-config-${{ matrix.llvm }} -DCMAKE_INSTALL_PREFIX=$HOME/install -DBuild_Documentation=${{ matrix.doc }}
+        cmake -B build -S. -DLLVM_CONFIG=/usr/bin/llvm-config -DCMAKE_INSTALL_PREFIX=$HOME/install
         cd build && make -j2 || make -j1 VERBOSE=1
 
     - name: Test clair
@@ -62,10 +102,12 @@ jobs:
         cd build
         ctest -j2 --output-on-failure
 
-    - name: Deploy documentation to website
-      if: matrix.doc == 'ON' && github.ref == 'refs/heads/unstable'
-      uses: JamesIves/github-pages-deploy-action@v4
+    - name: ccache statistics
+      if: always()
+      run: ccache -sv
+
+    - uses: actions/cache/save@v4
+      if: always()
       with:
-        folder: build/doc/html
-        branch: github.io
-        target-folder: docs/unstable
+        path: ${{ env.CCACHE_DIR }}
+        key: ccache-${{ matrix.os }}-${{ matrix.cc }}-${{ github.run_id }}

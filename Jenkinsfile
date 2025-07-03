@@ -15,7 +15,7 @@ properties([
 def platforms = [:]
 
 /****************** linux builds (in docker) */
-/* Each platform must have a corresponding Dockerfile.PLATFORM in triqs/packaging */
+/* Each platform must have a corresponding Dockerfile.PLATFORM in packaging */
 def dockerPlatforms = ["ubuntu-clang", "sanitize"]
 /* .each is currently broken in jenkins */
 for (int i = 0; i < dockerPlatforms.size(); i++) {
@@ -76,13 +76,14 @@ for (int i = 0; i < osxPlatforms.size(); i++) {
           "C_INCLUDE_PATH=$hdf5/include:${env.BREW}/include",
           "CPLUS_INCLUDE_PATH=$venv/include:$hdf5/include:${env.BREW}/include",
           "LIBRARY_PATH=$venv/lib:$hdf5/lib:${env.BREW}/lib",
-          "LD_LIBRARY_PATH=$hdf5/lib",
+          "DYLD_LIBRARY_PATH=$venv/lib:$hdf5/lib:${env.BREW}/lib",
           "PYTHONPATH=$installDir/lib/python3.12/site-packages",
+          "VIRTUAL_ENV=$venv",
           "OMP_NUM_THREADS=2"]) {
         deleteDir()
         sh "python3 -m venv $venv"
         sh "pip3 install -U -r $srcDir/requirements.txt"
-        sh "cmake $srcDir -DCMAKE_INSTALL_PREFIX=$installDir -DPython_EXECUTABLE=$venv/bin/python -Dzstd_LIBRARY=$BREW/lib/libzstd.dylib -Dzstd_INCLUDE_DIR=$BREW/include"
+        sh "cmake $srcDir -DCMAKE_INSTALL_PREFIX=$installDir -Dzstd_LIBRARY=$BREW/lib/libzstd.dylib -Dzstd_INCLUDE_DIR=$BREW/include"
         sh "make -j2 || make -j1 VERBOSE=1"
         catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') { try {
           sh "make test CTEST_OUTPUT_ON_FAILURE=1"

@@ -48,13 +48,13 @@ jobs:
         sudo apt-get install lsb-release wget software-properties-common &&
         sudo apt-get install
         ccache
-        clang
+        clang-19
         g++
         doxygen
-        llvm-dev
-        libclang-dev
+        llvm-19-dev
+        libclang-19-dev
         libomp-dev
-        clang-format
+        clang-format-19
         libgmp-dev
         libhdf5-dev
         libopenblas-dev

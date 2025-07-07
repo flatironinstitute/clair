@@ -16,6 +16,9 @@ list(PREPEND CMAKE_PREFIX_PATH "${LLVM_ROOT_DIR}/lib/cmake/llvm/")
 
 find_package(LLVM REQUIRED CONFIG)
 find_package(Clang REQUIRED CONFIG)
+if(LLVM_VERSION VERSION_LESS 19.0.0)
+  message(FATAL_ERROR "LLVM version ${LLVM_VERSION} is not supported. Please use LLVM 19.0.0 or later. Use LLVM_ROOT to specify a different LLVM installation.")
+endif()
 
 set(CLANG_EXECUTABLE "${CLANG_INSTALL_PREFIX}/bin/clang++")
 

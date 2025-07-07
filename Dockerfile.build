@@ -4,6 +4,7 @@ ARG APPNAME=clair
 
 # Install here missing dependencies, e.g.
 # RUN apt-get install -y python3-skimage
+RUN apt-get update && apt-get install -y libzstd-dev
 
 ARG BUILDUID=983
 RUN useradd -u $BUILDUID -m build

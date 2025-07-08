@@ -55,5 +55,4 @@ endif()
 # ========= Build all components ==========
 
 add_subdirectory(clu)
-add_subdirectory(plugins)
 add_subdirectory(tools)

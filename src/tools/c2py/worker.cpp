@@ -21,9 +21,13 @@ static const struct {
 //--------------------------------------------------------
 
 worker_t::worker_t(clang::CompilerInstance *ci) : ci{ci} {
-  auto p                  = std::filesystem::path{ci->getFrontendOpts().Inputs[0].getFile().str()};
-  module_info.sourcefile  = str_t{p.filename()};
-  module_info.module_name = str_t{p.stem()};
+
+  auto p                 = std::filesystem::absolute(ci->getFrontendOpts().Inputs[0].getFile().str());
+  module_info.sourcefile = str_t{p.string()};
+  //  auto p                  = std::filesystem::path{ci->getFrontendOpts().Inputs[0].getFile().str()};
+  // module_info.sourcefile  = str_t{p.filename()};
+  module_info.module_name          = str_t{p.stem()};
+  module_info.sourcefile_full_stem = p.parent_path() / p.stem();
 }
 
 //--------------------------------------------------------

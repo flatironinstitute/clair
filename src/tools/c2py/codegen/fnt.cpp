@@ -25,8 +25,7 @@ static const struct {
 // ---------------------------------------------------------------
 
 str_t fnt_params(fnt_ptr_t f) {
-  return join(
-     itertools::range(f->getNumParams()), [f](int i) { return f->getParamDecl(i)->getNameAsString(); }, ',');
+  return join(itertools::range(f->getNumParams()), [f](int i) { return f->getParamDecl(i)->getNameAsString(); }, ',');
 }
 
 // ---------------------------------------------------------------
@@ -86,15 +85,13 @@ str_t fnt_param_type(fnt_ptr_t f, int i) { return clu::get_fully_qualified_name(
 // ---------------------------------------------------------------
 
 str_t fnt_paramtypes(fnt_ptr_t f) {
-  return join(
-     itertools::range(f->getNumParams()), [f](int i) { return fnt_param_type(f, i); }, ',');
+  return join(itertools::range(f->getNumParams()), [f](int i) { return fnt_param_type(f, i); }, ',');
 }
 
 // ---------------------------------------------------------------
 
 str_t fnt_param_with_types(fnt_ptr_t f) {
-  return join(
-     itertools::range(f->getNumParams()), [f](int i) { return fnt_param_type(f, i) + ' ' + f->getParamDecl(i)->getNameAsString(); }, ',');
+  return join(itertools::range(f->getNumParams()), [f](int i) { return fnt_param_type(f, i) + ' ' + f->getParamDecl(i)->getNameAsString(); }, ',');
 }
 
 // ---------------------------------------------------------------
@@ -102,8 +99,7 @@ str_t fnt_param_with_types(fnt_ptr_t f) {
 str_t fnt_tparams(fnt_ptr_t f) {
 
   clang::ASTContext *ctx = &f->getASTContext();
-  return join(
-     f->getTemplateSpecializationArgs()->asArray(), [&ctx](auto &&ta) { return clu::get_name_of_TemplateArgument(ta, ctx); }, ',');
+  return join(f->getTemplateSpecializationArgs()->asArray(), [&ctx](auto &&ta) { return clu::get_name_of_TemplateArgument(ta, ctx); }, ',');
 }
 
 // ===================================================================
@@ -171,8 +167,7 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
       doc << fmt::format(R"RAW( static constexpr auto doc_f_{}_{} = R"DOC({})DOC"; )RAW", fun_counter, i, pydoc(fi));
     }
     doc << fmt::format(R"RAW( static const auto doc_d_{0} = fun_{0}.doc({{ {1} }}); )RAW", fun_counter,
-                       join(
-                          itertools::range(long(flist.size())), [c = fun_counter](int i) { return fmt::format("doc_f_{}_{}", c, i); }, ','));
+                       join(itertools::range(long(flist.size())), [c = fun_counter](int i) { return fmt::format("doc_f_{}_{}", c, i); }, ','));
   }
 
   // ---- put if in the table ----

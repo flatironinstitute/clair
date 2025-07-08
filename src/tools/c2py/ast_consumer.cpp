@@ -16,6 +16,7 @@
 #include "clu/misc.hpp"
 #include "fmt/core.h"
 #include "utility/logger.hpp"
+#include <filesystem>
 
 using clang::ast_matchers::MatchFinder;
 static const struct {
@@ -23,6 +24,8 @@ static const struct {
 } logs;
 
 void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
+
+  std::cerr << "Current working dir: " << std::filesystem::current_path() << "\n";
 
   // Parsing just occurred. If error, we stop
   if (ctx.getDiagnostics().hasErrorOccurred()) return;

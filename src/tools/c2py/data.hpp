@@ -69,7 +69,8 @@ struct module_info_t {
 
   str_t module_name;
   str_t package_name;
-  str_t sourcefile;
+  str_t sourcefile;           // full path name of the source file, e.g. "/some/path/to/my_module.cpp"
+  str_t sourcefile_full_stem; //  e.g. "/some/path/to/my_module"
   str_t documentation;
   str_t ns;
   bool has_module_init = false;

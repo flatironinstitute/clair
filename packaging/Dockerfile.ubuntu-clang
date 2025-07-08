@@ -6,11 +6,13 @@ RUN apt-get update && apt-get install -y lsb-release wget software-properties-co
       #wget -O /tmp/llvm.sh https://apt.llvm.org/llvm.sh && chmod +x /tmp/llvm.sh && /tmp/llvm.sh ${LLVM} && \
       DEBIAN_FRONTEND=noninteractive apt-get install -y \
       clang-${LLVM} \
+      clang-tools-${LLVM}\
       cmake \
       g++ \
       gfortran \
       git \
       vim \
+      lld-${LLVM} \
       lldb-${LLVM} \
       clang-format-${LLVM} \
       hdf5-tools \
@@ -23,6 +25,7 @@ RUN apt-get update && apt-get install -y lsb-release wget software-properties-co
       libhdf5-dev \
       libopenblas-dev \
       libopenmpi-dev \
+      ninja-build\
       openmpi-bin \
       openmpi-common \
       openmpi-doc \

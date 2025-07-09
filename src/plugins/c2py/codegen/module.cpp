@@ -42,7 +42,7 @@ using c2py::operator""_a;
 
 // ==================== Wrapped classes =====================
 
-{Modulehxxfile}
+{WrapInfo}
 
 // ==================== enums =====================
 
@@ -173,7 +173,7 @@ str_t codegen_module(module_info_t const &m) {
                     "FunctionDecls"_a        = FunctionDecls.str(),        //
                     "FunctionDocs"_a         = FunctionDocs.str(),         //
                     "FunctionTable"_a        = FunctionTable.str(),        //
-                    "Modulehxxfile"_a        = codegen_hxx(m),             //
+                    "WrapInfo"_a             = codegen_wrap_info(m),       //
                     "PyTypeReadyDecls"_a     = PyTypeReadyDecls.str(),     //
                     "AddTypeObjectDecls"_a   = AddTypeObjectDecls.str(),   //
                     "Hdf5C2pyIncluder"_a     = Hdf5C2pyIncluder.str(),     //
@@ -184,20 +184,29 @@ str_t codegen_module(module_info_t const &m) {
 
   return r;
 }
+
+// =========== wrp info generation ==============
+
+str_t codegen_wrap_info(module_info_t const &m) {
+  std::stringstream wrap_info;
+  for (auto const &[_, cls_info] : m.classes) {
+    wrap_info << fmt::format(R"RAW( template <> constexpr bool c2py::is_wrapped<{0}>   = true;)RAW", //
+                             clu::get_fully_qualified_name(cls_info.ptr));
+  }
+  return wrap_info.str();
+}
+
 // =========== hxx generation ==============
 
 str_t codegen_hxx(module_info_t const &m) {
   std::stringstream hxx;
+  hxx << "#include <c2py/c2py.hpp>\n\n";
   hxx << fmt::format(R"RAW(
     #ifndef C2PY_HXX_DECLARATION_{0}_GUARDS
     #define C2PY_HXX_DECLARATION_{0}_GUARDS
     )RAW",
                      m.module_name);
-
-  for (auto const &[_, cls_info] : m.classes) {
-    hxx << fmt::format(R"RAW( template <> constexpr bool c2py::is_wrapped<{0}>   = true;)RAW", //
-                       clu::get_fully_qualified_name(cls_info.ptr));
-  }
+  hxx << codegen_wrap_info(m);
   hxx << "\n#endif";
 
   return hxx.str();

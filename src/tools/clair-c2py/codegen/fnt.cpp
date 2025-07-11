@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <numeric>
-#include "./fnt.hpp"
-#include "data.hpp"
+#include "fnt.hpp"
+#include "../data.hpp"
 #include <fmt/core.h>
 #include <fmt/format.h>
 using namespace fmt::literals;

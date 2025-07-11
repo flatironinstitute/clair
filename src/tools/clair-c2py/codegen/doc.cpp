@@ -1,6 +1,6 @@
-#include "./doc.hpp"
+#include "doc.hpp"
 #include "clu/doc_string.hpp"
-#include "data.hpp"
+#include "../data.hpp"
 #include "clu/fullqualifiedname.hpp"
 #include <clang/AST/DeclCXX.h>
 #include <fmt/core.h>

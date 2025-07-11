@@ -30,21 +30,16 @@ MESSAGE(STATUS "LLVM_LIBRARY_DIR : ${LLVM_LIBRARY_DIR}")
 MESSAGE(STATUS "CLANG_INCLUDE_DIR : ${CLANG_INCLUDE_DIR}")
 MESSAGE(STATUS "CLANG_EXECUTABLE : ${CLANG_EXECUTABLE}")
 
-#===============================================================================
-#  Find clang-format
-#===============================================================================
-find_program (CLANG_FORMAT NAMES clang-format clang-format-${LLVM_VERSION_MAJOR} PATHS ${CLANG_INSTALL_PREFIX})
-MESSAGE(STATUS "CLANG_FORMAT : ${CLANG_FORMAT}")
-
-#===============================================================================
-# Create an Interface target for compiler plugins
-#===============================================================================
-add_library(clang_plugin INTERFACE)
-target_include_directories(clang_plugin SYSTEM INTERFACE ${CLANG_INCLUDE_DIR} ${LLVM_INCLUDE_DIR})
+#===============================================================
+# Create an Interface target for the Clang and LLVM Libraries
+#===============================================================
+add_library(clang_llvm INTERFACE)
+target_link_libraries(clang_llvm INTERFACE clang-cpp $<$<PLATFORM_ID:Linux>:LLVMSupport>)
+target_include_directories(clang_llvm INTERFACE ${CLANG_INCLUDE_DIR} ${LLVM_INCLUDE_DIR})
 
 # Allow undefined symbols in shared objects on Darwin (this is the default behaviour on Linux)
-target_link_libraries(clang_plugin INTERFACE "$<$<PLATFORM_ID:Darwin>:-undefined dynamic_lookup>")
+target_link_libraries(clang_llvm INTERFACE "$<$<PLATFORM_ID:Darwin>:-undefined dynamic_lookup>")
 
 if(NOT LLVM_ENABLE_RTTI)
- target_compile_options(clang_plugin INTERFACE -fno-rtti)
+ target_compile_options(clang_llvm INTERFACE -fno-rtti)
 endif()

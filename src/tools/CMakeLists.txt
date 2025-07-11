@@ -12,9 +12,8 @@ function(add_tool TOOL_NAME)
   
   # Configure annoteate tool target
   target_compile_features(${TOOL_NAME} PRIVATE cxx_std_20)
-  target_compile_options(${TOOL_NAME} PRIVATE -fno-rtti)
-  target_include_directories(${TOOL_NAME} PRIVATE ${CLANG_INCLUDE_DIR} ${LLVM_INCLUDE_DIR} ${PROJECT_SOURCE_DIR}/src)
-  target_link_libraries(${TOOL_NAME} PRIVATE clu fmt::fmt clang-cpp $<$<PLATFORM_ID:Linux>:LLVMSupport>)
+  target_include_directories(${TOOL_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+  target_link_libraries(${TOOL_NAME} PRIVATE clu fmt::fmt clang_llvm)
   set_target_properties(${TOOL_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
   
   # Install the tool

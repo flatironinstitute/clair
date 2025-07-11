@@ -33,8 +33,6 @@ static constexpr auto module_code_tpl = R"RAW(
 #define C2PY_VERSION_MAJOR {c2py_version_major}
 #define C2PY_VERSION_MINOR {c2py_version_minor}
 
-#include "{sourcefile}"
-
 #include <c2py/c2py.hpp>
 {Hdf5C2pyIncluder}
 

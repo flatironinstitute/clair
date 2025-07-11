@@ -35,7 +35,7 @@ MESSAGE(STATUS "CLANG_EXECUTABLE : ${CLANG_EXECUTABLE}")
 #===============================================================
 add_library(clang_llvm INTERFACE)
 target_link_libraries(clang_llvm INTERFACE clang-cpp $<$<PLATFORM_ID:Linux>:LLVMSupport>)
-target_include_directories(clang_llvm INTERFACE ${CLANG_INCLUDE_DIR} ${LLVM_INCLUDE_DIR})
+target_include_directories(clang_llvm SYSTEM INTERFACE ${CLANG_INCLUDE_DIR} ${LLVM_INCLUDE_DIR})
 
 # Allow undefined symbols in shared objects on Darwin (this is the default behaviour on Linux)
 target_link_libraries(clang_llvm INTERFACE "$<$<PLATFORM_ID:Darwin>:-undefined dynamic_lookup>")

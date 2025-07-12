@@ -25,8 +25,6 @@ static const struct {
 
 void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
 
-  std::cerr << "Current working dir: " << std::filesystem::current_path() << "\n";
-
   // Parsing just occurred. If error, we stop
   if (ctx.getDiagnostics().hasErrorOccurred()) return;
 

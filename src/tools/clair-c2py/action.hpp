@@ -15,23 +15,8 @@
 #include "utility/macros.hpp"
 #include "utility/stl_complement.hpp"
 #include "clu/clang_formatter.hpp"
-
+#include "pp_include_callback.hpp"
 #include "./clang_format_config.hpp"
-
-// class custom_action : public clang::ASTFrontendAction {
-//     config_t config;
-//     std::shared_ptr<worker_t> worker; // why shared ???  why not worker_t ??
-
-//     public:
-//     using ASTConsumerPointer = std::unique_ptr<clang::ASTConsumer>;
-
-//     custom_action(config_t config) : config{std::move(config)} {}
-
-//     ASTConsumerPointer CreateASTConsumer(clang::CompilerInstance &compiler, llvm::StringRef) override {
-//       worker = std::make_unique<worker_t>(&compiler, config);
-//       return std::make_unique<ast_consumer>(worker);
-//     }
-//   };
 
 class custom_action : public clang::ASTFrontendAction {
   std::shared_ptr<worker_t> worker;
@@ -60,12 +45,19 @@ class custom_action : public clang::ASTFrontendAction {
 
   // --------------------------
 
-  //bool ParseArgs(clang::CompilerInstance const &, const std::vector<std::string> &) override { return true; }
+  void ExecuteAction() override {
+    clang::Preprocessor &PP = getCompilerInstance().getPreprocessor();
+    ASTContext &ctx         = worker->ci->getASTContext();
+
+    PP.addPPCallbacks(std::make_unique<pp_include_callback>(getCompilerInstance().getSourceManager(), &ctx, *worker.get()));
+    ASTFrontendAction::ExecuteAction(); // Run the AST part too, if needed
+  }
 
   // --------------------------
 
   void EndSourceFileAction() override {
-    std::cerr << "Current working dir: " << std::filesystem::current_path() << "\n";
+
+    util::logger log = util::logger{&std::cout, "-- ", ""};
 
     auto &ci = this->getCompilerInstance();
     if (ci.getASTContext().getDiagnostics().hasErrorOccurred()) return;
@@ -80,7 +72,16 @@ class custom_action : public clang::ASTFrontendAction {
     code_hxx = clu::clang_format(code_hxx);
     std::ofstream(outfilename) << code;
     std::ofstream(outfilename_hxx) << code_hxx;
-    std::cerr << "Generated Python bindings " << outfilename << std::endl;
+    log(fmt::format("Generated Python bindings in files: {} and {}", outfilename, outfilename_hxx));
+
+    // Examine if the preprocessor has found the include of the generated file in the module.
+    if (not worker->includes_generated_cxx) {
+      auto include_directive = fmt::format("\n#include \"{}\"", worker->module_info.module_name + ".wrap.cxx");
+      worker->rewriter->InsertTextBefore(worker->ci->getSourceManager().getLocForEndOfFile(worker->ci->getSourceManager().getMainFileID()),
+                                         include_directive);
+      worker->rewriter->overwriteChangedFiles();
+      log(fmt::format("Adding the include directive for the generated file {}\n in the main module file\n", include_directive));
+    }
   }
 };
 

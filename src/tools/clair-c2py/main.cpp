@@ -21,8 +21,6 @@ static cl::OptionCategory decorate_fun_tool_category(""); //NOLINT
 
 int main(int argc, const char **argv) try {
 
-  std::cerr << "Current working dir: " << std::filesystem::current_path() << "\n";
-
   struct {
     //util::logger error  = util::logger::error();
     util::logger report = util::logger{&std::cout, "-- ", ""};
@@ -43,23 +41,14 @@ int main(int argc, const char **argv) try {
 
   clang::tooling::ClangTool main_tool(opt_parser->getCompilations(), opt_parser->getSourcePathList());
 
-  //   clang::tooling::ArgumentsAdjuster PrintAdjuster = [](const clang::tooling::CommandLineArguments &args, llvm::StringRef /*filename*/) {
-  //     std::cerr << "Invoked with arguments:\n";
-  //     for (const auto &arg : args) { std::cerr << arg << " "; }
-  //     std::cerr << "\n---\n";
-  //     return args;
-  //   };
-
-  //   main_tool.appendArgumentsAdjuster(PrintAdjuster);
-
   // Additional Command line arguments to be given to the compiler, after all other options
   // from e.g. CXXFLAGS and co, and the -resource-dir.
   auto args = clu::get_clang_additional_args_from_env_variables();
   args.emplace_back("-DCLAIR_WRAP_GEN");
+  args.emplace_back("-Wno-unused-const-variable");
+  args.emplace_back("-Wno-unused-variable");
   for (auto const &x : args) logs.report("Adding {}", x);
   main_tool.appendArgumentsAdjuster(getInsertArgumentAdjuster(args, clang::tooling::ArgumentInsertPosition::END));
-
-  std::cerr << "Current working dir: " << std::filesystem::current_path() << "\n";
 
   //if (main_tool.run(new custom_action_factory{config})) //NOLINT new is ok here
   if (main_tool.run(new custom_action_factory{})) //NOLINT new is ok here

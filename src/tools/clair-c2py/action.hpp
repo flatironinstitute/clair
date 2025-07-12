@@ -76,7 +76,7 @@ class custom_action : public clang::ASTFrontendAction {
 
     // Examine if the preprocessor has found the include of the generated file in the module.
     if (not worker->includes_generated_cxx) {
-      auto include_directive = fmt::format("\n#include \"{}\"", worker->module_info.module_name + ".wrap.cxx");
+      auto include_directive = fmt::format("\n#include \"{}\"\n", worker->module_info.module_name + ".wrap.cxx");
       worker->rewriter->InsertTextBefore(worker->ci->getSourceManager().getLocForEndOfFile(worker->ci->getSourceManager().getMainFileID()),
                                          include_directive);
       worker->rewriter->overwriteChangedFiles();

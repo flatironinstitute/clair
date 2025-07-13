@@ -47,10 +47,8 @@ class custom_action : public clang::ASTFrontendAction {
 
   void ExecuteAction() override {
     clang::Preprocessor &PP = getCompilerInstance().getPreprocessor();
-    ASTContext &ctx         = worker->ci->getASTContext();
-
-    PP.addPPCallbacks(std::make_unique<pp_include_callback>(getCompilerInstance().getSourceManager(), &ctx, *worker.get()));
-    ASTFrontendAction::ExecuteAction(); // Run the AST part too, if needed
+    PP.addPPCallbacks(std::make_unique<pp_include_callback>(&getCompilerInstance().getASTContext(), *worker.get()));
+    ASTFrontendAction::ExecuteAction();
   }
 
   // --------------------------
@@ -77,9 +75,10 @@ class custom_action : public clang::ASTFrontendAction {
     // Examine if the preprocessor has found the include of the generated file in the module.
     if (not worker->includes_generated_cxx) {
       auto include_directive = fmt::format("\n#include \"{}\"\n", worker->module_info.module_name + ".wrap.cxx");
-      worker->rewriter->InsertTextBefore(worker->ci->getSourceManager().getLocForEndOfFile(worker->ci->getSourceManager().getMainFileID()),
-                                         include_directive);
-      worker->rewriter->overwriteChangedFiles();
+      auto rewriter          = std::make_unique<clang::Rewriter>(worker->ci->getSourceManager(), worker->ci->getLangOpts());
+      rewriter->InsertTextBefore(worker->ci->getSourceManager().getLocForEndOfFile(worker->ci->getSourceManager().getMainFileID()),
+                                 include_directive);
+      rewriter->overwriteChangedFiles();
       log(fmt::format("Adding the include directive for the generated file {}\n in the main module file\n", include_directive));
     }
   }

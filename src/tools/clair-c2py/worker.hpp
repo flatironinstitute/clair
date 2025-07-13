@@ -16,8 +16,7 @@ struct worker_t {
   module_info_t module_info;
   clang::ClassTemplateDecl const *add_methods_to = nullptr;
 
-  bool includes_generated_cxx = false, includes_c2py_first = false;
-  std::unique_ptr<clang::Rewriter> rewriter;
+  bool includes_generated_cxx = false;
 
   worker_t(clang::CompilerInstance *ci);
 

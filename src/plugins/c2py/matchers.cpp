@@ -5,6 +5,9 @@
 #include "utility/logger.hpp"
 #include "utility/macros.hpp"
 #include "clang/ASTMatchers/ASTMatchers.h"
+#include <clang/Sema/Sema.h>
+#include <clang/Sema/Template.h>
+
 static const struct {
   util::logger rejected = util::logger{&std::cout, "-- ", "\033[1;33mRejecting: \033[0m"};
   util::logger note     = util::logger{&std::cout, "-- ", "\033[1;32mNote:  \033[0m"};
@@ -144,8 +147,25 @@ template <> void matcher<mtch::ModuleClsWrap>::run(const MatchResult &Result) {
   assert(d);
   if (auto *cls = d->getUnderlyingType()->getAsCXXRecordDecl()) {
     if (llvm::dyn_cast<clang::ClassTemplateSpecializationDecl>(cls)) {
-      // probably useless ?
-      if (not cls->hasDefinition()) { clu::emit_error(d, "c2py: The class template should be explicitly instantiated"); }
+      if (not cls->hasDefinition()) {
+        // We have an alias e.g. A<int>, but it was not instantiated in the code
+        // clang is lazy with aliases, it does not instantiate them
+        // We use the Sema to instantiate the class
+        if (auto *ctsd = llvm::dyn_cast<clang::ClassTemplateSpecializationDecl>(cls); not ctsd->isCompleteDefinition()) {
+          clang::CXXRecordDecl *Pattern = ctsd->getSpecializedTemplate()->getTemplatedDecl();
+          auto &SemaRef                 = worker->ci->getSema();
+
+          SemaRef.InstantiateClass(ctsd->getLocation(),                        // PointOfInstantiation
+                                   ctsd,                                       // Instantiation
+                                   Pattern,                                    // Pattern
+                                   SemaRef.getTemplateInstantiationArgs(ctsd), // TemplateArgs
+                                   clang::TSK_ExplicitInstantiationDefinition,
+                                   /*Complain=*/true);
+          if (ctsd->isInvalidDecl()) clu::emit_error(d, "c2py: Error in instantiating the class");
+        }
+        // Default previous behaviour: request that the user explicitely instantiate the class.
+        //clu::emit_error(d, "c2py: Please instantiate the class explicitely");
+      }
     }
     worker->module_info.classes.emplace_back(d->getName().str(), cls_info_t{cls});
     //if (not inserted) clu::emit_error(d, "[c2py] Class declaration duplication");

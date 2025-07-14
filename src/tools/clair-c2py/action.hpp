@@ -30,10 +30,10 @@ class custom_action : public clang::ASTFrontendAction {
   //  virtual bool PrepareToExecuteAction(clang::CompilerInstance & Compiler) override{}
 
   // skip function bodies. Gain in compiling time is small
-  // virtual bool BeginInvocation(clang::CompilerInstance &CI) override {
-  //   CI.getInvocation().getFrontendOpts().SkipFunctionBodies = 1;
-  //   return true;
-  // }
+  bool BeginInvocation(clang::CompilerInstance &CI) override {
+    CI.getInvocation().getFrontendOpts().SkipFunctionBodies = 1;
+    return true;
+  }
 
   // --------------------------
 

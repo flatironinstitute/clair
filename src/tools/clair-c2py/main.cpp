@@ -41,9 +41,7 @@ int main(int argc, const char **argv) try {
 
   // ------- load the config if present
 
-  const auto &sources = opt_parser->getSourcePathList();
-
-  fs::path input = sources[0];
+  fs::path input = opt_parser->getSourcePathList()[0];
   input.replace_extension(".toml");
   configuration config;
   if (fs::exists(input.string())) config = configuration_from_toml(input.string());
@@ -56,8 +54,8 @@ int main(int argc, const char **argv) try {
   // from e.g. CXXFLAGS and co, and the -resource-dir.
   auto args = clu::get_clang_additional_args_from_env_variables();
   args.emplace_back("-DCLAIR_C2PY_WRAP_GEN");
-  //args.emplace_back("-DCLAIR_WRAP_GEN");
   // DEBUG ONLY
+  //args.emplace_back("-DCLAIR_WRAP_GEN");
   //args.emplace_back("-Wno-unused-const-variable");
   //args.emplace_back("-Wno-unused-variable");
   if (opt_verbose)

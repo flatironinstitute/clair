@@ -8,10 +8,26 @@
 
 namespace clu {
 
-  // Full qualification of a (class) type, including the template parameters
-  // Also clean the std::__1 etc...
+  // these functions are non trivial, there are PrintPolicy details
+  // set properly, spurious std::__1 and co to remove.
 
-  str_t get_fully_qualified_name(clang::QualType const &t, clang::ASTContext &ctx);
-  str_t get_fully_qualified_name(clang::TypeDecl const *t);
+  /**
+   * @brief Get the fully qualified name of a type
+   * 
+   * @param t Type
+   * @param ctx 
+   * @param canonical True for code generation, False for documentation purpose.
+   * @return str_t 
+   */
+  str_t get_fully_qualified_name(clang::QualType const &t, clang::ASTContext &ctx, bool canonical = true);
+
+  /**
+   * @brief Get the fully qualified name of a type
+   * 
+   * @param t Type
+   * @param canonical True for code generation, False for documentation purpose.
+   * @return str_t 
+   */
+  str_t get_fully_qualified_name(clang::TypeDecl const *t, bool canonical = true);
 
 } // namespace clu

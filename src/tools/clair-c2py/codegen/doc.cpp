@@ -49,7 +49,7 @@ std::vector<std::vector<std::string>> get_fields_info(cls_info_t const &cls_info
   for (auto *f : cls_info.fields) {
     std::vector<std::string> m(4);
     m[0] = f->getNameAsString();
-    m[1] = clu::get_fully_qualified_name(f->getType(), *ctx);
+    m[1] = clu::get_fully_qualified_name(f->getType(), *ctx, /*canonical*/ false);
 
     if (clang::Expr *init = f->getInClassInitializer()) {
       llvm::StringRef s =

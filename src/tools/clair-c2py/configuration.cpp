@@ -47,7 +47,7 @@ std::string format_toml_error(const toml::parse_error &err) {
 
 // ----------------------------------------
 
-configuration config_from_toml(const std::string &toml_file) try {
+configuration configuration_from_toml(const std::string &toml_file) try {
   configuration config;
   toml::table table = toml::parse_file(toml_file);
 

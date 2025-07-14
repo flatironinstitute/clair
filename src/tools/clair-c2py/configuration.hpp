@@ -16,4 +16,4 @@ struct configuration {
   bool get_set_as_properties = false;
 };
 
-configuration config_from_toml();
+configuration configuration_from_toml(const std::string &toml_file);

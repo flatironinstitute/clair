@@ -1,3 +1,4 @@
+#include <filesystem>
 #include "llvm/Support/Process.h"
 #include "clang/Tooling/CommonOptionsParser.h"
 
@@ -5,8 +6,10 @@
 #include "utility/macros.hpp"
 #include "utility/logger.hpp"
 #include "action.hpp"
+#include "configuration.hpp"
 
 namespace cl = llvm::cl;
+namespace fs = std::filesystem;
 
 // ==========  Options of the program using LLVM ===================
 
@@ -23,11 +26,9 @@ static const cl::opt<bool> opt_verbose("v", cl::desc("Verbose"), cl::cat(c2py_op
 int main(int argc, const char **argv) try {
 
   struct {
-    //util::logger error  = util::logger::error();
+    util::logger error  = util::logger::error();
     util::logger report = util::logger{&std::cout, "-- ", ""};
   } const logs;
-
-  // logs.report(fmt::format(R"RAW(Using clang version {}.{}.{})RAW", __clang_major__, __clang_minor__, __clang_patchlevel__));
 
   // ----- Parse the options in the command line
   auto opt_parser = clang::tooling::CommonOptionsParser::create(argc, argv, c2py_opt_category);
@@ -36,7 +37,19 @@ int main(int argc, const char **argv) try {
     return EXIT_FAILURE;
   }
 
-  // auto config = config_t{opt_ns.c_str(), opt_annotate + " "};
+  if (opt_verbose) logs.report(fmt::format(R"RAW(Based on clang version {}.{}.{})RAW", __clang_major__, __clang_minor__, __clang_patchlevel__));
+
+  // ------- load the config
+
+  // const auto sources = opt_parser->getSourcePathList(); // WARNING: for a mysterious reason multiple call to getSourcePathList leads to a bug
+  // llvm::outs() << "Sources size: " << sources.size() << "\n";
+
+  // fs::path input = sources[0];
+  // input.replace_extension(".toml");
+  // configuration config;
+  // if (fs::exists(input.string())) config = configuration_from_toml(input.string());
+
+  // PRINT(config.reject_names);
 
   // ------- main tool
 
@@ -45,9 +58,10 @@ int main(int argc, const char **argv) try {
   // Additional Command line arguments to be given to the compiler, after all other options
   // from e.g. CXXFLAGS and co, and the -resource-dir.
   auto args = clu::get_clang_additional_args_from_env_variables();
-  args.emplace_back("-DCLAIR_WRAP_GEN");
-  args.emplace_back("-Wno-unused-const-variable");
-  args.emplace_back("-Wno-unused-variable");
+  args.emplace_back("-DCLAIR_C2PY_WRAP_GEN");
+  // DEBUG ONLY
+  //args.emplace_back("-Wno-unused-const-variable");
+  //args.emplace_back("-Wno-unused-variable");
   if (opt_verbose)
     for (auto const &x : args) logs.report("Adding {}", x);
   main_tool.appendArgumentsAdjuster(getInsertArgumentAdjuster(args, clang::tooling::ArgumentInsertPosition::END));

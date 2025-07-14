@@ -22,6 +22,17 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(fmt)
 set_property(TARGET fmt PROPERTY POSITION_INDEPENDENT_CODE ON)
 
+# toml++
+message(STATUS "-------- Fetch & Configure toml++ -------------")
+FetchContent_Declare(
+  tomlplusplus
+  GIT_REPOSITORY https://github.com/marzer/tomlplusplus.git
+  GIT_TAG v3.4.0
+  #GIT_TAG        master
+  EXCLUDE_FROM_ALL
+)
+FetchContent_MakeAvailable(tomlplusplus)
+
 # ========= Dynamic Analyzer Checks ==========
 
 option(ASAN OFF "Compile library and executables with LLVM Address Sanitizer")

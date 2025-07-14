@@ -1,4 +1,5 @@
 #pragma once
+#include "./configuration.hpp"
 #include "./data.hpp"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Rewrite/Core/Rewriter.h"
@@ -13,6 +14,7 @@ struct worker_t {
   clang::ConceptDecl const *HasHdf5                         = nullptr;
   clang::ConceptDecl const *HasNonDeletedDefaultConstructor = nullptr;
 
+  configuration config;
   module_info_t module_info;
   clang::ClassTemplateDecl const *add_methods_to = nullptr;
 

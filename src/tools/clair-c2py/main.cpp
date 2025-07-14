@@ -11,11 +11,12 @@ namespace cl = llvm::cl;
 // ==========  Options of the program using LLVM ===================
 
 static const cl::extrahelp OurHelp(R"HELPDOC(
-  clang-c2py tool .....
-  Usage e.g. : 
+  clang-c2py generates Python binding for C++.
+  Usage: 
     clang-c2py my_module.cpp
 )HELPDOC");
-static cl::OptionCategory decorate_fun_tool_category(""); //NOLINT
+static cl::OptionCategory c2py_opt_category(""); //NOLINT
+static const cl::opt<bool> opt_verbose("v", cl::desc("Verbose"), cl::cat(c2py_opt_category));
 
 //====================   main    ==========================================
 
@@ -29,7 +30,7 @@ int main(int argc, const char **argv) try {
   // logs.report(fmt::format(R"RAW(Using clang version {}.{}.{})RAW", __clang_major__, __clang_minor__, __clang_patchlevel__));
 
   // ----- Parse the options in the command line
-  auto opt_parser = clang::tooling::CommonOptionsParser::create(argc, argv, decorate_fun_tool_category);
+  auto opt_parser = clang::tooling::CommonOptionsParser::create(argc, argv, c2py_opt_category);
   if (not opt_parser) {
     logs.report("Error in parsing the options. Use -help (or -h) to get documentation.");
     return EXIT_FAILURE;
@@ -47,10 +48,12 @@ int main(int argc, const char **argv) try {
   args.emplace_back("-DCLAIR_WRAP_GEN");
   args.emplace_back("-Wno-unused-const-variable");
   args.emplace_back("-Wno-unused-variable");
-  for (auto const &x : args) logs.report("Adding {}", x);
+  if (opt_verbose)
+    for (auto const &x : args) logs.report("Adding {}", x);
   main_tool.appendArgumentsAdjuster(getInsertArgumentAdjuster(args, clang::tooling::ArgumentInsertPosition::END));
 
   //if (main_tool.run(new custom_action_factory{config})) //NOLINT new is ok here
+  // to use multiple files, share the data in the factory
   if (main_tool.run(new custom_action_factory{})) //NOLINT new is ok here
     throw std::runtime_error("Failed.");
 

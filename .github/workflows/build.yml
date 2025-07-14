@@ -2,9 +2,9 @@ name: build
 
 on:
   push:
-    branches: [ unstable, '[0-9]+.[0-9]+.x' ]
+    branches: [ unstable, tool, '[0-9]+.[0-9]+.x' ]
   pull_request:
-    branches: [ unstable, '[0-9]+.[0-9]+.x' ]
+    branches: [ unstable, tool, '[0-9]+.[0-9]+.x' ]
   workflow_call:
   workflow_dispatch:
 

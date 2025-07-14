@@ -14,7 +14,7 @@
 #include "codegen/module.hpp"
 #include "utility/macros.hpp"
 #include "utility/stl_complement.hpp"
-#include "clu/clang_formatter.hpp"
+#include "clu/clang_format.hpp"
 #include "pp_include_callback.hpp"
 
 class custom_action : public clang::ASTFrontendAction {

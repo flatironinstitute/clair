@@ -1,4 +1,4 @@
-#include "./clang_formatter.hpp"
+#include "./clang_format.hpp"
 #include "utility/string_tools.hpp"
 #include "utility/logger.hpp"
 #include "clang/Tooling/Tooling.h"

@@ -65,14 +65,14 @@ class custom_action : public clang::ASTFrontendAction {
     auto outfilename     = worker->module_info.sourcefile_full_stem + ".wrap.cxx";
     auto outfilename_hxx = worker->module_info.sourcefile_full_stem + ".wrap.hxx";
 
-    // auto clang_format_style = clang::format::getStyle("file",                         // StyleName: look for .clang-format file
-    //                                                   worker->module_info.sourcefile, // FileName: directory to start search from
-    //                                                   "LLVM"                          // Fallback style if no config found
-    //                                                   )
-    //                              .get(); // because of FallBack the get is always valid
+    auto clang_format_style = clang::format::getStyle("file",                         // StyleName: look for .clang-format file
+                                                      worker->module_info.sourcefile, // FileName: directory to start search from
+                                                      "LLVM"                          // Fallback style if no config found
+                                                      )
+                                 .get(); // because of FallBack the get is always valid
 
-    //code     = clu::clang_format(code, clang_format_style);
-    //code_hxx = clu::clang_format(code_hxx, clang_format_style);
+    code     = clu::clang_format(code, clang_format_style);
+    code_hxx = clu::clang_format(code_hxx, clang_format_style);
     std::ofstream(outfilename) << code;
     std::ofstream(outfilename_hxx) << code_hxx;
     log(fmt::format("Generated Python bindings in files: {} and {}", outfilename, outfilename_hxx));

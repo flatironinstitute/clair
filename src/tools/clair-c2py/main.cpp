@@ -39,17 +39,14 @@ int main(int argc, const char **argv) try {
 
   if (opt_verbose) logs.report(fmt::format(R"RAW(Based on clang version {}.{}.{})RAW", __clang_major__, __clang_minor__, __clang_patchlevel__));
 
-  // ------- load the config
+  // ------- load the config if present
 
-  // const auto sources = opt_parser->getSourcePathList(); // WARNING: for a mysterious reason multiple call to getSourcePathList leads to a bug
-  // llvm::outs() << "Sources size: " << sources.size() << "\n";
+  const auto &sources = opt_parser->getSourcePathList();
 
-  // fs::path input = sources[0];
-  // input.replace_extension(".toml");
-  // configuration config;
-  // if (fs::exists(input.string())) config = configuration_from_toml(input.string());
-
-  // PRINT(config.reject_names);
+  fs::path input = sources[0];
+  input.replace_extension(".toml");
+  configuration config;
+  if (fs::exists(input.string())) config = configuration_from_toml(input.string());
 
   // ------- main tool
 
@@ -59,6 +56,7 @@ int main(int argc, const char **argv) try {
   // from e.g. CXXFLAGS and co, and the -resource-dir.
   auto args = clu::get_clang_additional_args_from_env_variables();
   args.emplace_back("-DCLAIR_C2PY_WRAP_GEN");
+  //args.emplace_back("-DCLAIR_WRAP_GEN");
   // DEBUG ONLY
   //args.emplace_back("-Wno-unused-const-variable");
   //args.emplace_back("-Wno-unused-variable");

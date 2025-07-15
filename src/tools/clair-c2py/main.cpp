@@ -1,4 +1,6 @@
+#include <cstdlib>
 #include <filesystem>
+#include <fstream>
 #include "llvm/Support/Process.h"
 #include "clang/Tooling/CommonOptionsParser.h"
 
@@ -20,6 +22,7 @@ static const cl::extrahelp OurHelp(R"HELPDOC(
 )HELPDOC");
 static cl::OptionCategory c2py_opt_category(""); //NOLINT
 static const cl::opt<bool> opt_verbose("v", cl::desc("Verbose"), cl::cat(c2py_opt_category));
+static const cl::opt<bool> opt_default_config("default-config", cl::desc("If not configuration file, use default."), cl::cat(c2py_opt_category));
 
 //====================   main    ==========================================
 
@@ -39,12 +42,29 @@ int main(int argc, const char **argv) try {
 
   if (opt_verbose) logs.report(fmt::format(R"RAW(Based on clang version {}.{}.{})RAW", __clang_major__, __clang_minor__, __clang_patchlevel__));
 
-  // ------- load the config if present
+  // ------- load the config if presen
 
-  fs::path input = opt_parser->getSourcePathList()[0];
-  input.replace_extension(".toml");
-  configuration config;
-  if (fs::exists(input.string())) config = configuration_from_toml(input.string());
+  auto config_filename = fs::path{opt_parser->getSourcePathList()[0]}.replace_extension(".toml").string();
+  configuration config = {};
+  if (not fs::exists(config_filename)) {
+    if (not opt_default_config) {
+      // No config file, we write a default one and report
+      // #embed is C, it will be C++23, meanwhile we silence the warning that we use a C extension
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc23-extensions"
+      constexpr char config_default[] = { //NOLINT
+#embed "configuration.default.toml"
+         , '\0'};
+#pragma clang diagnostic pop
+      std::ofstream{config_filename} << config_default;
+      logs.report(
+         fmt::format("\033[1;31mConfiguration file {} not found.\n\033[1;32m  A default one was created.\n  Please edit this file and rerun\033[0m",
+                     config_filename));
+      return EXIT_FAILURE; // should we ?
+    }
+  }
+  // load the config from the file
+  config = configuration_from_toml(config_filename);
 
   // ------- main tool
 
@@ -62,9 +82,8 @@ int main(int argc, const char **argv) try {
     for (auto const &x : args) logs.report("Adding {}", x);
   main_tool.appendArgumentsAdjuster(getInsertArgumentAdjuster(args, clang::tooling::ArgumentInsertPosition::END));
 
-  //if (main_tool.run(new custom_action_factory{config})) //NOLINT new is ok here
   // to use multiple files, share the data in the factory
-  if (main_tool.run(new custom_action_factory{})) //NOLINT new is ok here
+  if (main_tool.run(new custom_action_factory{config})) //NOLINT new is ok here
     throw std::runtime_error("Failed.");
 
 } catch (const std::exception &error) {

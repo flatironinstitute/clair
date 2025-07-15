@@ -20,7 +20,7 @@ static const struct {
 
 //--------------------------------------------------------
 
-worker_t::worker_t(clang::CompilerInstance *ci) : ci{ci} {
+worker_t::worker_t(clang::CompilerInstance *ci, configuration const &config) : ci{ci}, config{config} {
 
   auto p                 = std::filesystem::absolute(ci->getFrontendOpts().Inputs[0].getFile().str());
   module_info.sourcefile = str_t{p.string()};

@@ -19,11 +19,12 @@
 
 class custom_action : public clang::ASTFrontendAction {
   std::shared_ptr<worker_t> worker;
+  configuration config;
 
   public:
   using ASTConsumerPointer = std::unique_ptr<clang::ASTConsumer>;
 
-  custom_action() = default;
+  custom_action(configuration config) : config{config} {}
 
   // --------------------------
 
@@ -38,7 +39,13 @@ class custom_action : public clang::ASTFrontendAction {
   // --------------------------
 
   ASTConsumerPointer CreateASTConsumer(clang::CompilerInstance &compiler, llvm::StringRef) override {
-    worker = std::make_unique<worker_t>(&compiler);
+    worker = std::make_unique<worker_t>(&compiler, config);
+
+    auto outfilename = worker->module_info.sourcefile_full_stem + ".wrap.cxx";
+    if (not std::filesystem::exists(outfilename)) std::ofstream{outfilename};
+    // empty file to ensure that the tool can parse the include "mymodule.cxx"
+    // if it has been removed for any reason.
+
     return std::make_unique<ast_consumer>(worker);
   }
 
@@ -49,6 +56,12 @@ class custom_action : public clang::ASTFrontendAction {
     PP.addPPCallbacks(std::make_unique<pp_include_callback>(&getCompilerInstance().getASTContext(), *worker.get()));
     ASTFrontendAction::ExecuteAction();
   }
+
+  // --------------------------
+
+  //bool BeginSourceFileAction(clang::CompilerInstance &CI) override {
+  //   return true;
+  // }
 
   // --------------------------
 
@@ -92,10 +105,8 @@ class custom_action : public clang::ASTFrontendAction {
 // ----------------------------------------------
 
 struct custom_action_factory : public clang::tooling::FrontendActionFactory {
-  //config_t config;
-  //custom_action_factory(config_t config) : config{std::move(config)} {}
-  custom_action_factory() = default;
+  configuration config;
+  custom_action_factory(configuration config) : config{std::move(config)} {}
 
-  std::unique_ptr<clang::FrontendAction> create() override { return std::make_unique<custom_action>(); }
-  //std::unique_ptr<clang::FrontendAction> create() override { return std::make_unique<custom_action>(config); }
+  std::unique_ptr<clang::FrontendAction> create() override { return std::make_unique<custom_action>(config); }
 };

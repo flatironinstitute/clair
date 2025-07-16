@@ -80,7 +80,7 @@ str_t fnt_params_with_default(clang::FunctionDecl const *f) {
 }
 // ---------------------------------------------------------------
 
-str_t fnt_param_type(fnt_ptr_t f, int i) { return clu::get_fully_qualified_name(f->getParamDecl(i)->getOriginalType(), f->getASTContext()); }
+str_t fnt_param_type(fnt_ptr_t f, int i) { return clu::get_fully_qualified_name(f->getParamDecl(i)->getType(), f->getASTContext()); }
 
 // ---------------------------------------------------------------
 

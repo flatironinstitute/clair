@@ -164,7 +164,7 @@ std::vector<fnt_info_t> flist_rm_const(std::vector<fnt_info_t> const &mlist) {
   auto get_parameters = [](fnt_ptr_t f) -> qual_type_vec_t {
     qual_type_vec_t res;
     res.reserve(f->getNumParams());
-    for (auto const &p : f->parameters()) res.push_back(p->getOriginalType());
+    for (auto const &p : f->parameters()) res.push_back(p->getType());
     return res;
   };
 
@@ -293,7 +293,7 @@ void worker_t::check_convertibility() {
   auto checkf = [this, &is_wrapped](fnt_ptr_t const &f) {
     for (auto i : itertools::range(f->getNumParams())) {
       auto *p = f->getParamDecl(i);
-      auto ty = p->getOriginalType();
+      auto ty = p->getType();
       if ((not ty->isVoidType()) and (not clu::satisfy_concept(ty, this->IsConvertiblePy2C, this->ci)) and (not is_wrapped(ty)))
         clu::emit_error(p, "c2py: Can not convert this argument from python to C++");
     }

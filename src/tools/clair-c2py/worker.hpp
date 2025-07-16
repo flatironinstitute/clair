@@ -8,7 +8,10 @@ struct worker_t {
 
   clang::CompilerInstance *ci;
   configuration config;
-  module_info_t module_info;
+
+  std::string match_names, match_files; // Remove and just use config ? SAME
+  std::optional<std::regex> reject_names;
+  bool get_set_as_properties = false;
 
   clang::ClassTemplateDecl const *add_methods_to            = nullptr;
   clang::ConceptDecl const *IsConvertiblePy2C               = nullptr;
@@ -20,12 +23,15 @@ struct worker_t {
 
   bool includes_generated_cxx = false;
 
+  module_info_t module_info;
+
   worker_t(clang::CompilerInstance *ci, configuration const &config);
 
   void run();
 
   private:
   void get_additional_methods();
+  void scan_class_elements(cls_info_t &cls_info, module_info_t &m_info, cls_ptr_t cls);
   void scan_class_and_bases_elements();
   void prepare_methods();
   void remove_multiple_decl();

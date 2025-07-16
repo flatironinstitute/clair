@@ -52,25 +52,12 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
 
   if (worker->HasHdf5) logs.note("Found Flatiron/h5 Storable concept. Will generate h5 code for all wrapped classes satisfying this concept.");
 
-  // ------- Match the config variables in c2py_module in main file
-  // e.g. auto ns = "N"; etc...
-  {
-    matcher<mtch::ModuleVars> vars{worker};
-    MatchFinder mf;
-    mf.addMatcher(namespaceDecl(isExpansionInMainFile(), hasName("c2py_module"), //
-                                forEach(varDecl().bind("decl"))),
-                  &vars);
-
-    mf.matchAST(ctx);
-  }
-  if (ctx.getDiagnostics().hasErrorOccurred()) return;
-
   // ------- Match automatically detected classes.
   {
     matcher<mtch::Cls> ma{worker};
     MatchFinder mf;
     //std::cout << "worker->module_info.match_names" << worker->module_info.match_names;
-    if (auto const &s = worker->module_info.match_names; not s.empty())
+    if (auto const &s = worker->match_names; not s.empty())
       mf.addMatcher(cxxRecordDecl(matchesName(s), unless(isExpansionInSystemHeader())).bind("class"), &ma);
     //mf.addMatcher(namespaceDecl(unless(isExpansionInSystemHeader()), hasName(ns), forEach(cxxRecordDecl().bind("class"))), &ma);
     else
@@ -85,7 +72,7 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
     matcher<mtch::Fnt> ma{worker};
     // NB the std header clause will remove everything included with -isystem (e.g. other libs)
     MatchFinder mf;
-    if (auto const &s = worker->module_info.match_names; not s.empty())
+    if (auto const &s = worker->match_names; not s.empty())
       mf.addMatcher(functionDecl(matchesName(s), unless(anyOf(isExpansionInSystemHeader(), cxxMethodDecl(), hasAncestor(friendDecl())))).bind("func"),
                     &ma);
     else
@@ -100,7 +87,7 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
   {
     matcher<mtch::Enum> ma{worker};
     MatchFinder mf;
-    if (auto const &s = worker->module_info.match_names; not s.empty())
+    if (auto const &s = worker->match_names; not s.empty())
       mf.addMatcher(enumDecl(matchesName(s), unless(isExpansionInSystemHeader())).bind("en"), &ma);
     else
       mf.addMatcher(enumDecl(isExpansionInMainFile(), unless(isExpansionInSystemHeader())).bind("en"), &ma);

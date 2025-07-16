@@ -72,13 +72,7 @@ struct module_info_t {
   str_t sourcefile;           // full path name of the source file, e.g. "/some/path/to/my_module.cpp"
   str_t sourcefile_full_stem; //  e.g. "/some/path/to/my_module"
   str_t documentation;
-  str_t ns;
-  bool has_module_init = false;
-
-  // Filters
-  std::string match_names, match_files; // string used a regex in the AST Matchers directly
-  std::optional<std::regex> reject_names;
-  bool get_set_as_properties = false;
+  bool has_module_init = false; // TODO : REMOVE
 
   std::map<str_t, std::vector<fnt_info_t>> functions; // vector not unique
   std::vector<std::pair<str_t, cls_info_t>> classes;  // index of cls_table. Must keep order of insertion to have base first

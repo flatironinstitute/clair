@@ -13,6 +13,8 @@ namespace clu {
       return {}; // no comment is not an error
   }
 
+  // -----------------------------------------------
+
   doc_string_t::doc_string_t(const clang::Decl *d) {
 
     const clang::ASTContext *ctx = &d->getASTContext();

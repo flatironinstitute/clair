@@ -68,7 +68,9 @@ configuration configuration_from_toml(const std::string &toml_file) try {
                                          "reject_names", "match_files",   "has_module_init", "get_set_as_properties"};
 
   for (const auto &[key, value] : table) {
-    if (valid_keys.find(std::string(key)) == valid_keys.end()) { throw std::runtime_error("Unknown field in TOML file: '" + std::string(key) + "'"); }
+    // PUT A LOG + the whole list...
+    //
+    if (valid_keys.find(std::string(key)) == valid_keys.end()) { throw std::runtime_error("Unknown field: '" + std::string(key) + "'"); }
   }
 
   return config;
@@ -76,5 +78,5 @@ configuration configuration_from_toml(const std::string &toml_file) try {
   throw std::runtime_error(format_toml_error(err));
 } //
 catch (const std::exception &ex) {
-  throw std::runtime_error("Error processing TOML file: " + std::string(ex.what()));
+  throw std::runtime_error("Error processing TOML file: " + toml_file + "\n" + std::string(ex.what()));
 }

@@ -16,7 +16,7 @@ namespace clu {
     if (not d->hasAttrs()) return false;
     auto const &attrs = d->getAttrs();
     return std::any_of(attrs.begin(), attrs.end(), [annotation](auto &att) {
-      if (auto an = llvm::dyn_cast_or_null<clang::AnnotateAttr>(att))
+      if (auto *an = llvm::dyn_cast_or_null<clang::AnnotateAttr>(att))
         return an->getAnnotation() == annotation;
       else
         return false;

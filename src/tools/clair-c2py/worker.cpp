@@ -1,4 +1,5 @@
 #include <clang/AST/Decl.h>
+#include <algorithm>
 #include <regex>
 #include <numeric>
 #include <filesystem>
@@ -15,12 +16,14 @@
 
 #include "./worker.hpp"
 static const struct {
+  util::logger error    = util::logger{&std::cout, "-- ", "\033[1;33mError:  \033[0m"};
   util::logger rejected = util::logger{&std::cout, "-- ", "\033[1;33mRejecting: \033[0m"};
 } logs;
 
 //--------------------------------------------------------
 
-worker_t::worker_t(clang::CompilerInstance *ci, configuration const &config) : ci{ci}, config{config} {
+worker_t::worker_t(clang::CompilerInstance *ci, configuration const &config)
+   : ci{ci}, config{config}, match_names(config.match_names), match_files(config.match_files), get_set_as_properties(config.get_set_as_properties) {
 
   auto p                 = std::filesystem::absolute(ci->getFrontendOpts().Inputs[0].getFile().str());
   module_info.sourcefile = str_t{p.string()};
@@ -28,6 +31,17 @@ worker_t::worker_t(clang::CompilerInstance *ci, configuration const &config) : c
   // module_info.sourcefile  = str_t{p.filename()};
   module_info.module_name          = str_t{p.stem()};
   module_info.sourcefile_full_stem = p.parent_path() / p.stem();
+  module_info.package_name         = config.package_name;
+  module_info.documentation        = config.documentation;
+
+  auto make_regex = [](str_t const &s, const char *name) -> std::regex {
+    try {
+      if (not s.empty()) return std::regex{s};
+    } catch (std::regex_error const &e) { logs.error(fmt::format("Regular Expression {} = {} is invalid: \n {}", name, s, e.what())); }
+    return {};
+  };
+
+  this->reject_names = make_regex(config.reject_names, "match_names");
 }
 
 //--------------------------------------------------------
@@ -60,7 +74,7 @@ void worker_t::get_additional_methods() {
 //--------------------------------------------------------
 
 // Given cls, stores its methods and friend functions
-void scan_class_elements(cls_info_t &cls_info, module_info_t &m_info, cls_ptr_t cls) {
+void worker_t::scan_class_elements(cls_info_t &cls_info, module_info_t &m_info, cls_ptr_t cls) {
 
   const bool is_base_class = (cls != cls_info.ptr);
 
@@ -97,7 +111,7 @@ void scan_class_elements(cls_info_t &cls_info, module_info_t &m_info, cls_ptr_t 
 
   for (clang::Decl *decl : cls->decls()) { // all declarations in the class
     if (decl->getAccess() != clang::AS_public) continue;
-    if (is_rejected(decl, m_info.reject_names, &logs.rejected)) continue;
+    if (is_rejected(decl, this->reject_names, &logs.rejected)) continue;
     // --------  method
     if (auto *m = llvm::dyn_cast<clang::FunctionDecl>(decl)) {
       treat_method(m);
@@ -241,7 +255,7 @@ void worker_t::remove_multiple_decl() {
 void worker_t::separate_properties() {
 
   auto &M = this->module_info;
-  if (not M.get_set_as_properties) return;
+  if (not this->get_set_as_properties) return;
 
   for (auto &[_, cls1] : M.classes) {
     // if the method has no argument and is not void (?)

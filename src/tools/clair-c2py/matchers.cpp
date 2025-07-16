@@ -14,76 +14,6 @@ static const struct {
   util::logger error    = util::logger{&std::cout, "-- ", "\033[1;33mError:  \033[0m"};
 } logs;
 
-// ******************************************************
-//  extract_literal functions.
-//  Take a string/int/bool, etc from a VarDecl with literal value
-// ******************************************************
-
-// Gets the initializer of the VarDecl, removing the ImplicitCastExpr
-const clang::Expr *get_vardecl_initlalizer(clang::VarDecl const *decl) {
-  auto *value = decl->getAnyInitializer();
-
-  auto *ex    = llvm::dyn_cast_or_null<clang::ExprWithCleanups>(value);
-  auto *ex2   = (ex ? *(ex->children().begin()) : value);
-  auto *iexpr = llvm::dyn_cast_or_null<clang::ImplicitCastExpr>(ex2);
-  while (iexpr) {
-    value = iexpr->getSubExpr();
-    iexpr = llvm::dyn_cast_or_null<clang::ImplicitCastExpr>(value);
-  }
-  return value;
-}
-
-// Literal string
-void extract_literal(clang::VarDecl const *d, str_t &x) {
-  auto value = get_vardecl_initlalizer(d);
-  if (auto *s = llvm::dyn_cast_or_null<clang::StringLiteral>(value))
-    x = s->getString().str();
-  else { clu::emit_error(d, "c2py: Variable of incorrect type. Expected a literal string."); }
-}
-
-// Regex : a string into a regex with control
-void extract_literal(clang::VarDecl const *d, std::optional<std::regex> &x) {
-  str_t s;
-  extract_literal(d, s);
-  try {
-    if (not s.empty()) x = std::regex{s};
-  } catch (std::regex_error const &e) {
-    logs.error(fmt::format("Regular Expression is invalid: \n {}", e.what()));
-    clu::emit_error(d, "c2py: invalid C++ regular expression. Cf std::regex documentation for information.");
-  }
-}
-
-// Bool
-void extract_literal(clang::VarDecl const *d, bool &x) {
-  auto value = get_vardecl_initlalizer(d);
-  if (auto *b = llvm::dyn_cast_or_null<clang::CXXBoolLiteralExpr>(value))
-    x = b->getValue();
-  else
-    clu::emit_error(d, "c2py: Variable of incorrect type. Expected a literal bool.");
-}
-
-// long
-void extract_literal(clang::VarDecl const *d, long &x) {
-  auto value      = get_vardecl_initlalizer(d);
-  auto const &ctx = d->getASTContext();
-  if (auto *i = llvm::dyn_cast_or_null<clang::IntegerLiteral>(value))
-    x = long{i->EvaluateKnownConstInt(ctx).getExtValue()};
-  else
-    clu::emit_error(d, "c2py: Variable of incorrect type. Expected a literal integer.");
-}
-
-// Check the module_init function exists
-void check_module_init(clang::VarDecl const *d, bool &x) {
-  auto value = get_vardecl_initlalizer(d);
-  if (auto *l = llvm::dyn_cast_or_null<clang::LambdaExpr>(value)) {
-    if (l->getCallOperator()->getNumParams() != 0)
-      clu::emit_error(d, "The init function must take 0 parameters.");
-    else
-      x = true;
-  } else
-    clu::emit_error(d, "c2py: Variable of incorrect type. Expected a lambda.");
-}
-
 // -----------------------------------------------------
 
 template <> void matcher<mtch::Concept>::run(const MatchResult &Result) {
@@ -107,29 +37,6 @@ template <> void matcher<mtch::Concept>::run(const MatchResult &Result) {
       worker->HasHdf5 = cpt;
     // else ignore the others concepts
   }
-}
-
-// -------------------------------------------------
-
-template <> void matcher<mtch::ModuleVars>::run(const MatchResult &Result) {
-  auto const *decl = Result.Nodes.getNodeAs<clang::VarDecl>("decl");
-  assert(decl);
-
-  static auto vars = std::map<str_t, std::function<void(clang::VarDecl const *, module_info_t &)>>{
-     {"module_name", [](auto *d, auto &M) { extract_literal(d, M.module_name); }},
-     {"package_name", [](auto *d, auto &M) { extract_literal(d, M.package_name); }},
-     {"documentation", [](auto *d, auto &M) { extract_literal(d, M.documentation); }},
-     {"module_init", [](auto *d, auto &M) { check_module_init(d, M.has_module_init); }},
-     {"get_set_as_properties", [](auto *d, auto &M) { extract_literal(d, M.get_set_as_properties); }},
-     {"match_names", [](auto *d, auto &M) { extract_literal(d, M.match_names); }},
-     {"reject_names", [](auto *d, auto &M) { extract_literal(d, M.reject_names); }},
-     {"match_files", [](auto *d, auto &M) { extract_literal(d, M.match_files); }},
-  };
-
-  if (auto it = vars.find(decl->getName().str()); it != vars.end())
-    it->second(decl, worker->module_info);
-  else
-    clu::emit_error(decl, "c2py: module variable declaration is not recognized.");
 }
 
 // -------------------------------------------------
@@ -222,7 +129,7 @@ template <> void matcher<mtch::Cls>::run(const clang::ast_matchers::MatchFinder:
   auto &M    = worker->module_info;
 
   // apply c2py_ignore and reject_names
-  if (is_rejected(cls, M.reject_names, &logs.rejected)) return;
+  if (is_rejected(cls, worker->reject_names, &logs.rejected)) return;
 
   // Reject classes defined in c2py_module
   if (qname.starts_with("c2py_module::")) return;
@@ -284,7 +191,7 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
 
   // apply c2py_ignore and the reject_name regex
   auto &M = worker->module_info;
-  if (is_rejected(f, M.reject_names, &logs.rejected)) return;
+  if (is_rejected(f, worker->reject_names, &logs.rejected)) return;
 
   // Reject functions defined in c2py_module
   auto fqname = f->getQualifiedNameAsString();
@@ -304,7 +211,7 @@ template <> void matcher<mtch::Enum>::run(const MatchResult &Result) {
   auto &M    = worker->module_info;
   auto qname = enu->getQualifiedNameAsString();
 
-  if (M.reject_names and std::regex_match(qname, M.reject_names.value())) {
+  if (worker->reject_names and std::regex_match(qname, worker->reject_names.value())) {
     logs.rejected(fmt::format(R"RAW({0} [{1}])RAW", qname, "reject_names"));
     return;
   }

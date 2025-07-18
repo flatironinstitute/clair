@@ -1,41 +1,31 @@
-#===============================================================================
-# LOAD LLVM CONFIGURATION
-#===============================================================================
-set(LLVM_CONFIG llvm-config CACHE STRING "Path to llvm-config")
+#=========================
+# Locate Clang and LLVM
+#=========================
 
-execute_process(COMMAND ${LLVM_CONFIG} --prefix OUTPUT_VARIABLE LLVM_ROOT_DIR_DEFAULT OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${CMAKE_CXX_COMPILER} -print-resource-dir
+  OUTPUT_VARIABLE CLANG_RESOURCE_DIR
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+set(CLANG_RESOURCE_DIR "${CLANG_RESOURCE_DIR}" CACHE PATH "Clang resource directory")
 
-# Set this to a valid LLVM installation dir
-set(LLVM_ROOT_DIR "${LLVM_ROOT_DIR_DEFAULT}") #CACHE PATH "LLVM installation directory")
-
-# Add the location of ClangConfig.cmake to CMake search paths (so that
-# find_package can locate it)
-list(PREPEND CMAKE_PREFIX_PATH "${LLVM_ROOT_DIR}/lib/cmake/clang/") 
-list(PREPEND CMAKE_PREFIX_PATH "${LLVM_ROOT_DIR}/lib/cmake/llvm/") 
-# We must find the proper LLVM config
-
-find_package(LLVM REQUIRED CONFIG)
-find_package(Clang REQUIRED CONFIG)
+find_package(Clang REQUIRED CONFIG HINTS ${LLVM_ROOT} $ENV{LLVM_ROOT} ${Clang_ROOT} $ENV{Clang_ROOT} ${CLANG_RESOURCE_DIR}/../../..)
 if(LLVM_VERSION VERSION_LESS 19.0.0)
   message(FATAL_ERROR "LLVM version ${LLVM_VERSION} is not supported. Please use LLVM 19.0.0 or later. Use LLVM_ROOT to specify a different LLVM installation.")
 endif()
 
-set(CLANG_EXECUTABLE "${CLANG_INSTALL_PREFIX}/bin/clang++")
-
-MESSAGE(STATUS "LLVM_ROOT_DIR_DEFAULT : ${LLVM_ROOT_DIR_DEFAULT}")
-MESSAGE(STATUS "LLVM_ROOT_DIR : ${LLVM_ROOT_DIR}")
-MESSAGE(STATUS "LLVM_VERSION_MAJOR : ${LLVM_VERSION_MAJOR}")
-MESSAGE(STATUS "LLVM_INCLUDE_DIR : ${LLVM_INCLUDE_DIR}")
-MESSAGE(STATUS "LLVM_LIBRARY_DIR : ${LLVM_LIBRARY_DIR}")
-MESSAGE(STATUS "CLANG_INCLUDE_DIR : ${CLANG_INCLUDE_DIR}")
-MESSAGE(STATUS "CLANG_EXECUTABLE : ${CLANG_EXECUTABLE}")
+message(STATUS "LLVM_VERSION : ${LLVM_VERSION}")
+message(STATUS "LLVM_INSTALL_PREFIX : ${LLVM_INSTALL_PREFIX}")
+message(STATUS "LLVM_INCLUDE_DIRS : ${LLVM_INCLUDE_DIRS}")
+message(STATUS "LLVM_LIBRARY_DIRS : ${LLVM_LIBRARY_DIRS}")
+message(STATUS "CLANG_INSTALL_PREFIX : ${CLANG_INSTALL_PREFIX}")
+message(STATUS "CLANG_RESOURCE_DIR : ${CLANG_RESOURCE_DIR}")
+message(STATUS "CLANG_INCLUDE_DIRS : ${CLANG_INCLUDE_DIRS}")
 
 #===============================================================
 # Create an Interface target for the Clang and LLVM Libraries
 #===============================================================
 add_library(clang_llvm INTERFACE)
 target_link_libraries(clang_llvm INTERFACE clang-cpp $<$<PLATFORM_ID:Linux>:LLVMSupport>)
-target_include_directories(clang_llvm SYSTEM INTERFACE ${CLANG_INCLUDE_DIR} ${LLVM_INCLUDE_DIR})
+target_include_directories(clang_llvm SYSTEM INTERFACE ${CLANG_INCLUDE_DIRS} ${LLVM_INCLUDE_DIRS})
 
 # Allow undefined symbols in shared objects on Darwin (this is the default behaviour on Linux)
 target_link_libraries(clang_llvm INTERFACE "$<$<PLATFORM_ID:Darwin>:-undefined dynamic_lookup>")

@@ -94,7 +94,7 @@ jobs:
         CC: ${{ matrix.cc }}
         CXX: ${{ matrix.cxx }}
       run: |
-        cmake -B build -S. -DLLVM_CONFIG=/usr/bin/llvm-config -DCMAKE_INSTALL_PREFIX=$HOME/install
+        cmake -B build -S. -DCMAKE_INSTALL_PREFIX=$HOME/install
         cd build && make -j2 || make -j1 VERBOSE=1
 
     - name: Test clair

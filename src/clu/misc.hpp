@@ -59,5 +59,6 @@ namespace clu {
   // -------------has_annotation -----------------
 
   bool has_annotation(const clang::Decl *d, const char *annotation);
+  std::optional<std::string> get_annotation_value(const clang::Decl *d, std::string head);
 
 } // namespace clu

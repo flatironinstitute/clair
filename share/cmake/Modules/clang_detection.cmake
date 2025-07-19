@@ -20,6 +20,18 @@ message(STATUS "CLANG_INSTALL_PREFIX : ${CLANG_INSTALL_PREFIX}")
 message(STATUS "CLANG_RESOURCE_DIR : ${CLANG_RESOURCE_DIR}")
 message(STATUS "CLANG_INCLUDE_DIRS : ${CLANG_INCLUDE_DIRS}")
 
+# On OS X, we check SDKROOT. If not present, the tool will 
+# set this environement variable at start (for its own process only) before running.
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  execute_process(
+      COMMAND xcrun --show-sdk-path
+      OUTPUT_VARIABLE SDKROOT
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+  set(SDKROOT "${SDKROOT}" CACHE PATH "Clang SDKROOT")
+  message(STATUS "Detected SDKROOT: ${SDKROOT}")
+endif()
+
 #===============================================================
 # Create an Interface target for the Clang and LLVM Libraries
 #===============================================================

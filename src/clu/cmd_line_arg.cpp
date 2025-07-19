@@ -2,18 +2,31 @@
 #include <iostream>
 #include "llvm/Support/Process.h"
 #include "utility/string_tools.hpp"
+#include "utility/logger.hpp"
 
 #include <filesystem>
+#include <stdexcept>
 namespace fs = std::filesystem;
+using namespace std::string_literals;
 
-// a trick to silence clangd ... the macro is always defined by cmake ...
-#ifndef CLANG_RESOURCE_DIR
-const auto CLANG_RESOURCE_DIR = "";
-#endif
 static const std::string resource_dir = CLANG_RESOURCE_DIR;
 
 namespace clu {
   clang::tooling::CommandLineArguments get_clang_additional_args_from_env_variables() {
+
+#ifdef __APPLE__
+    // We examine the SDKROOT
+    const char *sdkroot = std::getenv("SDKROOT");
+    if (!sdkroot || std::string(sdkroot).empty()) {
+      setenv("SDKROOT", SDKROOT, 1); // overwrite = 1
+      util::logger log = util::logger{&std::cout, "-- ", ""};
+      log("SDKROOT set to: "s + SDKROOT);
+    } else {
+      // sanity check
+      if (sdkroot != std::string{SDKROOT})
+        throw std::runtime_error("SDKROOT inconsistent between xcrun --show-sdk-path and the environement variable");
+    }
+#endif
 
     clang::tooling::CommandLineArguments arguments;
 

@@ -39,14 +39,6 @@ template <> void matcher<mtch::Concept>::run(const MatchResult &Result) {
   }
 }
 
-// -------------------------------------------------
-
-template <> void matcher<mtch::ModuleFntDispatch>::run(const MatchResult &Result) {
-  auto const *decl = Result.Nodes.getNodeAs<clang::VarDecl>("decl");
-  assert(decl);
-  analyse_dispatch(worker->module_info.functions, decl);
-}
-
 // --------------------------------------------------------------------------------
 
 template <> void matcher<mtch::ModuleClsWrap>::run(const MatchResult &Result) {
@@ -74,22 +66,8 @@ template <> void matcher<mtch::ModuleClsWrap>::run(const MatchResult &Result) {
         //clu::emit_error(d, "c2py: Please instantiate the class explicitely");
       }
     }
-    worker->module_info.classes.emplace_back(d->getName().str(), cls_info_t{cls});
-    //if (not inserted) clu::emit_error(d, "[c2py] Class declaration duplication");
+    worker->module_info.add_class(d->getName().str(), cls);
   }
-}
-
-// -------------------------------------------------
-
-template <> void matcher<mtch::ModuleClsInfo>::run(const MatchResult &Result) {
-  auto const *decl = Result.Nodes.getNodeAs<clang::ClassTemplateDecl>("decl");
-  assert(decl);
-
-  auto varname = decl->getName().str();
-  if (varname == "add_methods_to")
-    worker->add_methods_to = decl;
-  else
-    clu::emit_error(decl, "c2py: unknown class declaration");
 }
 
 // -------------------------------------------------
@@ -146,11 +124,19 @@ template <> void matcher<mtch::Cls>::run(const clang::ast_matchers::MatchFinder:
 
   // Insert in the module class list
   str_t py_name = util::camel_case(cls->getNameAsString());
-  M.classes.emplace_back(py_name, cls_info_t{cls}); //
+  M.add_class(py_name, cls); // classes.emplace_back(py_name, cls_info_t{cls}); //
 
   //if (not inserted) clu::emit_error(cls, "Class rejected. Should have another class with the same Python name ??");
 }
 
+// -------------------------------------------------
+
+clang::CXXRecordDecl *get_as_CXXRecordDecl(clang::QualType qtype) {
+  qtype = qtype.getNonReferenceType().getCanonicalType();
+  if (auto *rtype = qtype->getAs<clang::RecordType>())
+    if (auto *cxxrec = llvm::dyn_cast<clang::CXXRecordDecl>(rtype->getDecl())) return cxxrec;
+  return nullptr; // Not a class/struct type
+}
 // -------------------------------------------------
 template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
 
@@ -199,7 +185,32 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
 
   // Insert in the module function list. Unicity will be taken care of later by worker.
   str_t py_name = f->getNameAsString();
-  M.functions[py_name].push_back(fnt_info_t{f});
+  if (auto rename = clu::get_annotation_value(f, "c2py_rename")) py_name = *rename;
+
+  // One function can be tagged as module_init
+  if (clu::has_annotation(f, "c2py_module_init")) {
+    if (M.module_init) {
+      clu::emit_error(f, "Only one function can be tagged c2py_module_init.");
+      clu::emit_error(M.module_init, "The previous one was here.");
+    }
+    if (f->param_size() != 0) clu::emit_error(f, "A function tagged c2py_module_init must take no arguments");
+    if (not f->getReturnType()->isVoidType()) clu::emit_error(f, "A function tagged c2py_module_init must return void");
+    M.module_init = f;
+  }
+
+  if (not clu::has_annotation(f, "c2py_wrap_as_method"))
+    M.functions[py_name].push_back(fnt_info_t{f});
+  else {
+    if (f->param_size() == 0) {
+      clu::emit_error(f, "A function tagged c2py_wrap_as_method must take at least 1 argument (self)");
+      return;
+    }
+    auto first_arg_type = get_as_CXXRecordDecl(f->getParamDecl(0)->getType());
+    if (auto it = M.classes_ptr_to_info.find(first_arg_type); it != M.classes_ptr_to_info.end())
+      M.classes[it->second].second.methods[py_name].push_back(fnt_info_t{.ptr = f, .rewrite = false});
+    else
+      clu::emit_error(f->getParamDecl(0), "You request to wrap this function as a method, but the first argument is not a class being wrapped.");
+  }
 }
 
 // -------------------------------------------------

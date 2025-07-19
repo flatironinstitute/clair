@@ -158,7 +158,8 @@ str_t codegen_module(module_info_t const &m) {
   for (auto const &[fpyname, overloads] : m.functions) //
     codegen::write_dispatch(FunctionDecls, FunctionTable, FunctionDocs, fpyname, overloads, nullptr, false);
 
-  std::string ModuleInitFunction = (m.has_module_init ? " // Initialization of the module \n c2py_module::module_init();" : "");
+  std::string ModuleInitFunction =
+     (m.module_init ? fmt::format(" // Initialization of the module \n {}();", m.module_init->getQualifiedNameAsString()) : "");
 
   std::string r;
   try {

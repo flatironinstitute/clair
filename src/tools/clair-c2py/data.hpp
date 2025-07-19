@@ -24,10 +24,6 @@ struct fnt_info_t {
 // Make the vector "unique", elimnating redondant declaration.
 std::vector<fnt_info_t> make_unique(std::vector<fnt_info_t> const &flist);
 
-// Analyse a c2py::dispatch declaration
-// Used by worker and matchers (for methods and funtion resp.)
-void analyse_dispatch(std::map<str_t, std::vector<fnt_info_t>> &fmap, clang::VarDecl const *decl);
-
 /// Should the decl be ignored due to
 /// i) a c2py_ignore annotation
 /// ii) its qualified name matches the regex
@@ -72,9 +68,16 @@ struct module_info_t {
   str_t sourcefile;           // full path name of the source file, e.g. "/some/path/to/my_module.cpp"
   str_t sourcefile_full_stem; //  e.g. "/some/path/to/my_module"
   str_t documentation;
-  bool has_module_init = false; // TODO : REMOVE
+  clang::FunctionDecl const *module_init = nullptr;
 
   std::map<str_t, std::vector<fnt_info_t>> functions; // vector not unique
-  std::vector<std::pair<str_t, cls_info_t>> classes;  // index of cls_table. Must keep order of insertion to have base first
   std::vector<clang::EnumDecl const *> enums;         // all enums (including in classes)
+
+  std::vector<std::pair<str_t, cls_info_t>> classes; // index of cls_table. Must keep order of insertion to have base first
+  std::map<cls_ptr_t, long> classes_ptr_to_info;     // reverse search table
+  void add_class(std::string_view name, clang::CXXRecordDecl const *cls) {
+    if (classes_ptr_to_info.contains(cls)) return; // already wrapped.
+    classes.emplace_back(name, cls_info_t{.ptr = cls});
+    classes_ptr_to_info[cls] = long(classes.size() - 1); // index in classes
+  }
 };

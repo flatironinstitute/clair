@@ -30,7 +30,6 @@ struct worker_t {
   void run();
 
   private:
-  void get_additional_methods();
   void scan_class_elements(cls_info_t &cls_info, module_info_t &m_info, cls_ptr_t cls);
   void scan_class_and_bases_elements();
   void prepare_methods();

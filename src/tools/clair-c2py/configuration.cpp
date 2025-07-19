@@ -60,7 +60,6 @@ configuration configuration_from_toml(const std::string &toml_file) try {
   config.match_names           = get_toml_value_or_default<str_t>(table, "match_names", "");
   config.reject_names          = get_toml_value_or_default<str_t>(table, "reject_names", "");
   config.match_files           = get_toml_value_or_default<str_t>(table, "match_files", "");
-  config.has_module_init       = get_toml_value_or_default<bool>(table, "has_module_init", false);
   config.get_set_as_properties = get_toml_value_or_default<bool>(table, "get_set_as_properties", false);
 
   // Check for spurious fields

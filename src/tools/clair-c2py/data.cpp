@@ -36,24 +36,6 @@ std::vector<fnt_info_t> make_unique(std::vector<fnt_info_t> const &flist) {
   return res;
 }
 
-// -------------------------------------
-
-void analyse_dispatch(std::map<str_t, std::vector<fnt_info_t>> &fmap, clang::VarDecl const *decl) {
-  if (auto *cls = decl->getType()->getAsCXXRecordDecl(); cls and cls->getQualifiedNameAsString() == "c2py::dispatch_t") {
-
-    if (auto spe = llvm::dyn_cast_or_null<clang::ClassTemplateSpecializationDecl>(cls)) {
-      for (auto const &targ : spe->getTemplateInstantiationArgs()[0].pack_elements()) {
-        if (auto *f = llvm::dyn_cast_or_null<clang::FunctionDecl>(targ.getAsDecl())) {
-          auto fname = str_t{decl->getName()};
-          fmap[fname].push_back(fnt_info_t{f, false});
-        } else
-          clu::emit_error(targ.getAsDecl(), "c2py: c2py::dispatch<...> takes only function pointers");
-      }
-    }
-  } else
-    clu::emit_error(decl, "c2py: only c2py::dispatch<...> declaration is authorized here");
-}
-
 // -----------------------------
 bool is_rejected(clang::Decl const *decl, std::optional<std::regex> const &reject_regex, util::logger const *log) {
   auto *named_decl = llvm::dyn_cast<clang::NamedDecl>(decl);

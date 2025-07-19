@@ -46,33 +46,6 @@ worker_t::worker_t(clang::CompilerInstance *ci, configuration const &config)
 
 //--------------------------------------------------------
 
-// Analyze the add_methods_to<A> fields and extract the dispatch in it
-void worker_t::get_additional_methods() {
-
-  // We first build a reverse table ptr -> info for the classes
-  // Meanwhile, for each class, we call force_instantiation_add_methods
-  // which ensure that c2py::module_info::add_methods_to is fully instantiated
-  // (in case the user has done a partial instantiation)
-  std::map<cls_ptr_t, cls_info_t *> ptr_to_info;
-  for (auto &[n, cls_info] : this->module_info.classes) {
-    auto b = clu::satisfy_concept(cls_info.ptr, this->force_instantiation_add_methods, this->ci);
-    EXPECTS(b);
-    ptr_to_info.insert({cls_info.ptr, &cls_info});
-  }
-
-  for (auto const &spe : this->add_methods_to->specializations()) {
-    if (auto const *cls = spe->getTemplateArgs()[0].getAsType()->getAsCXXRecordDecl()) { // pick up the <CLS> arg
-      // we search for this cls in the table
-      if (auto it = ptr_to_info.find(cls); it != ptr_to_info.end()) {
-        for (clang::Decl const *decl : spe->decls())
-          if (auto *v = llvm::dyn_cast<clang::VarDecl>(decl)) analyse_dispatch(it->second->methods, v);
-      }
-    }
-  }
-}
-
-//--------------------------------------------------------
-
 // Given cls, stores its methods and friend functions
 void worker_t::scan_class_elements(cls_info_t &cls_info, module_info_t &m_info, cls_ptr_t cls) {
 
@@ -335,8 +308,8 @@ void worker_t::check_convertibility() {
 
 // -------------------
 
+// MOVE IT UP IN HANDLE_TU
 void worker_t::run() {
-  this->get_additional_methods();
   this->scan_class_and_bases_elements();
   this->prepare_methods();
   // must be after prepare_methods

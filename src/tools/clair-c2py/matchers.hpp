@@ -6,7 +6,7 @@
 using MatchCallback = clang::ast_matchers::MatchFinder::MatchCallback;
 using MatchResult   = clang::ast_matchers::MatchFinder::MatchResult;
 
-enum class mtch { Concept, ModuleFntDispatch, ModuleClsWrap, ModuleClsInfo, Cls, Fnt, Enum };
+enum class mtch { Concept, ModuleClsWrap, Cls, Fnt, Enum };
 
 // cpp file implements for all M in mtch values...
 template <auto M> class matcher : public MatchCallback {

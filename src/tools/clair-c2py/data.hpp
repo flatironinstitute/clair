@@ -24,12 +24,6 @@ struct fnt_info_t {
 // Make the vector "unique", elimnating redondant declaration.
 std::vector<fnt_info_t> make_unique(std::vector<fnt_info_t> const &flist);
 
-/// Should the decl be ignored due to
-/// i) a c2py_ignore annotation
-/// ii) its qualified name matches the regex
-/// If log is present, it logs the rejection
-bool is_rejected(clang::Decl const *decl, std::optional<std::regex> const &reject_regex, util::logger const *log = nullptr);
-
 // -----------------------------------------------------------
 // Serialization method
 enum class Serialization { None, Tuple, H5, Repr };
@@ -75,9 +69,16 @@ struct module_info_t {
 
   std::vector<std::pair<str_t, cls_info_t>> classes; // index of cls_table. Must keep order of insertion to have base first
   std::map<cls_ptr_t, long> classes_ptr_to_info;     // reverse search table
+
   void add_class(std::string_view name, clang::CXXRecordDecl const *cls) {
     if (classes_ptr_to_info.contains(cls)) return; // already wrapped.
     classes.emplace_back(name, cls_info_t{.ptr = cls});
     classes_ptr_to_info[cls] = long(classes.size() - 1); // index in classes
+  }
+
+  bool is_wrapped(clang::QualType ty) {
+    clang::CXXRecordDecl const *cls = ty->getAsCXXRecordDecl();
+    if (!cls) cls = ty->getPointeeCXXRecordDecl();
+    return cls and classes_ptr_to_info.contains(cls);
   }
 };

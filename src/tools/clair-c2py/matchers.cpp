@@ -107,7 +107,7 @@ template <> void matcher<mtch::Cls>::run(const clang::ast_matchers::MatchFinder:
   auto &M    = worker->module_info;
 
   // apply c2py_ignore and reject_names
-  if (is_rejected(cls, worker->reject_names, &logs.rejected)) return;
+  if (worker->is_rejected(cls, &logs.rejected)) return;
 
   // Reject classes defined in c2py_module
   if (qname.starts_with("c2py_module::")) return;
@@ -177,7 +177,7 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
 
   // apply c2py_ignore and the reject_name regex
   auto &M = worker->module_info;
-  if (is_rejected(f, worker->reject_names, &logs.rejected)) return;
+  if (worker->is_rejected(f, &logs.rejected)) return;
 
   // Reject functions defined in c2py_module
   auto fqname = f->getQualifiedNameAsString();
@@ -218,14 +218,8 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
 template <> void matcher<mtch::Enum>::run(const MatchResult &Result) {
   auto *enu = Result.Nodes.getNodeAs<clang::EnumDecl>("en");
   if (!enu) return;
-
   auto &M    = worker->module_info;
   auto qname = enu->getQualifiedNameAsString();
-
-  if (worker->reject_names and std::regex_match(qname, worker->reject_names.value())) {
-    logs.rejected(fmt::format(R"RAW({0} [{1}])RAW", qname, "reject_names"));
-    return;
-  }
-
+  if (worker->is_rejected(enu, &logs.rejected)) return;
   M.enums.push_back(enu);
 }

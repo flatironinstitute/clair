@@ -10,18 +10,15 @@ struct worker_t {
   configuration config;
 
   std::string match_names, match_files; // Remove and just use config ? SAME
-  std::optional<std::regex> reject_names;
-  bool get_set_as_properties = false;
+  std::optional<llvm::Regex> reject_names;
 
-  clang::ClassTemplateDecl const *add_methods_to            = nullptr;
   clang::ConceptDecl const *IsConvertiblePy2C               = nullptr;
   clang::ConceptDecl const *IsConvertibleC2Py               = nullptr;
-  clang::ConceptDecl const *force_instantiation_add_methods = nullptr;
   clang::ConceptDecl const *HasSerializeLikeBoost           = nullptr;
   clang::ConceptDecl const *HasHdf5                         = nullptr;
   clang::ConceptDecl const *HasNonDeletedDefaultConstructor = nullptr;
 
-  bool includes_generated_cxx = false;
+  bool user_has_included_generated_cxx = false;
 
   module_info_t module_info;
 
@@ -29,8 +26,14 @@ struct worker_t {
 
   void run();
 
+  /// Should the decl be ignored due to
+  /// i) a c2py_ignore annotation
+  /// ii) its qualified name matches the reject_names
+  /// If log is present, it logs the rejection
+  bool is_rejected(clang::Decl const *decl, util::logger const *log = nullptr);
+
   private:
-  void scan_class_elements(cls_info_t &cls_info, module_info_t &m_info, cls_ptr_t cls);
+  void scan_class_elements(cls_info_t &cls_info, cls_ptr_t cls);
   void scan_class_and_bases_elements();
   void prepare_methods();
   void remove_multiple_decl();

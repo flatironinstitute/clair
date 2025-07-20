@@ -23,7 +23,7 @@ static const struct {
 //--------------------------------------------------------
 
 worker_t::worker_t(clang::CompilerInstance *ci, configuration const &config)
-   : ci{ci}, config{config}, match_names(config.match_names), match_files(config.match_files), get_set_as_properties(config.get_set_as_properties) {
+   : ci{ci}, config{config}, match_names(config.match_names), match_files(config.match_files) {
 
   auto p                 = std::filesystem::absolute(ci->getFrontendOpts().Inputs[0].getFile().str());
   module_info.sourcefile = str_t{p.string()};
@@ -34,20 +34,39 @@ worker_t::worker_t(clang::CompilerInstance *ci, configuration const &config)
   module_info.package_name         = config.package_name;
   module_info.documentation        = config.documentation;
 
-  auto make_regex = [](str_t const &s, const char *name) -> std::regex {
-    try {
-      if (not s.empty()) return std::regex{s};
-    } catch (std::regex_error const &e) { logs.error(fmt::format("Regular Expression {} = {} is invalid: \n {}", name, s, e.what())); }
-    return {};
+  auto make_regex = [](str_t const &s) -> std::optional<llvm::Regex> {
+    if (s.empty()) return {};
+    auto r = llvm::Regex{s};
+    EXPECTS_WITH_MESSAGE(r.isValid(), "Internal error. Regex has been checked before but is invalid now. ");
+    return std::move(r);
   };
 
-  this->reject_names = make_regex(config.reject_names, "match_names");
+  this->reject_names = make_regex(config.reject_names);
+}
+
+// -----------------------------
+
+bool worker_t::is_rejected(clang::Decl const *decl, util::logger const *log) {
+  auto *named_decl = llvm::dyn_cast<clang::NamedDecl>(decl);
+  if (!named_decl) return true; // no name -> reject
+  auto name = named_decl->getQualifiedNameAsString();
+  // is annoted explicitely -> reject
+  if (clu::has_annotation(named_decl, "c2py_ignore")) {
+    if (log) (*log)(fmt::format(R"RAW({0} [{1}])RAW", name, "C2PY_IGNORE"));
+    return true;
+  }
+  // matches the regex -> reject
+  if (reject_names && reject_names->match(name)) {
+    if (log) (*log)(fmt::format(R"RAW({0} [{1}])RAW", name, "reject_names"));
+    return true;
+  }
+  return false;
 }
 
 //--------------------------------------------------------
 
 // Given cls, stores its methods and friend functions
-void worker_t::scan_class_elements(cls_info_t &cls_info, module_info_t &m_info, cls_ptr_t cls) {
+void worker_t::scan_class_elements(cls_info_t &cls_info, cls_ptr_t cls) {
 
   const bool is_base_class = (cls != cls_info.ptr);
 
@@ -84,7 +103,7 @@ void worker_t::scan_class_elements(cls_info_t &cls_info, module_info_t &m_info, 
 
   for (clang::Decl *decl : cls->decls()) { // all declarations in the class
     if (decl->getAccess() != clang::AS_public) continue;
-    if (is_rejected(decl, this->reject_names, &logs.rejected)) continue;
+    if (this->is_rejected(decl, &logs.rejected)) continue;
     // --------  method
     if (auto *m = llvm::dyn_cast<clang::FunctionDecl>(decl)) {
       treat_method(m);
@@ -108,7 +127,7 @@ void worker_t::scan_class_and_bases_elements() {
   //std::vector<cls_ptr_t> merged;
   auto &allcls = this->module_info.classes;
   for (auto &[_, cls_info] : allcls) {
-    scan_class_elements(cls_info, this->module_info, cls_info.ptr);
+    scan_class_elements(cls_info, cls_info.ptr);
 
     for (auto b : cls_info.ptr->bases()) {
       if (b.getAccessSpecifier() != clang::AccessSpecifier::AS_public) continue; // only public bases
@@ -116,7 +135,7 @@ void worker_t::scan_class_and_bases_elements() {
       bool c_is_not_wrapped = std::find_if(allcls.begin(), allcls.end(), [c](auto &&p) { return p.second.ptr == c; }) == allcls.end();
       if (c_is_not_wrapped) {
         // We merge the element of the base into the class in progress.
-        scan_class_elements(cls_info, this->module_info, c);
+        scan_class_elements(cls_info, c);
       } else {
         if (cls_info.base != nullptr) clu::emit_error(cls_info.ptr, "This class has more than one bases to wrap");
         cls_info.base = c;
@@ -129,11 +148,16 @@ void worker_t::scan_class_and_bases_elements() {
 // Takes a list of methods, and return a list without const/non const method
 // Choose the non-const version if there is both.
 //
+// OP: CAN WE REMOVE THIS ???
+// --> find a method -> for each method, store signature (qual_type_vec_t )
+// table -> qual_type_vec_t  --> bool = const, no const
+
 std::vector<fnt_info_t> flist_rm_const(std::vector<fnt_info_t> const &mlist) {
 
   using qual_type_vec_t = llvm::SmallVector<clang::QualType>;
   std::vector<std::pair<qual_type_vec_t, int>> v(mlist.size());
 
+  // MOVE THIS TO ADD method
   auto get_parameters = [](fnt_ptr_t f) -> qual_type_vec_t {
     qual_type_vec_t res;
     res.reserve(f->getNumParams());
@@ -228,7 +252,7 @@ void worker_t::remove_multiple_decl() {
 void worker_t::separate_properties() {
 
   auto &M = this->module_info;
-  if (not this->get_set_as_properties) return;
+  if (not this->config.get_set_as_properties) return;
 
   for (auto &[_, cls1] : M.classes) {
     // if the method has no argument and is not void (?)
@@ -249,6 +273,8 @@ void worker_t::separate_properties() {
 }
 // ------------------------------------------------
 
+// TODO 2 functin : take Qautlype (for field), and functionDecl
+// in worker.
 // Check convertibility of parameters, return type, and fields
 void worker_t::check_convertibility() {
 

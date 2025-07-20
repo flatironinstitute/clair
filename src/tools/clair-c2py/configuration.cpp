@@ -12,6 +12,7 @@
 #include "llvm/ADT/StringRef.h"
 
 #include "../../utility/logger.hpp"
+#include "../../utility/string_tools.hpp"
 static const struct {
   util::logger error = util::logger{&std::cout, "-- ", "\033[1;33mError:  \033[0m"};
 } logs;

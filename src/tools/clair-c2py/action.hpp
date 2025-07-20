@@ -91,7 +91,7 @@ class custom_action : public clang::ASTFrontendAction {
     log(fmt::format("Generated Python bindings in files: {} and {}", outfilename, outfilename_hxx));
 
     // Examine if the preprocessor has found the include of the generated file in the module.
-    if (not worker->includes_generated_cxx) {
+    if (not worker->user_has_included_generated_cxx) {
       auto include_directive = fmt::format("\n#include \"{}\"\n", worker->module_info.module_name + ".wrap.cxx");
       auto rewriter          = std::make_unique<clang::Rewriter>(worker->ci->getSourceManager(), worker->ci->getLangOpts());
       rewriter->InsertTextBefore(worker->ci->getSourceManager().getLocForEndOfFile(worker->ci->getSourceManager().getMainFileID()),

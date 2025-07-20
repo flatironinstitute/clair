@@ -32,11 +32,11 @@ struct worker_t {
   /// If log is present, it logs the rejection
   bool is_rejected(clang::Decl const *decl, util::logger const *log = nullptr);
 
+  bool check_convertibility(clang::FunctionDecl const *f, bool test_return_type = true) const;
+
   private:
+  void analyze_one_method(clang::FunctionDecl const *f, cls_info_t &cls_info, cls_ptr_t cls);
   void scan_class_elements(cls_info_t &cls_info, cls_ptr_t cls);
-  void scan_class_and_bases_elements();
-  void prepare_methods();
-  void remove_multiple_decl();
+  void scan_class_and_bases_elements(cls_info_t &cls_info);
   void separate_properties();
-  void check_convertibility();
 };

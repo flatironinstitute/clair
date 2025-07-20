@@ -21,9 +21,6 @@ struct fnt_info_t {
   [[nodiscard]] clang::CXXMethodDecl const *as_method() const { return llvm::dyn_cast_or_null<clang::CXXMethodDecl>(ptr); }
 };
 
-// Make the vector "unique", elimnating redondant declaration.
-std::vector<fnt_info_t> make_unique(std::vector<fnt_info_t> const &flist);
-
 // -----------------------------------------------------------
 // Serialization method
 enum class Serialization { None, Tuple, H5, Repr };
@@ -76,7 +73,7 @@ struct module_info_t {
     classes_ptr_to_info[cls] = long(classes.size() - 1); // index in classes
   }
 
-  bool is_wrapped(clang::QualType ty) {
+  bool is_wrapped(clang::QualType ty) const {
     clang::CXXRecordDecl const *cls = ty->getAsCXXRecordDecl();
     if (!cls) cls = ty->getPointeeCXXRecordDecl();
     return cls and classes_ptr_to_info.contains(cls);

@@ -1,14 +1,14 @@
 #include "./ast_consumer.hpp"
 #include "clang/AST/ASTContext.h"
 #include "clang/ASTMatchers/ASTMatchers.h"
-
-#include "./matchers.hpp"
-#include "clu/misc.hpp"
-#include "fmt/core.h"
-#include "utility/logger.hpp"
-#include <filesystem>
 #include <llvm/Support/raw_ostream.h>
+#include <filesystem>
 #include <ostream>
+#include "fmt/core.h"
+
+#include "clu/misc.hpp"
+#include "utility/logger.hpp"
+#include "./matchers.hpp"
 
 using clang::ast_matchers::MatchFinder;
 static const struct {
@@ -41,7 +41,7 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
   // ------- Build the matcher to restrict the match to the namespaces
   auto make_ns_matcher = [&]() -> DeclarationMatcher {
     // 1- Build nested namespaceDecl(hasName(...), hasDeclContext(...))
-    // e.g. namspace A::B would yield
+    // e.g. namespace A::B would yield
     // namespaceDecl(hasName("A"), hasDeclContext(namespaceDecl(hasName("B"))
     std::vector<DeclarationMatcher> ns_matcher_list;
     for (const auto &parts : worker->config._namespaces_list) {

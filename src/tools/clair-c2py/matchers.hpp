@@ -8,7 +8,7 @@ using MatchResult   = clang::ast_matchers::MatchFinder::MatchResult;
 
 enum class mtch { Concept, ModuleClsWrap, Cls, Fnt, Enum };
 
-// cpp file implements for all M in mtch values...
+// cpp file implements for all M
 template <auto M> class matcher : public MatchCallback {
   worker_t *worker;
 

@@ -1,12 +1,13 @@
 #include "./matchers.hpp"
 #include "clang/Basic/SourceManager.h"
+#include "clang/ASTMatchers/ASTMatchers.h"
+#include <clang/Sema/Sema.h>
+#include <clang/Sema/Template.h>
+
 #include "clu/misc.hpp"
 #include "clu/concept.hpp"
 #include "utility/logger.hpp"
 #include "utility/macros.hpp"
-#include "clang/ASTMatchers/ASTMatchers.h"
-#include <clang/Sema/Sema.h>
-#include <clang/Sema/Template.h>
 
 static const struct {
   util::logger rejected = util::logger{&std::cout, "-- ", "\033[1;33mRejecting: \033[0m"};
@@ -39,15 +40,17 @@ template <> void matcher<mtch::Concept>::run(const MatchResult &Result) {
 
 // --------------------------------------------------------------------------------
 
+// Match the using PythonClass = my_class<...> in c2py_module namespace
+// in the case of a class template specialization only
 template <> void matcher<mtch::ModuleClsWrap>::run(const MatchResult &Result) {
   auto *d = Result.Nodes.getNodeAs<clang::TypeAliasDecl>("decl");
   assert(d);
   if (auto *cls = d->getUnderlyingType()->getAsCXXRecordDecl()) {
-    if (llvm::dyn_cast<clang::ClassTemplateSpecializationDecl>(cls)) {
+    if (llvm::dyn_cast<clang::ClassTemplateSpecializationDecl>(cls)) { // is template specialization
       if (not cls->hasDefinition()) {
         // We have an alias e.g. A<int>, but it was not instantiated in the code
         // clang is lazy with aliases, it does not instantiate them
-        // We use the Sema to instantiate the class
+        // We use the Sema to instantiate the class ourselves
         if (auto *ctsd = llvm::dyn_cast<clang::ClassTemplateSpecializationDecl>(cls); not ctsd->isCompleteDefinition()) {
           clang::CXXRecordDecl *Pattern = ctsd->getSpecializedTemplate()->getTemplatedDecl();
           auto &SemaRef                 = worker->ci->getSema();
@@ -58,7 +61,7 @@ template <> void matcher<mtch::ModuleClsWrap>::run(const MatchResult &Result) {
                                    SemaRef.getTemplateInstantiationArgs(ctsd), // TemplateArgs
                                    clang::TSK_ExplicitInstantiationDefinition,
                                    /*Complain=*/true);
-          if (ctsd->isInvalidDecl()) clu::emit_error(d, "c2py: Error in instantiating the class");
+          if (ctsd->isInvalidDecl()) clu::emit_error(d, "c2py: Error in instantiating the class on the right hand side of the alias");
         }
         // Default previous behaviour: request that the user explicitely instantiate the class.
         //clu::emit_error(d, "c2py: Please instantiate the class explicitely");
@@ -70,12 +73,12 @@ template <> void matcher<mtch::ModuleClsWrap>::run(const MatchResult &Result) {
 
 // -------------------------------------------------
 
+// the analysis part of the class matcher
+// pulled out because it recursively calls itself on nested classes
 void analyze_class(clang::CXXRecordDecl const *cls, worker_t *worker) {
 
   if (!cls) return; // just in case
   if (cls->getASTContext().getDiagnostics().hasErrorOccurred()) return;
-
-  //std::cerr << "found class " << cls->getQualifiedNameAsString() << "\n";
 
   // Filter some automatic instantiation from the compiler, and alike
   if (!cls->getSourceRange().isValid()) return;
@@ -84,45 +87,37 @@ void analyze_class(clang::CXXRecordDecl const *cls, worker_t *worker) {
   if (auto a = cls->getAccess(); a == clang::AccessSpecifier::AS_protected or a == clang::AccessSpecifier::AS_private)
     return; // remove protected/private classes
 
-#if LLVM_VERSION_MAJOR < 18
-  if (not((cls->getTagKind() == clang::TTK_Struct) or (cls->getTagKind() == clang::TTK_Class))) return; // just struct and class
-#else
+  // only struct and class
   if (not((cls->getTagKind() == clang::TagTypeKind::Struct) or (cls->getTagKind() == clang::TagTypeKind::Class))) return; // just struct and class
-#endif
 
-  if (auto *s = llvm::dyn_cast_or_null<clang::ClassTemplateSpecializationDecl>(cls)) {
-    if (!s->isExplicitInstantiationOrSpecialization()) return;
-  }
-
-  // Reject the declaration of the template itself.
+  // Reject the declaration of a class template (not an instantiation)
   if (cls->getDescribedClassTemplate()) return;
 
-  // FIXME : check ? why ?
+  // Template specialization: accept only EXPLICIT instantiation
+  // if (auto *s = llvm::dyn_cast_or_null<clang::ClassTemplateSpecializationDecl>(cls)) {
+  //   if (!s->isExplicitInstantiationOrSpecialization()) return;
+  // }
+
   // Reject template specialization
   if (llvm::dyn_cast_or_null<clang::ClassTemplateSpecializationDecl>(cls)) return;
 
-  // Apply the filters
-  auto qname = cls->getQualifiedNameAsString();
-  auto &M    = worker->module_info;
+  // ---- Apply the filters
 
   // apply c2py_ignore and reject_names
   if (worker->is_rejected(cls, &logs.rejected)) return;
 
   // reject a class which already HAS a converter Py2C
-  // NB : if the class has already a C2py converter, it is overuled
-  // by the wrapping. It is necessary since all classes with iterator
-  // can have a default c2py converter as a generator
-  // which is superseded by the wrapping it is exists
+  // otherwise the wrapping would take precedence
   if (clu::satisfy_concept(cls, worker->IsConvertiblePy2C, worker->ci)) {
-    logs.rejected(fmt::format(R"RAW({0} [{1}])RAW", qname, "Already has a converter"));
+    logs.rejected(fmt::format(R"RAW({0} [{1}])RAW", cls->getQualifiedNameAsString(), "Already has a converter"));
     return;
   }
 
   // Insert in the module class list
   str_t py_name = util::camel_case(cls->getNameAsString());
-  M.add_class(py_name, cls);
+  worker->module_info.add_class(py_name, cls);
 
-  // Finally analyze recursively the nested classes, as they can be pruned by the namespaces
+  // Finally analyze recursively the nested classes, as they can be pruned by the namespaces directive
   for (auto const *d : cls->decls()) {
     if (auto const *inner = llvm::dyn_cast<clang::CXXRecordDecl>(d); inner) analyze_class(inner, worker);
   }
@@ -137,7 +132,7 @@ template <> void matcher<mtch::Cls>::run(const clang::ast_matchers::MatchFinder:
 
 // -------------------------------------------------
 
-clang::CXXRecordDecl *get_as_CXXRecordDecl(clang::QualType qtype) {
+clang::CXXRecordDecl *as_CXXRecordDecl(clang::QualType qtype) {
   qtype = qtype.getNonReferenceType().getCanonicalType();
   if (auto *rtype = qtype->getAs<clang::RecordType>())
     if (auto *cxxrec = llvm::dyn_cast<clang::CXXRecordDecl>(rtype->getDecl())) return cxxrec;
@@ -148,18 +143,11 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
 
   auto *f = Result.Nodes.getNodeAs<clang::FunctionDecl>("func");
   if (!f) return;
+
   // ............. Discard some automatic instantiation from the compiler, and alike
   // f in e.g. operator new, internal function, not defined in the sources
   // function defined in std headers are already filtered by the AST Matching
   if (!f->getBeginLoc().isValid()) return;
-
-  // Instantiation: accept only EXPLICIT instantiation
-  if (const auto *info = f->getTemplateSpecializationInfo(); info and not info->isExplicitInstantiationOrSpecialization()) return;
-  // We could also accept all instantiation on the main file ...
-  //auto &SM = worker->ci->getSourceManager();
-  //(SM.isInMainFile(f->getPointOfInstantiation()))
-  //fmt::println("Point of instantitation : {}", f->getPointOfInstantiation().printToString(SM));
-  //if (f->isFunctionTemplateSpecialization()) return;
 
   // Skip deleted function
   if (f->isDeleted()) return;
@@ -170,14 +158,16 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
   // skip the deduction guides (CTAD)
   if (llvm::dyn_cast_or_null<clang::CXXDeductionGuideDecl>(f)) return;
 
-  // Reject the declaration of the template itself.
+  // Instantiation: accept only EXPLICIT instantiation
+  if (const auto *info = f->getTemplateSpecializationInfo(); info and not info->isExplicitInstantiationOrSpecialization()) return;
+
+  // Reject function template declaration
   if (f->getDescribedFunctionTemplate()) return;
 
-  // reject method
-  //if (llvm::dyn_cast_or_null<clang::CXXMethodDecl>(f)) return;
+  // method should not be here
+  EXPECTS(not llvm::dyn_cast_or_null<clang::CXXMethodDecl>(f));
 
-  auto qname = f->getQualifiedNameAsString();
-  if (qname.starts_with("c2py::")) {
+  if (f->getQualifiedNameAsString().starts_with("c2py::")) {
     logs.error("FATAL ERROR: incorrect configuration or includes. It requests wrapping c2py functions which makes no sense.");
     std::abort();
   }
@@ -188,10 +178,6 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
   // apply c2py_ignore and the reject_name regex
   auto &M = worker->module_info;
   if (worker->is_rejected(f, &logs.rejected)) return;
-
-  // Insert in the module function list. Unicity will be taken care of later by worker.
-  str_t py_name = f->getNameAsString();
-  if (auto rename = clu::get_annotation_value(f, "c2py_rename")) py_name = *rename;
 
   // ---- module_init tag
   // At most one function can be tagged as module_init
@@ -207,6 +193,14 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
     M.module_init = f;
   }
 
+  // Check convertibility
+  if (not worker->check_convertibility(f)) return;
+
+  // Insert in the module function list. Unicity will be taken care of later by worker.
+  str_t py_name = f->getNameAsString();
+  if (auto rename = clu::get_annotation_value(f, "c2py_rename")) py_name = *rename;
+
+  // store the function in the module_info or as method of a class if c2py_wrap_as_method is set
   if (not clu::has_annotation(f, "c2py_wrap_as_method"))
     M.functions[py_name].push_back(fnt_info_t{f});
   else {
@@ -214,7 +208,7 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
       clu::emit_error(f, "A function tagged c2py_wrap_as_method must take at least 1 argument (self)");
       return;
     }
-    auto first_arg_type = get_as_CXXRecordDecl(f->getParamDecl(0)->getType());
+    auto first_arg_type = as_CXXRecordDecl(f->getParamDecl(0)->getType());
     if (auto it = M.classes_ptr_to_info.find(first_arg_type); it != M.classes_ptr_to_info.end())
       M.classes[it->second].second.methods[py_name].push_back(fnt_info_t{.ptr = f, .rewrite = false});
     else
@@ -227,8 +221,6 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
 template <> void matcher<mtch::Enum>::run(const MatchResult &Result) {
   auto *enu = Result.Nodes.getNodeAs<clang::EnumDecl>("en");
   if (!enu) return;
-  auto &M    = worker->module_info;
-  auto qname = enu->getQualifiedNameAsString();
   if (worker->is_rejected(enu, &logs.rejected)) return;
-  M.enums.push_back(enu);
+  worker->module_info.enums.push_back(enu);
 }

@@ -14,6 +14,7 @@ using util::join;
 static const struct {
   util::logger cls         = util::logger{&std::cout, "-- ", "\033[1;32mClass: \033[0m"};
   util::logger cls_details = util::logger{&std::cout, "-- ", "\033[1;32m         -- \033[0m"};
+  util::logger prop        = util::logger{&std::cout, "-- ", "\033[1;32m  Property: \033[0m"};
 } logs;
 
 // ===================================================================
@@ -312,7 +313,10 @@ void codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const 
   // ---------- Properties ------------
 
   std::stringstream PropertiesDecls, Properties, PropertiesDocs;
-  for (auto const &[pyname, prop] : cls_info.properties) codegen_getter_setter(PropertiesDecls, Properties, PropertiesDocs, pyname, prop);
+  for (auto const &[pyname, prop] : cls_info.properties) {
+    logs.prop(fmt::format("{}", pyname));
+    codegen_getter_setter(PropertiesDecls, Properties, PropertiesDocs, pyname, prop);
+  }
 
   if (cls_info.synthetize_dict_attribute()) codegen_synth___dict_attribute(code, Properties, cls_info);
 

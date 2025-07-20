@@ -1,13 +1,10 @@
 #include "configuration.hpp"
-#include <toml++/toml.h>
-#include <fstream>
 #include <set>
 #include <filesystem>
-#include <string>
-#include <sstream>
 #include <iostream>
 #include <fmt/core.h>
 #include <fmt/format.h>
+#include <toml++/toml.h>
 #include "llvm/Support/Regex.h"
 #include "llvm/ADT/StringRef.h"
 
@@ -108,7 +105,6 @@ configuration read_configuration(std::string const &toml_file_name) try {
       throw std::runtime_error(
          fmt::format("The key \033[1;31mnamespace\033[0m = \033[1m{}\033[0m is not valid. It is not a list of namespaces", nsPath));
     }
-    //std::cerr << "FRFREF " << nsPath << std::endl;
     // Split "A::B::C" into {"A", "B", "C"}
     std::vector<str_t> parts;
     std::stringstream ss(nsPath);
@@ -120,7 +116,6 @@ configuration read_configuration(std::string const &toml_file_name) try {
     config._namespaces_list.push_back(std::move(parts));
   }
 
-  // all good !
   return config;
 } catch (const toml::parse_error &err) {
   throw std::runtime_error(format_toml_error(err));

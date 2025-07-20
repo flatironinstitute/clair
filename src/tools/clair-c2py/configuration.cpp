@@ -64,7 +64,7 @@ configuration configuration_from_toml(const std::string &toml_file) try {
   // Extract optional values with defaults
   config.package_name  = get_toml_value_or_default<str_t>(table, "package_name", "");
   config.documentation = get_toml_value_or_default<str_t>(table, "documentation", "");
-  config.namespaces    = get_toml_value_or_default<str_t>(table, "namespace", "");
+  config.namespaces    = get_toml_value_or_default<str_t>(table, "namespaces", "");
   config.match_names   = get_toml_value_or_default<str_t>(table, "match_names", "");
   config.reject_names  = get_toml_value_or_default<str_t>(table, "reject_names", "");
   config.match_files   = get_toml_value_or_default<str_t>(table, "match_files", "");
@@ -73,7 +73,7 @@ configuration configuration_from_toml(const std::string &toml_file) try {
   config.get_set_as_properties = get_toml_value_or_default<bool>(table, "get_set_as_properties", false);
 
   // -------  Check that TOML entries are valid entries
-  std::set<std::string> const valid_keys{"package_name", "documentation", "namespace",       "match_names",
+  std::set<std::string> const valid_keys{"package_name", "documentation", "namespaces",      "match_names",
                                          "reject_names", "match_files",   "has_module_init", "get_set_as_properties"};
 
   bool ok = true;
@@ -97,12 +97,25 @@ configuration configuration_from_toml(const std::string &toml_file) try {
   expect_regex(config.reject_names, "reject_names");
   expect_regex(config.match_files, "match_files");
 
-  // check the namespace is no regex, but a simple string
-  if (not config.namespaces.empty()) {
-    //static const std::regex ns_acceptable(R"(^[a-zA-Z_][a-zA-Z0-9_]*(::[a-zA-Z_][a-zA-Z0-9_]*)*$)");
-    //if (not std::regex_match(config._namespace, ns_acceptable))
-    //  throw std::runtime_error(
-    //     fmt::format("The key\033[1;31m namespace\033[0m = \033[1m{}\033[0m is not valid. It is NOT a regex, Cf doc.", config._namespace));
+  // We transform and validate the namespaces string
+  // _namespaces_list is list [ ["A"], ["A", "B"], ...] if namespace is "A A::B"
+  for (const auto &nsPath : util::split(config.namespaces)) {
+    if (util::trim(nsPath).empty()) continue; // skip empty namespaces
+    static const llvm::Regex ns_acceptable(R"(^[a-zA-Z_][a-zA-Z0-9_]*(::[a-zA-Z_][a-zA-Z0-9_]*)*$)");
+    if (not ns_acceptable.match(nsPath)) {
+      throw std::runtime_error(
+         fmt::format("The key \033[1;31mnamespace\033[0m = \033[1m{}\033[0m is not valid. It is not a list of namespaces", nsPath));
+    }
+    //std::cerr << "FRFREF " << nsPath << std::endl;
+    // Split "A::B::C" into {"A", "B", "C"}
+    std::vector<str_t> parts;
+    std::stringstream ss(nsPath);
+    std::string part;
+    while (std::getline(ss, part, ':')) {
+      if (!part.empty() && part != ":") parts.push_back(part);
+      if (ss.peek() == ':') ss.get(); // consume second ':'
+    }
+    config._namespaces_list.push_back(std::move(parts));
   }
 
   // all good !

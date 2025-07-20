@@ -27,8 +27,6 @@ template <> void matcher<mtch::Concept>::run(const MatchResult &Result) {
       worker->IsConvertiblePy2C = cpt;
     else if (cname == "IsConvertibleC2Py")
       worker->IsConvertibleC2Py = cpt;
-    else if (cname == "force_instantiation_add_methods")
-      worker->force_instantiation_add_methods = cpt;
     else if (cname == "HasSerializeLikeBoost")
       worker->HasSerializeLikeBoost = cpt;
     else if (cname == "HasNonDeletedDefaultConstructor")
@@ -72,11 +70,12 @@ template <> void matcher<mtch::ModuleClsWrap>::run(const MatchResult &Result) {
 
 // -------------------------------------------------
 
-template <> void matcher<mtch::Cls>::run(const clang::ast_matchers::MatchFinder::MatchResult &Result) {
-  const auto *cls = Result.Nodes.getNodeAs<clang::CXXRecordDecl>("class");
+void analyze_class(clang::CXXRecordDecl const *cls, worker_t *worker) {
 
   if (!cls) return; // just in case
   if (cls->getASTContext().getDiagnostics().hasErrorOccurred()) return;
+
+  //std::cerr << "found class " << cls->getQualifiedNameAsString() << "\n";
 
   // Filter some automatic instantiation from the compiler, and alike
   if (!cls->getSourceRange().isValid()) return;
@@ -109,9 +108,6 @@ template <> void matcher<mtch::Cls>::run(const clang::ast_matchers::MatchFinder:
   // apply c2py_ignore and reject_names
   if (worker->is_rejected(cls, &logs.rejected)) return;
 
-  // Reject classes defined in c2py_module
-  if (qname.starts_with("c2py_module::")) return;
-
   // reject a class which already HAS a converter Py2C
   // NB : if the class has already a C2py converter, it is overuled
   // by the wrapping. It is necessary since all classes with iterator
@@ -124,9 +120,19 @@ template <> void matcher<mtch::Cls>::run(const clang::ast_matchers::MatchFinder:
 
   // Insert in the module class list
   str_t py_name = util::camel_case(cls->getNameAsString());
-  M.add_class(py_name, cls); // classes.emplace_back(py_name, cls_info_t{cls}); //
+  M.add_class(py_name, cls);
 
-  //if (not inserted) clu::emit_error(cls, "Class rejected. Should have another class with the same Python name ??");
+  // Finally analyze recursively the nested classes, as they can be pruned by the namespaces
+  for (auto const *d : cls->decls()) {
+    if (auto const *inner = llvm::dyn_cast<clang::CXXRecordDecl>(d); inner) analyze_class(inner, worker);
+  }
+}
+
+// -------------------------------------------------
+
+template <> void matcher<mtch::Cls>::run(const clang::ast_matchers::MatchFinder::MatchResult &Result) {
+  const auto *cls = Result.Nodes.getNodeAs<clang::CXXRecordDecl>("class");
+  analyze_class(cls, this->worker);
 }
 
 // -------------------------------------------------
@@ -143,7 +149,6 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
   auto *f = Result.Nodes.getNodeAs<clang::FunctionDecl>("func");
   if (!f) return;
   // ............. Discard some automatic instantiation from the compiler, and alike
-
   // f in e.g. operator new, internal function, not defined in the sources
   // function defined in std headers are already filtered by the AST Matching
   if (!f->getBeginLoc().isValid()) return;
@@ -169,8 +174,7 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
   if (f->getDescribedFunctionTemplate()) return;
 
   // reject method
-  // FIXME : in matcher ?
-  if (llvm::dyn_cast_or_null<clang::CXXMethodDecl>(f)) return;
+  //if (llvm::dyn_cast_or_null<clang::CXXMethodDecl>(f)) return;
 
   // Discard some special function
   if (f->getNameAsString().starts_with("operator")) return;
@@ -179,15 +183,14 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
   auto &M = worker->module_info;
   if (worker->is_rejected(f, &logs.rejected)) return;
 
-  // Reject functions defined in c2py_module
-  auto fqname = f->getQualifiedNameAsString();
-  if (fqname.starts_with("c2py_module::")) return;
-
   // Insert in the module function list. Unicity will be taken care of later by worker.
   str_t py_name = f->getNameAsString();
   if (auto rename = clu::get_annotation_value(f, "c2py_rename")) py_name = *rename;
 
-  // One function can be tagged as module_init
+  // ---- module_init tag
+  // At most one function can be tagged as module_init
+  // Its signature must be () -> void
+  // it will be called by the Python module init function
   if (clu::has_annotation(f, "c2py_module_init")) {
     if (M.module_init) {
       clu::emit_error(f, "Only one function can be tagged c2py_module_init.");

@@ -7,7 +7,7 @@ struct configuration {
   str_t documentation = {};
 
   // filters
-  str_t _namespace;
+  str_t namespaces;
   str_t match_names  = {};
   str_t reject_names = {};
   str_t match_files  = {};

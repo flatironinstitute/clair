@@ -8,6 +8,13 @@
 #include <iostream>
 #include <fmt/core.h>
 #include <fmt/format.h>
+#include "llvm/Support/Regex.h"
+#include "llvm/ADT/StringRef.h"
+
+#include "../../utility/logger.hpp"
+static const struct {
+  util::logger error = util::logger{&std::cout, "-- ", "\033[1;33mError:  \033[0m"};
+} logs;
 
 // Generic helper function to extract a value from a TOML table or throw an error if missing
 template <typename T> T get_toml_value(const toml::table &table, const std::string &key) {
@@ -54,24 +61,50 @@ configuration configuration_from_toml(const std::string &toml_file) try {
   // Extract required values (no default, must be present)
 
   // Extract optional values with defaults
-  config.package_name          = get_toml_value_or_default<str_t>(table, "package_name", "");
-  config.documentation         = get_toml_value_or_default<str_t>(table, "documentation", "");
-  config._namespace            = get_toml_value_or_default<str_t>(table, "namespace", "");
-  config.match_names           = get_toml_value_or_default<str_t>(table, "match_names", "");
-  config.reject_names          = get_toml_value_or_default<str_t>(table, "reject_names", "");
-  config.match_files           = get_toml_value_or_default<str_t>(table, "match_files", "");
+  config.package_name  = get_toml_value_or_default<str_t>(table, "package_name", "");
+  config.documentation = get_toml_value_or_default<str_t>(table, "documentation", "");
+  config.namespaces    = get_toml_value_or_default<str_t>(table, "namespace", "");
+  config.match_names   = get_toml_value_or_default<str_t>(table, "match_names", "");
+  config.reject_names  = get_toml_value_or_default<str_t>(table, "reject_names", "");
+  config.match_files   = get_toml_value_or_default<str_t>(table, "match_files", "");
+
+  // TO BE DISCUSSED
   config.get_set_as_properties = get_toml_value_or_default<bool>(table, "get_set_as_properties", false);
 
-  // Check for spurious fields
+  // -------  Check that TOML entries are valid entries
   std::set<std::string> const valid_keys{"package_name", "documentation", "namespace",       "match_names",
                                          "reject_names", "match_files",   "has_module_init", "get_set_as_properties"};
 
+  bool ok = true;
   for (const auto &[key, value] : table) {
-    // PUT A LOG + the whole list...
-    //
-    if (valid_keys.find(std::string(key)) == valid_keys.end()) { throw std::runtime_error("Unknown field: '" + std::string(key) + "'"); }
+    if (auto k = str_t{key}; not valid_keys.contains(k)) {
+      ok = false;
+      logs.error(fmt::format("Unknown field: {}", k));
+    }
+  }
+  if (not ok) throw std::runtime_error("Too many errors. Aborting");
+
+  // -------  Validation
+  auto expect_regex = [](llvm::StringRef pattern, const char *name) {
+    if (pattern.empty()) return;
+    llvm::Regex R(pattern, llvm::Regex::NoFlags); // same flavour used by matchesName
+    std::string ErrMsg;
+    if (not R.isValid(ErrMsg))
+      throw std::runtime_error(fmt::format("The key \033[1;31m{}\033[0m = \033[1m{}\033[0m  is not a valid regex", name, std::string{pattern}));
+  };
+  expect_regex(config.match_names, "match_names");
+  expect_regex(config.reject_names, "reject_names");
+  expect_regex(config.match_files, "match_files");
+
+  // check the namespace is no regex, but a simple string
+  if (not config.namespaces.empty()) {
+    //static const std::regex ns_acceptable(R"(^[a-zA-Z_][a-zA-Z0-9_]*(::[a-zA-Z_][a-zA-Z0-9_]*)*$)");
+    //if (not std::regex_match(config._namespace, ns_acceptable))
+    //  throw std::runtime_error(
+    //     fmt::format("The key\033[1;31m namespace\033[0m = \033[1m{}\033[0m is not valid. It is NOT a regex, Cf doc.", config._namespace));
   }
 
+  // all good !
   return config;
 } catch (const toml::parse_error &err) {
   throw std::runtime_error(format_toml_error(err));

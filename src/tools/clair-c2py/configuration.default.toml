@@ -4,9 +4,9 @@ package_name = ""
 # The documentation string of the module. 
 documentation = ""
 
-# Namespace. 
+# List of namespaces to restrict the wrapping.  
 # Only the classes/functions/enums declared in this namespace will be wrapped
-namespace = ""
+namespaces = ""
 
 # Match/reject elements according to regex
 # If match_names/match_names are both set, filter for all elements 

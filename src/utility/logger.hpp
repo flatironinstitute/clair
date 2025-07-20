@@ -34,13 +34,19 @@ namespace util {
       if (not activated) return;
       auto s = mess;
       *out << head_line << intro;
-      lazy_split(
-         s,
-         [self = this, c = 0](auto &&s) mutable {
-           if (c++ > 0) (*self->out) << '\n' << self->head_line_spaces << self->intro_spaces;
-           (*self->out) << s;
-         },
-         '\n');
+      auto spl = split(std::string{s}, '\n');
+      int c    = 0;
+      for (auto const &x : spl) {
+        if (c++ > 0) *out << '\n' << head_line_spaces << intro_spaces;
+        (*out) << x;
+      }
+      // lazy_split(
+      //    s,
+      //    [self = this, c = 0](auto &&s) mutable {
+      //      if (c++ > 0) (*self->out) << '\n' << self->head_line_spaces << self->intro_spaces;
+      //      (*self->out) << s;
+      //    },
+      //    '\n');
       *out << '\n';
     }
 

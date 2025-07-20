@@ -32,44 +32,69 @@ namespace util {
 
   // -------  split
 
-  // FIXME C++20 replace by ranges
-  template <typename F, typename StringChar> void lazy_split(str_t const &str, F f, StringChar const &delim = ' ', int nlim = -1) {
-    std::size_t current = str.find(delim), previous = 0;
-    for (int i = 0; (current != str_t::npos) and (i != nlim); ++i) {
-      f(str.substr(previous, current - previous));
-      if constexpr (std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_extent_t<StringChar>>>, char>) {
-        previous = current + 1;
-      } else {
-        previous = current + delim.size();
-      }
-      current = str.find(delim, previous);
+  // // FIXME C++20 replace by ranges
+  // template <typename F, typename StringChar> void lazy_split(str_t const &str, F f, StringChar const &delim = ' ', int nlim = -1) {
+  //   std::size_t current = str.find(delim), previous = 0;
+  //   for (int i = 0; (current != str_t::npos) and (i != nlim); ++i) {
+  //     f(str.substr(previous, current - previous));
+  //     if constexpr (std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_extent_t<StringChar>>>, char>) {
+  //       previous = current + 1;
+  //     } else {
+  //       previous = current + delim.size();
+  //     }
+  //     current = str.find(delim, previous);
+  //   }
+  //   f(trim(str.substr(previous, current - previous)));
+  // }
+
+  inline std::vector<std::string> split(std::string_view input, char delim = ' ') {
+    std::vector<std::string> out;
+    while (true) {
+      std::size_t pos = input.find(delim);
+      out.emplace_back(input.substr(0, pos));   // slice [0,pos) or [0,end)
+      if (pos == std::string_view::npos) break; // no more delimiters
+      input.remove_prefix(pos + 1);             // skip past the delimiter
     }
-    f(trim(str.substr(previous, current - previous)));
+    return out;
   }
 
-  inline std::vector<str_t> split(str_t const &str, char delim = ' ') {
-    std::size_t current = str.find(delim), previous = 0;
-    std::vector<str_t> res;
-    while (current != str_t::npos) {
-      res.push_back(str.substr(previous, current - previous));
-      previous = current + 1;
-      current  = str.find(delim, previous);
-    }
-    res.push_back(trim(str.substr(previous, current - previous)));
-    return res;
-  }
+  inline std::vector<std::string> split(std::string const &input, char delim = ' ') { return split(std::string_view{input}, delim); }
 
-  inline std::vector<str_t> split(str_t const &str, str_t delim, int nlim = -1) {
-    std::size_t current = str.find(delim), previous = 0;
-    std::vector<str_t> res;
-    for (int i = 0; (current != str_t::npos) and (i != nlim); ++i) {
-      res.push_back(str.substr(previous, current - previous));
-      previous = current + delim.size();
-      current  = str.find(delim, previous);
-    }
-    res.push_back(trim(str.substr(previous, current - previous)));
-    return res;
-  }
+  // inline std::vector<str_t> split1(str_t const &str, char delim = ' ') {
+  //   std::size_t current = str.find(delim), previous = 0;
+  //   std::vector<str_t> res;
+  //   while (current != str_t::npos) {
+  //     res.push_back(str.substr(previous, current - previous));
+  //     previous = current + 1;
+  //     current  = str.find(delim, previous);
+  //   }
+  //   auto rest = trim(str.substr(previous, current - previous));
+  //   if (not rest.empty()) res.push_back(rest);
+  //   return res;
+  // }
+
+  // inline std::vector<str_t> split2(const str_t &str, char delim = ' ') {
+  //   std::vector<str_t> res;
+  //   std::size_t start = 0, end;
+  //   while ((end = str.find(delim, start)) != str_t::npos) {
+  //     res.emplace_back(trim(str.substr(start, end - start)));
+  //     start = end + 1;
+  //   }
+  //   res.emplace_back(trim(str.substr(start)));
+  //   return res;
+  // }
+
+  // inline std::vector<str_t> split1(str_t const &str, str_t delim, int nlim = -1) {
+  //   std::size_t current = str.find(delim), previous = 0;
+  //   std::vector<str_t> res;
+  //   for (int i = 0; (current != str_t::npos) and (i != nlim); ++i) {
+  //     res.push_back(str.substr(previous, current - previous));
+  //     previous = current + delim.size();
+  //     current  = str.find(delim, previous);
+  //   }
+  //   res.push_back(trim(str.substr(previous, current - previous)));
+  //   return res;
+  // }
   // -------  join ---------
 
   // join the mapping of F onto the range R, with separator sep.
@@ -91,21 +116,20 @@ namespace util {
 
   // join with f as identity by default
   template <typename R, typename Sep> str_t join(R const &r, Sep sep, bool add_last = false) {
-    return join(
-       r, [](auto &&x) { return x; }, sep, add_last);
+    return join(r, [](auto &&x) { return x; }, sep, add_last);
   }
 
   // -------  indent_string ---------
 
-  inline str_t indent_string(str_t const &s, str_t const &indent) { return indent + join(split(trim(s), "\n"), "\n" + indent); }
+  inline str_t indent_string(str_t const &s, str_t const &indent) { return indent + join(split(trim(s), '\n'), "\n" + indent); }
 
   // -------  indent_string ---------
 
-  inline bool starts_with(str_t const &s, str_t const &start) {
-    return (s.rfind(start, 0) == 0);
-    //NB : C++20 has it in std::string.
-    // Here is a simple use of rfind,  Cf https://stackoverflow.com/questions/1878001/how-do-i-check-if-a-c-stdstring-starts-with-a-certain-string-and-convert-a
-  }
+  // inline bool starts_with(str_t const &s, str_t const &start) {
+  //   return (s.rfind(start, 0) == 0);
+  //   //NB : C++20 has it in std::string.
+  //   // Here is a simple use of rfind,  Cf https://stackoverflow.com/questions/1878001/how-do-i-check-if-a-c-stdstring-starts-with-a-certain-string-and-convert-a
+  // }
 
   // -------  CamelCase hash
   // change a class name into CamelCase, for default Python naming
@@ -123,30 +147,30 @@ namespace util {
        "");
   }
 
-  // -------  hash
+  // // -------  hash
 
-  // A simple *reproducible* hash for a string. Same function as Java std lib
-  // std::hash is not reproducible !!
-  inline uint64_t hash_string_to_hex(std::string const &s) {
-    uint64_t r = 0;
-    long size  = long(s.size());
-    for (long i = 0; i < size; i++) r = r * 31 + s[i]; //NOLINT
-    return r;
-  }
+  // // A simple *reproducible* hash for a string. Same function as Java std lib
+  // // std::hash is not reproducible !!
+  // inline uint64_t hash_string_to_hex(std::string const &s) {
+  //   uint64_t r = 0;
+  //   long size  = long(s.size());
+  //   for (long i = 0; i < size; i++) r = r * 31 + s[i]; //NOLINT
+  //   return r;
+  // }
 
-  // put an in into a string in hex format
-  inline str_t to_string_hex(uint64_t x) {
-    std::stringstream fs;
-    fs << std::hex << x;
-    return fs.str();
-  }
+  // // put an in into a string in hex format
+  // inline str_t to_string_hex(uint64_t x) {
+  //   std::stringstream fs;
+  //   fs << std::hex << x;
+  //   return fs.str();
+  // }
 
-  // reverse from to_string_hex : string in hex format -> int
-  inline uint64_t from_string_hex(str_t const &x) {
-    uint64_t r = 0;
-    std::istringstream fs(x);
-    fs >> std::hex >> r;
-    return r;
-  }
+  // // reverse from to_string_hex : string in hex format -> int
+  // inline uint64_t from_string_hex(str_t const &x) {
+  //   uint64_t r = 0;
+  //   std::istringstream fs(x);
+  //   fs >> std::hex >> r;
+  //   return r;
+  // }
 
 } // namespace util

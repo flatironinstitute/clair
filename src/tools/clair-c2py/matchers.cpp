@@ -11,7 +11,7 @@
 static const struct {
   util::logger rejected = util::logger{&std::cout, "-- ", "\033[1;33mRejecting: \033[0m"};
   util::logger note     = util::logger{&std::cout, "-- ", "\033[1;32mNote:  \033[0m"};
-  util::logger error    = util::logger{&std::cout, "-- ", "\033[1;33mError:  \033[0m"};
+  util::logger error    = util::logger{&std::cout, "-- ", "\033[1;31mError:  \033[0m"};
 } logs;
 
 // -----------------------------------------------------
@@ -175,6 +175,12 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
 
   // reject method
   //if (llvm::dyn_cast_or_null<clang::CXXMethodDecl>(f)) return;
+
+  auto qname = f->getQualifiedNameAsString();
+  if (qname.starts_with("c2py::")) {
+    logs.error("FATAL ERROR: incorrect configuration or includes. It requests wrapping c2py functions which makes no sense.");
+    std::abort();
+  }
 
   // Discard some special function
   if (f->getNameAsString().starts_with("operator")) return;

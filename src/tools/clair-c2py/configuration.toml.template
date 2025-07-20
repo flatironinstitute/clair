@@ -1,12 +1,12 @@
 # Name of the package if any. Package.ModuleName will be the module name 
-package_name = ""
+package_name = "{0}"
 
 # The documentation string of the module. 
-documentation = ""
+documentation = "{1}"
 
 # List of namespaces to restrict the wrapping.  
 # Only the classes/functions/enums declared in this namespace will be wrapped
-namespaces = ""
+namespaces = "{2}"
 
 # Match/reject elements according to regex
 # If match_names/match_names are both set, filter for all elements 
@@ -15,12 +15,12 @@ namespaces = ""
 #    if reject_names and reject_names match Qname : skip X
 #    else keep X.
 
-# match_names = ""
-# reject_names = ""
+match_names = "{3}"
+reject_names = "{4}"
 
 # Only keep elements declared in files matching the pattern
-# match_files = "" # String must be a regex
+match_files = "{5}" # String must be a regex
 
 # If true, transform methods with no arguments into property
 # RENAME AND DOCUMENT. DISCUSS
-# get_set_as_properties= false
+get_set_as_properties = {6}

@@ -252,7 +252,7 @@ void worker_t::remove_multiple_decl() {
 void worker_t::separate_properties() {
 
   auto &M = this->module_info;
-  if (not this->config.get_set_as_properties) return;
+  if (not this->config.wrap_no_arg_methods_as_properties) return;
 
   for (auto &[_, cls1] : M.classes) {
     // if the method has no argument and is not void (?)

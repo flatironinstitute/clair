@@ -2,7 +2,7 @@
 #include <toml++/toml.h>
 #include <fstream>
 #include <set>
-#include <stdexcept>
+#include <filesystem>
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -13,8 +13,10 @@
 
 #include "../../utility/logger.hpp"
 #include "../../utility/string_tools.hpp"
+
+namespace fs = std::filesystem;
 static const struct {
-  util::logger error = util::logger{&std::cout, "-- ", "\033[1;33mError:  \033[0m"};
+  util::logger error = util::logger{&std::cout, "-- ", "\033[1;31mError:  \033[0m"};
 } logs;
 
 // Generic helper function to extract a value from a TOML table or throw an error if missing
@@ -70,11 +72,11 @@ configuration configuration_from_toml(const std::string &toml_file) try {
   config.match_files   = get_toml_value_or_default<str_t>(table, "match_files", "");
 
   // TO BE DISCUSSED
-  config.get_set_as_properties = get_toml_value_or_default<bool>(table, "get_set_as_properties", false);
+  config.wrap_no_arg_methods_as_properties = get_toml_value_or_default<bool>(table, "wrap_no_arg_methods_as_properties", false);
 
   // -------  Check that TOML entries are valid entries
   std::set<std::string> const valid_keys{"package_name", "documentation", "namespaces",      "match_names",
-                                         "reject_names", "match_files",   "has_module_init", "get_set_as_properties"};
+                                         "reject_names", "match_files",   "has_module_init", "wrap_no_arg_methods_as_properties"};
 
   bool ok = true;
   for (const auto &[key, value] : table) {
@@ -125,4 +127,20 @@ configuration configuration_from_toml(const std::string &toml_file) try {
 } //
 catch (const std::exception &ex) {
   throw std::runtime_error("Error processing TOML file: " + toml_file + "\n" + std::string(ex.what()));
+}
+
+//--------------------------------------------------
+
+str_t write_configuration(configuration const &config, const std::string &cpp_source) {
+  auto config_filename = fs::path{cpp_source}.replace_extension(".toml").string();
+// #embed is C, it will be C++23, meanwhile we silence the warning that we use a C extension
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc23-extensions"
+  static constexpr char config_default[] = {//NOLINT
+#embed "configuration.toml.template"
+                                            , '\0'};
+#pragma clang diagnostic pop
+  std::ofstream{config_filename} << fmt::format(config_default, config.package_name, config.documentation, config.namespaces, config.match_names,
+                                                config.reject_names, config.match_files, config.wrap_no_arg_methods_as_properties);
+  return config_filename;
 }

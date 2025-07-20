@@ -24,6 +24,8 @@ static cl::OptionCategory c2py_opt_category(""); //NOLINT
 static const cl::opt<bool> opt_verbose("v", cl::desc("Verbose"), cl::cat(c2py_opt_category));
 static const cl::opt<bool> opt_gen_default_config("gen-default-config", cl::desc("Generate a default TOML configuration file for each source file."),
                                                   cl::cat(c2py_opt_category));
+static const cl::opt<bool> opt_gen_update_config("update-config", cl::desc("Update the TOML configuration file for each source file."),
+                                                 cl::cat(c2py_opt_category));
 
 //====================   main    ==========================================
 
@@ -45,20 +47,13 @@ int main(int argc, const char **argv) try {
 
   // ------- if the option --gen-default-config is present, we generate the config file and exit
 
-  if (opt_gen_default_config) {
+  if (opt_gen_default_config or opt_gen_update_config) {
     for (auto cpp_source : opt_parser->getSourcePathList()) {
-      auto config_filename = fs::path{cpp_source}.replace_extension(".toml").string();
-// #embed is C, it will be C++23, meanwhile we silence the warning that we use a C extension
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wc23-extensions"
-      constexpr char config_default[] = { //NOLINT
-#embed "configuration.default.toml"
-         , '\0'};
-#pragma clang diagnostic pop
-      std::ofstream{config_filename} << config_default;
-      logs.report(fmt::format("\033[1;34mGenerated configuration file {}\033[0m", config_filename));
-      return EXIT_SUCCESS;
+      auto config          = (opt_gen_update_config ? configuration_from_toml(cpp_source) : configuration{});
+      auto config_filename = write_configuration(config, cpp_source);
+      logs.report(fmt::format("\033[1;34m{} configuration file {}\033[0m", (opt_gen_update_config ? "Updated" : "Generated"), config_filename));
     }
+    return EXIT_SUCCESS;
   }
 
   // ------- load the config if presen

@@ -57,9 +57,9 @@ std::string format_toml_error(const toml::parse_error &err) {
 
 // ----------------------------------------
 
-configuration configuration_from_toml(const std::string &toml_file) try {
+configuration read_configuration(std::string const &toml_file_name) try {
   configuration config;
-  toml::table table = toml::parse_file(toml_file);
+  toml::table table = toml::parse_file(toml_file_name);
 
   // Extract required values (no default, must be present)
 
@@ -126,13 +126,12 @@ configuration configuration_from_toml(const std::string &toml_file) try {
   throw std::runtime_error(format_toml_error(err));
 } //
 catch (const std::exception &ex) {
-  throw std::runtime_error("Error processing TOML file: " + toml_file + "\n" + std::string(ex.what()));
+  throw std::runtime_error("Error processing TOML file: " + toml_file_name + "\n" + std::string(ex.what()));
 }
 
 //--------------------------------------------------
 
-str_t write_configuration(configuration const &config, const std::string &cpp_source) {
-  auto config_filename = fs::path{cpp_source}.replace_extension(".toml").string();
+void write_configuration(configuration const &config, std::string const &toml_file_name) {
 // #embed is C, it will be C++23, meanwhile we silence the warning that we use a C extension
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wc23-extensions"
@@ -140,7 +139,10 @@ str_t write_configuration(configuration const &config, const std::string &cpp_so
 #embed "configuration.toml.template"
                                             , '\0'};
 #pragma clang diagnostic pop
-  std::ofstream{config_filename} << fmt::format(config_default, config.package_name, config.documentation, config.namespaces, config.match_names,
-                                                config.reject_names, config.match_files, config.wrap_no_arg_methods_as_properties);
-  return config_filename;
+
+  // if the string contains a newline, we transform it into a multiline string for toml
+  auto l = [](const std::string &s) -> std::string { return (s.find('\n') != std::string::npos) ? "\"\"" + s + "\"\"" : s; };
+
+  std::ofstream{toml_file_name} << fmt::format(config_default, config.package_name, l(config.documentation), config.namespaces, config.match_names,
+                                               config.reject_names, config.match_files, config.wrap_no_arg_methods_as_properties);
 }

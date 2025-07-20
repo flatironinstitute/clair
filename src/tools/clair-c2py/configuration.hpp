@@ -18,6 +18,6 @@ struct configuration {
   std::vector<std::vector<str_t>> _namespaces_list; // list of namespaces, e.g. [ ["A"], ["A", "B"], ...] if namespace is "A A::B"
 };
 
-configuration configuration_from_toml(const std::string &toml_file);
+configuration read_configuration(std::string const &toml_file_name);
 
-str_t write_configuration(configuration const &config, const std::string &cpp_source);
+void write_configuration(configuration const &config, const std::string &toml_file_name);

@@ -24,8 +24,8 @@ static cl::OptionCategory c2py_opt_category(""); //NOLINT
 static const cl::opt<bool> opt_verbose("v", cl::desc("Verbose"), cl::cat(c2py_opt_category));
 static const cl::opt<bool> opt_gen_default_config("gen-default-config", cl::desc("Generate a default TOML configuration file for each source file."),
                                                   cl::cat(c2py_opt_category));
-static const cl::opt<bool> opt_gen_update_config("update-config", cl::desc("Update the TOML configuration file for each source file."),
-                                                 cl::cat(c2py_opt_category));
+static const cl::opt<bool> opt_update_config("update-config", cl::desc("Update the TOML configuration file for each source file."),
+                                             cl::cat(c2py_opt_category));
 
 //====================   main    ==========================================
 
@@ -47,11 +47,16 @@ int main(int argc, const char **argv) try {
 
   // ------- if the option --gen-default-config is present, we generate the config file and exit
 
-  if (opt_gen_default_config or opt_gen_update_config) {
+  if (opt_gen_default_config or opt_update_config) {
     for (auto cpp_source : opt_parser->getSourcePathList()) {
-      auto config          = (opt_gen_update_config ? configuration_from_toml(cpp_source) : configuration{});
-      auto config_filename = write_configuration(config, cpp_source);
-      logs.report(fmt::format("\033[1;34m{} configuration file {}\033[0m", (opt_gen_update_config ? "Updated" : "Generated"), config_filename));
+      auto config_filename = fs::path{cpp_source}.replace_extension(".toml").string();
+      configuration config;
+      if (opt_update_config)
+        config = read_configuration(config_filename);
+      else
+        config.match_files = cpp_source;
+      write_configuration(config, config_filename);
+      logs.report(fmt::format("\033[1;34m{} configuration file {}\033[0m", (opt_update_config ? "Updated" : "Generated"), config_filename));
     }
     return EXIT_SUCCESS;
   }
@@ -61,7 +66,7 @@ int main(int argc, const char **argv) try {
   auto config_filename = fs::path{opt_parser->getSourcePathList()[0]}.replace_extension(".toml").string();
   configuration config = {};
   // load the config from the file if present, else we keept the default config, i.e. equivalent to an empty file.
-  if (fs::exists(config_filename)) config = configuration_from_toml(config_filename);
+  if (fs::exists(config_filename)) config = read_configuration(config_filename);
 
   // ------- main tool
 

@@ -4,23 +4,23 @@ package_name = "{0}"
 # The documentation string of the module. 
 documentation = "{1}"
 
-# List of namespaces to restrict the wrapping.  
-# Only the classes/functions/enums declared in this namespace will be wrapped
+# List of namespaces as a space separated string e.g. "A A::B"
+# If non-empty, only the elements declared in EXACTLY these namespaces are wrapped.
+# NB e.g. in previous example A::detail will be ignored, whatever match_names.
 namespaces = "{2}"
 
-# Match/reject elements according to regex
-# If match_names/match_names are both set, filter for all elements 
-# Algorithm is (for an element X of fully qualified name Qname)
-#    if match_names and not match_names match Qname : skip X
-#    if reject_names and reject_names match Qname : skip X
+# Match/reject elements according to a regex (LLVM regex)
+# If match_names/match_names are both set, the algorithm is 
+#  for X of fully qualified name qname
+#    if match_names and match_names does not match Qname : skip X
+#    if reject_names and reject_names matches Qname : skip X
 #    else keep X.
-
+#
 match_names = "{3}"
 reject_names = "{4}"
 
 # Only keep elements declared in files matching the pattern
 match_files = "{5}" # String must be a regex
 
-# If true, transform methods with no arguments into property
-# RENAME AND DOCUMENT. DISCUSS
-get_set_as_properties = {6}
+# If true, transform methods with no arguments into a read only property
+wrap_no_arg_methods_as_properties = {6}

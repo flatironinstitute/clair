@@ -62,7 +62,7 @@ configuration read_configuration(std::string const &toml_file_name) try {
 
   // Extract optional values with defaults
   config.package_name  = util::trim(get_toml_value_or_default<str_t>(table, "package_name", ""));
-  config.documentation = util::trim(get_toml_value_or_default<str_t>(table, "documentation", ""));
+  config.documentation = get_toml_value_or_default<str_t>(table, "documentation", ""); // no trim
   config.namespaces    = util::trim(get_toml_value_or_default<str_t>(table, "namespaces", ""));
   config.match_names   = util::trim(get_toml_value_or_default<str_t>(table, "match_names", ""));
   config.reject_names  = util::trim(get_toml_value_or_default<str_t>(table, "reject_names", ""));

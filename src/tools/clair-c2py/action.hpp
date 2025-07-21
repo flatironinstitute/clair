@@ -9,8 +9,9 @@
 #include "clang/Frontend/FrontendActions.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Tooling/Tooling.h"
+#include "clang/Rewrite/Core/Rewriter.h"
 
-#include "./ast_consumer.hpp"
+#include "ast_consumer.hpp"
 #include "codegen/module.hpp"
 #include "utility/macros.hpp"
 #include "utility/stl_complement.hpp"
@@ -24,13 +25,10 @@ class custom_action : public clang::ASTFrontendAction {
   public:
   using ASTConsumerPointer = std::unique_ptr<clang::ASTConsumer>;
 
-  custom_action(configuration config) : config{config} {}
+  custom_action(configuration config) : config{std::move(config)} {}
 
   // --------------------------
-
-  //  virtual bool PrepareToExecuteAction(clang::CompilerInstance & Compiler) override{}
-
-  // skip function bodies. Gain in compiling time is small
+  // Skip function bodies, it gains parsing time, and we do not need them.
   bool BeginInvocation(clang::CompilerInstance &CI) override {
     CI.getInvocation().getFrontendOpts().SkipFunctionBodies = 1;
     return true;
@@ -91,7 +89,7 @@ class custom_action : public clang::ASTFrontendAction {
     log(fmt::format("Generated Python bindings in files: {} and {}", outfilename, outfilename_hxx));
 
     // Examine if the preprocessor has found the include of the generated file in the module.
-    if (not worker->user_has_included_generated_cxx) {
+    if (not worker->input_has_included_generated_cxx) {
       auto include_directive = fmt::format("\n#include \"{}\"\n", worker->module_info.module_name + ".wrap.cxx");
       auto rewriter          = std::make_unique<clang::Rewriter>(worker->ci->getSourceManager(), worker->ci->getLangOpts());
       rewriter->InsertTextBefore(worker->ci->getSourceManager().getLocForEndOfFile(worker->ci->getSourceManager().getMainFileID()),

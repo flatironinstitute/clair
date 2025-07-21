@@ -21,8 +21,7 @@ static const struct {
 
 //--------------------------------------------------------
 
-worker_t::worker_t(clang::CompilerInstance *ci, configuration const &config)
-   : ci{ci}, config{config}, match_names(config.match_names), match_files(config.match_files) {
+worker_t::worker_t(clang::CompilerInstance *ci, configuration const &config) : ci{ci}, config{config} {
 
   auto p                           = std::filesystem::absolute(ci->getFrontendOpts().Inputs[0].getFile().str());
   module_info.sourcefile           = str_t{p.string()};
@@ -95,6 +94,12 @@ void worker_t::analyze_one_method(clang::FunctionDecl const *f, cls_info_t &cls_
 
   auto name = m->getNameAsString();
 
+  // ---- constructors
+  if (llvm::isa<clang::CXXConstructorDecl>(m)) {
+    const bool is_base_class = (cls != cls_info.ptr);
+    if (not is_base_class and check_convertibility(m)) cls_info.constructors.push_back({m});
+    return;
+  }
   // ---- operators : keep only [] and ()
   if (name.starts_with("operator")) {
     if (name == "operator[]") {
@@ -121,19 +126,12 @@ void worker_t::analyze_one_method(clang::FunctionDecl const *f, cls_info_t &cls_
     return; // do not wrap these methods
   }
 
-  // ---- constructors
-  if (llvm::isa<clang::CXXConstructorDecl>(m)) {
-    const bool is_base_class = (cls != cls_info.ptr);
-    if (not is_base_class and check_convertibility(m)) cls_info.constructors.push_back({m});
-    return;
-  }
-
   // generic case
   if (check_convertibility(m)) cls_info.methods[m->getNameAsString()].push_back({m});
 }
 
 // ---------     MAKE UNIQUE functions--------------
-// Make a list of function unique
+// Make a list of function unique, keeping the order
 std::vector<fnt_info_t> make_unique(std::vector<fnt_info_t> const &flist) {
   llvm::DenseSet<const clang::FunctionDecl *> seen; // LLVM recommended replacement of std::set
   std::vector<fnt_info_t> res;
@@ -248,37 +246,32 @@ void worker_t::scan_class_and_bases_elements(cls_info_t &cls_info) {
 }
 
 // ------------------------------------------------
-void worker_t::separate_properties() {
-
-  if (not this->config.wrap_no_arg_methods_as_properties) return;
-
-  for (auto &[_, cls] : this->module_info.classes) {
-    // if the method has no argument and is not void (?)
-    // we remove it as method, and insert it in the property list
-    std::erase_if(cls.methods, [&cls](auto &&p) -> bool {
-      auto &[name, v] = p;
-      if ((v.size() == 1) and (v[0].ptr->getNumParams() == 0)) {
-        if (auto *m = v[0].as_method(); m and not m->getReturnType()->isVoidType()) {
-          cls.properties.insert({name, cls_info_t::property{v[0], {}}});
-          return true; // remove
-        }
+void worker_t::separate_properties(cls_info_t &cls_info) {
+  // if the method has no argument and is not void (?)
+  // we remove it as method, and insert it in the property list
+  std::erase_if(cls_info.methods, [&cls_info](auto &&p) -> bool {
+    auto &[name, v] = p;
+    if ((v.size() == 1) and (v[0].ptr->getNumParams() == 0)) {
+      if (auto *m = v[0].as_method(); m and not m->getReturnType()->isVoidType()) {
+        cls_info.properties.insert({name, cls_info_t::property{v[0], {}}});
+        return true; // remove
       }
-      return false; // default: do not remove
-    });
-  }
+    }
+    return false; // default: do not remove
+  });
 }
 
 // -------------------
 
 void worker_t::run() {
-  for (auto &[n, v] : this->module_info.functions) v = make_unique(v);
-  for (auto &[_, cls_info] : this->module_info.classes) this->scan_class_and_bases_elements(cls_info);
 
-  // Properties
-  this->separate_properties();
+  for (auto &[_, v] : this->module_info.functions) v = make_unique(v);
 
-  // Checks
   for (auto &[_, cls_info] : this->module_info.classes) {
+    this->scan_class_and_bases_elements(cls_info);
+    if (config.wrap_no_arg_methods_as_properties) this->separate_properties(cls_info);
+
+    // Checks
     if (cls_info.constructors.empty() and not cls_info.synthetize_dict_attribute()
         and not clu::satisfy_concept(cls_info.ptr, this->HasNonDeletedDefaultConstructor, this->ci))
       clu::emit_error(cls_info.ptr, "This class has no wrapped constructor and is not default constructible.");

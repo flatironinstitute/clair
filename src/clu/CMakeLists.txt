@@ -10,4 +10,6 @@ target_compile_features(clu PRIVATE cxx_std_20)
 set_target_properties(clu PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_link_libraries(clu PRIVATE fmt::fmt clang_llvm)
 target_include_directories(clu PRIVATE ${PROJECT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR})
-target_compile_definitions(clu PRIVATE CLANG_RESOURCE_DIR="${CLANG_RESOURCE_DIR}" SDKROOT="${SDKROOT}")
+target_compile_definitions(clu PRIVATE CLANG_RESOURCE_DIR="${CLANG_RESOURCE_DIR}" 
+                                       SDKROOT="${SDKROOT}" 
+                                       GIT_HASH="${PROJECT_GIT_HASH}")

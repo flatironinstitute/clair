@@ -52,4 +52,8 @@ namespace clu {
 
     return arguments;
   }
+
+  //==============================
+
+  std::string get_git_hash() { return GIT_HASH; }
 } // namespace clu

@@ -19,7 +19,7 @@ class pp_include_callback : public clang::PPCallbacks {
                           clang::OptionalFileEntryRef, clang::StringRef, clang::StringRef, const clang::Module *, bool,
                           clang::SrcMgr::CharacteristicKind) override { // NOLINT
     if (Ctx->getSourceManager().isInMainFile(loc)) {
-      worker.user_has_included_generated_cxx = (FileName == worker.module_info.module_name + ".wrap.cxx");
+      worker.input_has_included_generated_cxx = (FileName == worker.module_info.module_name + ".wrap.cxx");
       if (count++ == 0 && FileName != "c2py/c2py.hpp") {
         clu::emit_error(loc, *Ctx, "c2py/c2py.hpp should be included before any other include in the file");
       }

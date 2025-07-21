@@ -15,16 +15,14 @@ namespace clu {
   clang::tooling::CommandLineArguments get_clang_additional_args_from_env_variables() {
 
 #ifdef __APPLE__
-    // We examine the SDKROOT
+    // We examine the SDKROOT and set it for this process is the machine is poorly configured.
     const char *sdkroot = std::getenv("SDKROOT");
     if (!sdkroot || std::string(sdkroot).empty()) {
-      setenv("SDKROOT", SDKROOT, 1); // overwrite = 1
-      util::logger log = util::logger{&std::cout, "-- ", ""};
-      log("SDKROOT set to: "s + SDKROOT);
+      setenv("SDKROOT", SDKROOT, 1);                                      // overwrite = 1, for this process only
+      util::logger{&std::cout, "-- ", ""}("SDKROOT set to: "s + SDKROOT); // report !
     } else {
-      // sanity check
-      if (sdkroot != std::string{SDKROOT})
-        throw std::runtime_error("SDKROOT inconsistent between xcrun --show-sdk-path and the environement variable");
+      if (sdkroot != std::string{SDKROOT}) // SDKROOT is set but not to the expected value. That is strange.
+        util::logger::warning()("\033[1;31m SDKROOT inconsistent between xcrun --show-sdk-path and the environement variable \033[0m");
     }
 #endif
 

@@ -1,7 +1,11 @@
 #pragma once
+#include <utility>
+
 #include "utility/string_tools.hpp"
 
 struct configuration {
+
+  configuration(str_t module_filename) : match_files(std::move(module_filename)) {}
 
   str_t package_name  = {};
   str_t documentation = {};

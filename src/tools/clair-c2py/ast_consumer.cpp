@@ -10,6 +10,7 @@
 #include "utility/logger.hpp"
 #include "./matchers.hpp"
 
+namespace fs = std::filesystem;
 using clang::ast_matchers::MatchFinder;
 static const struct {
   util::logger note = util::logger{&std::cout, "-- ", "\033[1;32mNote:  \033[0m"};
@@ -82,14 +83,16 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
   };
   // add the arguments for the file if the option is set
   auto add_match_files = [&](auto l, auto... x) {
-    if (auto &s = worker->config.match_files; !s.empty())
-      return add_name(l, isExpansionInFileMatching(s), std::move(x)...);
-    else {
-      // if no match_files and no reject_names, we restrict to the main file (for test mainly)
-      if (worker->config.match_names.empty() and worker->config.reject_names.empty())
+    if (auto &s = worker->config.match_files; !s.empty()) {
+      //llvm::errs() << "Source file: " << fs::path{worker->module_info.sourcefile}.filename() << "\n";
+      //llvm::errs() << "Match files: " << worker->config.match_files << "\n";
+      // optimization : if the match file is exactly the main file, we can use isExpansionInMainFile which is much faster
+      if (fs::path{worker->module_info.sourcefile}.filename() == s)
         return add_name(l, isExpansionInMainFile(), std::move(x)...);
       else
-        return add_name(l, std::move(x)...);
+        return add_name(l, isExpansionInFileMatching(s), std::move(x)...);
+    } else {
+      return add_name(l, std::move(x)...);
     }
   };
 

@@ -50,23 +50,23 @@ int main(int argc, const char **argv) try {
   if (opt_gen_default_config or opt_update_config) {
     for (auto cpp_source : opt_parser->getSourcePathList()) {
       auto config_filename = fs::path{cpp_source}.replace_extension(".toml").string();
-      configuration config;
-      if (opt_update_config)
-        config = read_configuration(config_filename);
-      else
-        config.match_files = cpp_source;
+      configuration config = opt_update_config ? read_configuration(config_filename) : configuration{fs::path{cpp_source}.filename()};
       write_configuration(config, config_filename);
       logs.report(fmt::format("\033[1;34m{} configuration file {}\033[0m", (opt_update_config ? "Updated" : "Generated"), config_filename));
     }
     return EXIT_SUCCESS;
   }
 
-  // ------- load the config if presen
-
-  auto config_filename = fs::path{opt_parser->getSourcePathList()[0]}.replace_extension(".toml").string();
-  configuration config = {};
-  // load the config from the file if present, else we keept the default config, i.e. equivalent to an empty file.
-  if (fs::exists(config_filename)) config = read_configuration(config_filename);
+  // ------- load the config if present else default
+  // default config restricting to the module.cpp file (just filename, not full path)
+  if (opt_parser->getSourcePathList().size() != 1) {
+    logs.error(fmt::format("Expected exactly one source file, got {}.", opt_parser->getSourcePathList().size()));
+    return EXIT_FAILURE;
+  }
+  str_t source0 = opt_parser->getSourcePathList()[0];
+  configuration config{fs::path{source0}.filename()};
+  if (auto config_filename = fs::path{source0}.replace_extension(".toml").string(); fs::exists(config_filename))
+    config = read_configuration(config_filename);
 
   // ------- main tool
 

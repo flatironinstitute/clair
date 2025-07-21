@@ -55,18 +55,18 @@ std::string format_toml_error(const toml::parse_error &err) {
 // ----------------------------------------
 
 configuration read_configuration(std::string const &toml_file_name) try {
-  configuration config;
+  configuration config{""}; // nothing
   toml::table table = toml::parse_file(toml_file_name);
 
   // Extract required values (no default, must be present)
 
   // Extract optional values with defaults
-  config.package_name  = get_toml_value_or_default<str_t>(table, "package_name", "");
-  config.documentation = get_toml_value_or_default<str_t>(table, "documentation", "");
-  config.namespaces    = get_toml_value_or_default<str_t>(table, "namespaces", "");
-  config.match_names   = get_toml_value_or_default<str_t>(table, "match_names", "");
-  config.reject_names  = get_toml_value_or_default<str_t>(table, "reject_names", "");
-  config.match_files   = get_toml_value_or_default<str_t>(table, "match_files", "");
+  config.package_name  = util::trim(get_toml_value_or_default<str_t>(table, "package_name", ""));
+  config.documentation = util::trim(get_toml_value_or_default<str_t>(table, "documentation", ""));
+  config.namespaces    = util::trim(get_toml_value_or_default<str_t>(table, "namespaces", ""));
+  config.match_names   = util::trim(get_toml_value_or_default<str_t>(table, "match_names", ""));
+  config.reject_names  = util::trim(get_toml_value_or_default<str_t>(table, "reject_names", ""));
+  config.match_files   = util::trim(get_toml_value_or_default<str_t>(table, "match_files", ""));
 
   // TO BE DISCUSSED
   config.wrap_no_arg_methods_as_properties = get_toml_value_or_default<bool>(table, "wrap_no_arg_methods_as_properties", false);
@@ -115,6 +115,12 @@ configuration read_configuration(std::string const &toml_file_name) try {
     }
     config._namespaces_list.push_back(std::move(parts));
   }
+
+  // We could put a warning, but it will likely to produce a lot of wrapping, maybe some very corner cases in boost or alike
+  // that could crash the tool (?) and be very confusing for the user...
+  // Better to throw an error
+  if (config.match_names.empty() and config.reject_names.empty() and config.namespaces.empty() and config.match_files.empty())
+    throw std::runtime_error("The key \033[1;31mIncorrect configuration: match_name, reject_names, namespaces and match_files are all empty\033[0m");
 
   return config;
 } catch (const toml::parse_error &err) {

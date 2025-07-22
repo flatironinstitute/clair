@@ -70,6 +70,12 @@ jobs:
         python3-pip
         python3-scipy
         python3-ipython
+        python3-numpydoc
+        python3-sphinx
+        python3-sphinx-rtd-theme
+        python3-nbsphinx
+        python3-myst-parser
+        python3-linkify-it
 
     - name: Set up virtualenv
       run: |

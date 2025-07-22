@@ -73,6 +73,7 @@ jobs:
         python3-numpydoc
         python3-sphinx
         python3-sphinx-rtd-theme
+        python3-sphinx-copybutton
         python3-nbsphinx
         python3-myst-parser
         python3-linkify-it

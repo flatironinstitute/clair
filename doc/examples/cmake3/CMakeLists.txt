@@ -32,8 +32,8 @@ if (Update_Python_Bindings)
     OUTPUT my_module.wrap.cxx                                       # Generates this file
     DEPENDS my_module.cpp                                           #
   )
+  add_custom_target(bindings_generation DEPENDS my_module.wrap.cxx)
 
-  add_custom_target(wrap_gen DEPENDS my_module.wrap.cxx)
-  add_dependencies(my_module wrap_gen)  # Ensure bindings are generated before compilation
+  add_dependencies(my_module bindings_generation)  # Ensure bindings are generated before compilation
 endif()
 

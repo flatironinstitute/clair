@@ -39,8 +39,13 @@ add_library(clang_llvm INTERFACE)
 target_link_libraries(clang_llvm INTERFACE clang-cpp $<$<PLATFORM_ID:Linux>:LLVMSupport>)
 target_include_directories(clang_llvm SYSTEM INTERFACE ${CLANG_INCLUDE_DIRS} ${LLVM_INCLUDE_DIRS})
 
-# Allow undefined symbols in shared objects on Darwin (this is the default behaviour on Linux)
-target_link_libraries(clang_llvm INTERFACE "$<$<PLATFORM_ID:Darwin>:-undefined dynamic_lookup>")
+if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+  # Use LLVM provided libcxx
+  target_link_directories(clang_llvm INTERFACE ${LLVM_INSTALL_PREFIX}/lib/c++)
+
+  # Allow undefined symbols in shared objects on Darwin (this is the default behaviour on Linux)
+  target_link_libraries(clang_llvm INTERFACE "-undefined dynamic_lookup")
+endif()
 
 if(NOT LLVM_ENABLE_RTTI)
  target_compile_options(clang_llvm INTERFACE -fno-rtti)

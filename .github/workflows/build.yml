@@ -2,9 +2,9 @@ name: build
 
 on:
   push:
-    branches: [ unstable, tool, '[0-9]+.[0-9]+.x' ]
+    branches: [ unstable, '[0-9]+.[0-9]+.x' ]
   pull_request:
-    branches: [ unstable, tool, '[0-9]+.[0-9]+.x' ]
+    branches: [ unstable, '[0-9]+.[0-9]+.x' ]
   workflow_call:
   workflow_dispatch:
 
@@ -26,8 +26,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {os: ubuntu-24.04, cc: clang-19, cxx: clang++-19}
-          - {os: macos-14, cc: clang, cxx: clang++}
+          - {os: ubuntu-24.04, cc: clang-19, cxx: clang++-19, doc: ON }
+          - {os: macos-14, cc: clang, cxx: clang++, doc: OFF }
 
     runs-on: ${{ matrix.os }}
 
@@ -94,7 +94,7 @@ jobs:
         CC: ${{ matrix.cc }}
         CXX: ${{ matrix.cxx }}
       run: |
-        cmake -B build -S. -DCMAKE_INSTALL_PREFIX=$HOME/install
+        cmake -B build -S. -DCMAKE_INSTALL_PREFIX=$HOME/install -DBuild_Documentation=${{ matrix.doc }}
         cd build && make -j2 || make -j1 VERBOSE=1
 
     - name: Test clair
@@ -111,3 +111,11 @@ jobs:
       with:
         path: ${{ env.CCACHE_DIR }}
         key: ccache-${{ matrix.os }}-${{ matrix.cc }}-${{ github.run_id }}
+
+    - name: Deploy documentation to website
+      if: matrix.doc == 'ON' && github.ref == 'refs/heads/unstable'
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        folder: build/doc/html
+        branch: github.io
+        target-folder: docs/unstable

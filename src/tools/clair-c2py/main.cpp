@@ -24,7 +24,9 @@ void printCustomVersion(llvm::raw_ostream &OS) {
 static const cl::extrahelp OurHelp(R"HELPDOC(
   clang-c2py generates Python binding for C++.
   Usage: 
-    clang-c2py my_module.cpp
+   clair-c2py module_source_file.cpp -- all compiler options   # pass options on the command line, after the `--` separator
+   clair-c2py module_source_file.cpp                           # uses compile_commands.json in the current directory
+   clair-c2py module_source_file.cpp -p DIR                    # uses compile_commands.json from a specified directory DIR
 )HELPDOC");
 static cl::OptionCategory c2py_opt_category(""); //NOLINT
 static const cl::opt<bool> opt_verbose("v", cl::desc("Verbose"), cl::cat(c2py_opt_category));

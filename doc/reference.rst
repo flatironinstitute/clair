@@ -11,5 +11,6 @@ Reference documentation
    reference/classes
    reference/enums
    reference/converters
+   reference/multiple
 
 

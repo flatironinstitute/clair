@@ -6,6 +6,7 @@ This project provides a automatic C++ to Python bindings generation tool.
 
 This project is in **beta** stage.
 
-Cf documentation.
+See the [documentation](https://flatironinstitute.github.io/clair/latest/index.html).
+
 
 

@@ -31,5 +31,5 @@ This project is in beta stage. Documentation in progress.
    reference
    notebook
    issues
-   ChangeLog
+   changelog
    about

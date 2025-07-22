@@ -17,9 +17,9 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.viewcode',
               'sphinx.ext.autosummary',
               'sphinx.ext.githubpages',
-              'sphinx_copybutton',
+               'sphinx_copybutton',
               #'nbsphinx',
-               'myst_parser',
+#               'myst_parser',
               ]
 
 # Copy button options
@@ -57,7 +57,7 @@ html_style = 'css/custom.css'
 # options for the the rtd theme
 html_theme_options = {
     'logo_only': False,
-    'display_version': True,
+    #'display_version': True,
     'prev_next_buttons_location': 'bottom',
     'style_external_links': False,
     'vcs_pageview_mode': '',

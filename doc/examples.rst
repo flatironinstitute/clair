@@ -20,7 +20,8 @@ We can then generate the Python bindings for this function and compile them with
 
 .. code-block:: bash
    
-   $ clang++ -fplugin=clair_c2py.dylib  fun2.cpp -std=c++20 -shared -o fun2.so `c2py_flags`
+    clair-c2py fun2.cpp -- -std=c++20 `c2py_flags -i`
+    clang++ fun2.cpp -std=c++20 -shared -o fun2.so `c2py_flags`
 
 Finally, we use the module in Python:
 
@@ -42,7 +43,8 @@ We can again generate the Python bindings for this function and compile them wit
 
 .. code-block:: bash
    
-   $ clang++ -fplugin=clair_c2py.dylib  struct1.cpp -std=c++20 -shared -o struct1.so `c2py_flags`
+     clair-c2py struct1.cpp -- -std=c++20 `c2py_flags -i`
+     clang++ struct1.cpp -std=c++20 -shared -o struct1.so `c2py_flags`
 
 Finally, we use the module in Python:
 

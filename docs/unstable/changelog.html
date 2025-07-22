@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Examples &mdash; clair - Automatic Python/C++ bindings  documentation</title>
+  <title>Change Logs &mdash; clair - Automatic Python/C++ bindings  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=f7f783a0" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=8f9e6779" />
@@ -22,8 +22,8 @@
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Reference documentation" href="reference.html" />
-    <link rel="prev" title="CMake Integration" href="cmake.html" /> 
+    <link rel="next" title="About clair/c2py" href="about.html" />
+    <link rel="prev" title="Reporting issues" href="issues.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -84,9 +84,9 @@
 <li class="toctree-l2"><a class="reference internal" href="cmake.html#workflow">Workflow</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#functions">Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#functions">Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#classes">Classes</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="reference.html">Reference documentation</a><ul>
@@ -132,7 +132,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="notebook.html">Notebook integration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="issues.html">Reporting issues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html">Change Logs</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Change Logs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About clair/c2py</a></li>
 </ul>
 
@@ -150,9 +150,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Examples</li>
+      <li class="breadcrumb-item active">Change Logs</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/examples.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/changelog.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -160,83 +160,16 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="examples">
-<span id="id1"></span><h1>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h1>
-<div class="toctree-wrapper compound">
-</div>
-<section id="functions">
-<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
-<p>The following example shows a C++ function that takes a <code class="docutils literal notranslate"><span class="pre">std::vector&lt;double&gt;</span></code> and returns the sum of its elements:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// fun2.cpp</span>
-
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;numeric&gt;</span>
-
-<span class="kt">double</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">&amp;</span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">accumulate</span><span class="p">(</span><span class="n">begin</span><span class="p">(</span><span class="n">v</span><span class="p">),</span><span class="w"> </span><span class="n">end</span><span class="p">(</span><span class="n">v</span><span class="p">),</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
-</pre></div>
-</div>
-<p>We can then generate the Python bindings for this function and compile them with (assuming OS X and clang):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>clair-c2py<span class="w"> </span>fun2.cpp<span class="w"> </span>--<span class="w"> </span>-std<span class="o">=</span>c++20<span class="w"> </span><span class="sb">`</span>c2py_flags<span class="w"> </span>-i<span class="sb">`</span>
-clang++<span class="w"> </span>fun2.cpp<span class="w"> </span>-std<span class="o">=</span>c++20<span class="w"> </span>-shared<span class="w"> </span>-o<span class="w"> </span>fun2.so<span class="w"> </span><span class="sb">`</span>c2py_flags<span class="sb">`</span>
-</pre></div>
-</div>
-<p>Finally, we use the module in Python:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt; import fun2 as M</span>
-<span class="go">&gt;&gt;&gt; M.sum([1.2, 2.3, 4.5])</span>
-<span class="go">8.0</span>
-</pre></div>
-</div>
-</section>
-<section id="classes">
-<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading"></a></h2>
-<p>The following example shows a simple C++ struct and how to make it printable in Python:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// struct1.cpp</span>
-
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span>
-
-<span class="k">struct</span><span class="w"> </span><span class="nc">S</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
-
-<span class="w">  </span><span class="n">S</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">i</span><span class="p">{</span><span class="n">i</span><span class="p">}</span><span class="w"> </span><span class="p">{}</span>
-
-<span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">m</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-<span class="p">};</span>
-
-<span class="c1">// A function using S</span>
-<span class="kt">int</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">S</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">&amp;</span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">i</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-
-<span class="c1">// make S printable in C++</span>
-<span class="n">std</span><span class="o">::</span><span class="n">ostream</span><span class="w"> </span><span class="o">&amp;</span><span class="k">operator</span><span class="o">&lt;&lt;</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">ostream</span><span class="w"> </span><span class="o">&amp;</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">S</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">&amp;</span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">out</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;S struct with i=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-</pre></div>
-</div>
-<p>We can again generate the Python bindings for this function and compile them with (assuming OS X and clang):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>clair-c2py<span class="w"> </span>struct1.cpp<span class="w"> </span>--<span class="w"> </span>-std<span class="o">=</span>c++20<span class="w"> </span><span class="sb">`</span>c2py_flags<span class="w"> </span>-i<span class="sb">`</span>
-clang++<span class="w"> </span>struct1.cpp<span class="w"> </span>-std<span class="o">=</span>c++20<span class="w"> </span>-shared<span class="w"> </span>-o<span class="w"> </span>struct1.so<span class="w"> </span><span class="sb">`</span>c2py_flags<span class="sb">`</span>
-</pre></div>
-</div>
-<p>Finally, we use the module in Python:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt; import struct1 as M</span>
-<span class="go">&gt;&gt;&gt; s = M.S(2)</span>
-<span class="go">&gt;&gt;&gt; s.i</span>
-<span class="go">2</span>
-<span class="go">&gt;&gt;&gt; s.m()</span>
-<span class="go">2</span>
-<span class="go">&gt;&gt;&gt; print(s)</span>
-<span class="go">S struct with i=2</span>
-<span class="go">&gt;&gt;&gt; M.f(s)</span>
-<span class="go">2</span>
-</pre></div>
-</div>
-</section>
+  <section id="change-logs">
+<span id="changelog"></span><h1>Change Logs<a class="headerlink" href="#change-logs" title="Link to this heading"></a></h1>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cmake.html" class="btn btn-neutral float-left" title="CMake Integration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="reference.html" class="btn btn-neutral float-right" title="Reference documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="issues.html" class="btn btn-neutral float-left" title="Reporting issues" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="about.html" class="btn btn-neutral float-right" title="About clair/c2py" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

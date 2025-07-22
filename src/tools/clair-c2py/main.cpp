@@ -3,6 +3,7 @@
 #include <fstream>
 #include "llvm/Support/Process.h"
 #include "clang/Tooling/CommonOptionsParser.h"
+#include "clang/Basic/Version.h"
 
 #include "clu/cmd_line_arg.hpp"
 #include "utility/macros.hpp"
@@ -15,6 +16,11 @@ namespace fs = std::filesystem;
 
 // ==========  Options of the program using LLVM ===================
 
+void printCustomVersion(llvm::raw_ostream &OS) {
+  OS << "clair-c2py version (git hash) " << clu::get_git_hash() << "\n";
+  OS << "  Based on " << clang::getClangToolFullVersion("clang") << "\n";
+  OS.flush();
+}
 static const cl::extrahelp OurHelp(R"HELPDOC(
   clang-c2py generates Python binding for C++.
   Usage: 
@@ -37,6 +43,7 @@ int main(int argc, const char **argv) try {
   } const logs;
 
   // ----- Parse the options in the command line
+  cl::SetVersionPrinter(printCustomVersion);
   auto opt_parser = clang::tooling::CommonOptionsParser::create(argc, argv, c2py_opt_category);
   if (not opt_parser) {
     logs.report("Error in parsing the options. Use -help (or -h) to get documentation.");

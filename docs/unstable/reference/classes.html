@@ -1,20 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Classes &mdash; clair - Automatic Python/C++ bindings  documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=f7f783a0" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=8f9e6779" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
+  
+        <script src="../_static/jquery.js?v=8dae8fb0"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/clipboard.min.js?v=66b4909c"></script>
+        <script src="../_static/copybutton.js?v=71494f10"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
@@ -28,14 +31,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search"  style="background: #7E588A" >
-            <a href="../index.html" class="icon icon-home"> clair - Automatic Python/C++ bindings
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            clair - Automatic Python/C++ bindings
           </a>
               <div class="version">
                 0.1.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -63,16 +70,13 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../gettingstarted.html">Getting started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../gettingstarted.html#starting-example">Starting example</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../gettingstarted.html#what-happened">What happened ?</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../gettingstarted.html#reusing-the-bindings-without-clang">Reusing the bindings without clang</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../gettingstarted.html#what-happened">What happened?</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../cmake.html">CMake integration</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../cmake.html#compiling-with-clang-and-the-clair-plugin">Compiling with clang and the clair plugin</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../cmake.html#a-more-general-setup">A more general setup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../cmake.html#a-variant-avoiding-the-installation-of-c2py">A variant avoiding the installation of c2py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cmake.html">CMake Integration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../cmake.html#compiling">Compiling</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a><ul>
@@ -123,7 +127,6 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../notebook.html">Notebook integration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../issues.html">Reporting issues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ChangeLog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../about.html">About clair/c2py</a></li>
 </ul>
 
@@ -140,9 +143,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../reference.html">Reference documentation</a> &raquo;</li>
-      <li>Classes</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../reference.html">Reference documentation</a></li>
+      <li class="breadcrumb-item active">Classes</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/reference/classes.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -153,47 +156,47 @@
            <div itemprop="articleBody">
              
   <section id="classes">
-<span id="clsref"></span><h1>Classes<a class="headerlink" href="#classes" title="Permalink to this headline"></a></h1>
+<span id="clsref"></span><h1>Classes<a class="headerlink" href="#classes" title="Link to this heading"></a></h1>
 <p>Classes are automatically wrapped by clair (according to the filter rule in the configuration <a class="reference internal" href="customize.html#customize"><span class="std std-ref">Customization</span></a>).</p>
 <section id="constructors">
-<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline"></a></h2>
+<h2>Constructors<a class="headerlink" href="#constructors" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>TODO example + the synthetize option for parameters.
 specific file ?</p></li>
 </ul>
 </section>
 <section id="methods">
-<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline"></a></h2>
+<h2>Methods<a class="headerlink" href="#methods" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>TODO</p></li>
 </ul>
 </section>
 <section id="static-methods">
-<h2>Static Methods<a class="headerlink" href="#static-methods" title="Permalink to this headline"></a></h2>
+<h2>Static Methods<a class="headerlink" href="#static-methods" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>TODO : example</p></li>
 </ul>
 </section>
 <section id="operator">
-<h2>Operator()<a class="headerlink" href="#operator" title="Permalink to this headline"></a></h2>
+<h2>Operator()<a class="headerlink" href="#operator" title="Link to this heading"></a></h2>
 </section>
 <section id="id1">
-<h2>Operator[]<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h2>
+<h2>Operator[]<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
 </section>
 <section id="iterable-object">
-<h2>Iterable object<a class="headerlink" href="#iterable-object" title="Permalink to this headline"></a></h2>
+<h2>Iterable object<a class="headerlink" href="#iterable-object" title="Link to this heading"></a></h2>
 </section>
 <section id="str-and-repr">
-<h2>str and repr<a class="headerlink" href="#str-and-repr" title="Permalink to this headline"></a></h2>
+<h2>str and repr<a class="headerlink" href="#str-and-repr" title="Link to this heading"></a></h2>
 </section>
 <section id="copy">
-<h2>Copy<a class="headerlink" href="#copy" title="Permalink to this headline"></a></h2>
+<h2>Copy<a class="headerlink" href="#copy" title="Link to this heading"></a></h2>
 </section>
 <section id="operators">
-<h2>Operators<a class="headerlink" href="#operators" title="Permalink to this headline"></a></h2>
+<h2>Operators<a class="headerlink" href="#operators" title="Link to this heading"></a></h2>
 </section>
 <section id="hdf5">
-<h2>hdf5<a class="headerlink" href="#hdf5" title="Permalink to this headline"></a></h2>
+<h2>hdf5<a class="headerlink" href="#hdf5" title="Link to this heading"></a></h2>
 </section>
 </section>
 

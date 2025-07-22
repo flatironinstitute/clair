@@ -1,20 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Function &mdash; clair - Automatic Python/C++ bindings  documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=f7f783a0" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=8f9e6779" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
+  
+        <script src="../_static/jquery.js?v=8dae8fb0"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/clipboard.min.js?v=66b4909c"></script>
+        <script src="../_static/copybutton.js?v=71494f10"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
@@ -28,14 +31,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search"  style="background: #7E588A" >
-            <a href="../index.html" class="icon icon-home"> clair - Automatic Python/C++ bindings
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            clair - Automatic Python/C++ bindings
           </a>
               <div class="version">
                 0.1.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -63,16 +70,13 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../gettingstarted.html">Getting started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../gettingstarted.html#starting-example">Starting example</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../gettingstarted.html#what-happened">What happened ?</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../gettingstarted.html#reusing-the-bindings-without-clang">Reusing the bindings without clang</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../gettingstarted.html#what-happened">What happened?</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../cmake.html">CMake integration</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../cmake.html#compiling-with-clang-and-the-clair-plugin">Compiling with clang and the clair plugin</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../cmake.html#a-more-general-setup">A more general setup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../cmake.html#a-variant-avoiding-the-installation-of-c2py">A variant avoiding the installation of c2py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cmake.html">CMake Integration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../cmake.html#compiling">Compiling</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a><ul>
@@ -123,7 +127,6 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../notebook.html">Notebook integration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../issues.html">Reporting issues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ChangeLog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../about.html">About clair/c2py</a></li>
 </ul>
 
@@ -140,9 +143,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../reference.html">Reference documentation</a> &raquo;</li>
-      <li>Function</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../reference.html">Reference documentation</a></li>
+      <li class="breadcrumb-item active">Function</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/reference/fnt_basic.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -153,9 +156,9 @@
            <div itemprop="articleBody">
              
   <section id="function">
-<span id="fntref"></span><h1>Function<a class="headerlink" href="#function" title="Permalink to this headline"></a></h1>
+<span id="fntref"></span><h1>Function<a class="headerlink" href="#function" title="Link to this heading"></a></h1>
 <section id="type-conversion">
-<h2>Type conversion<a class="headerlink" href="#type-conversion" title="Permalink to this headline"></a></h2>
+<h2>Type conversion<a class="headerlink" href="#type-conversion" title="Link to this heading"></a></h2>
 <p>Python and C++ types are different.
 For example, a <code class="docutils literal notranslate"><span class="pre">long</span></code> in C++ is converted from/to a Python integer.
 In order to call a C++ function from Python, it is necessary to</p>
@@ -168,7 +171,7 @@ In order to call a C++ function from Python, it is necessary to</p>
 <code class="docutils literal notranslate"><span class="pre">clair</span></code> will report a compilation error for any attempt to wrap a function with an inconvertible type.</p>
 </section>
 <section id="dynamical-dispatch">
-<h2>Dynamical dispatch<a class="headerlink" href="#dynamical-dispatch" title="Permalink to this headline"></a></h2>
+<h2>Dynamical dispatch<a class="headerlink" href="#dynamical-dispatch" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>In C++, objects are statically typed (one variable has one type fixed at compilation), and functions can be overloaded.</p></li>
 <li><p>In Python, objects are dynamically typed, and there is no overload.</p></li>
@@ -178,13 +181,13 @@ In order to call a C++ function from Python, it is necessary to</p>
 and the first C++ function for which the Python arguments can be converted to the C++ types is called.
 If none applies, a Python exception is raised.</p>
 <p>Let us illustrate this with a simple example.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span><span class="cp"></span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span>
 
-<span class="k">struct</span><span class="w"> </span><span class="nc">A</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="kt">double</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">s</span><span class="p">;</span><span class="w"></span>
-<span class="p">};</span><span class="w"></span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">A</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">double</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">s</span><span class="p">;</span>
+<span class="p">};</span>
 </pre></div>
 </div>
 <p>The compiler reports:</p>
@@ -229,7 +232,7 @@ If none applies, a Python exception is raised.</p>
 </div>
 </section>
 <section id="template-functions">
-<h2>Template functions<a class="headerlink" href="#template-functions" title="Permalink to this headline"></a></h2>
+<h2>Template functions<a class="headerlink" href="#template-functions" title="Link to this heading"></a></h2>
 <p>The instantiation of generic functions in discussed in <a class="reference internal" href="customize.html#customize"><span class="std std-ref">Customization</span></a>.</p>
 </section>
 </section>

@@ -7,8 +7,7 @@ Compiling from source
 
 .. note:: 
 
-   It is not always necessary to install c2py, 
-   as it can be fetched by an application using it as a dependency during its own compilation process, 
+   It is usually not necessary to install c2py, as it is fetched by an application using it as a dependency during its own compilation process, 
    cf :ref:`cmake`.
 
 
@@ -80,9 +79,13 @@ The following CMake-options are available for ``clair``::
 Set environment variables
 -------------------------
 
+The installed clair-c2py should be available in the PATH .
+
 To load the proper paths into your current shell environment use::
 
      $ source path_to_clair_install_dir/share/clair/clairvars.sh
      $ source path_to_c2py_install_dir/share/c2py/c2pyvars.sh
 
+.. note::
 
+     TO BE REVIEWED. WE JUST NEED THE PATH ? 

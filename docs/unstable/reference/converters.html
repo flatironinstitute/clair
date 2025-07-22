@@ -1,20 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Converters &mdash; clair - Automatic Python/C++ bindings  documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=f7f783a0" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=8f9e6779" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
+  
+        <script src="../_static/jquery.js?v=8dae8fb0"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/clipboard.min.js?v=66b4909c"></script>
+        <script src="../_static/copybutton.js?v=71494f10"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
@@ -28,14 +31,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search"  style="background: #7E588A" >
-            <a href="../index.html" class="icon icon-home"> clair - Automatic Python/C++ bindings
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            clair - Automatic Python/C++ bindings
           </a>
               <div class="version">
                 0.1.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -63,16 +70,13 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../gettingstarted.html">Getting started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../gettingstarted.html#starting-example">Starting example</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../gettingstarted.html#what-happened">What happened ?</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../gettingstarted.html#reusing-the-bindings-without-clang">Reusing the bindings without clang</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../gettingstarted.html#what-happened">What happened?</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../cmake.html">CMake integration</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../cmake.html#compiling-with-clang-and-the-clair-plugin">Compiling with clang and the clair plugin</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../cmake.html#a-more-general-setup">A more general setup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../cmake.html#a-variant-avoiding-the-installation-of-c2py">A variant avoiding the installation of c2py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cmake.html">CMake Integration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../cmake.html#compiling">Compiling</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a><ul>
@@ -123,7 +127,6 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../notebook.html">Notebook integration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../issues.html">Reporting issues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ChangeLog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../about.html">About clair/c2py</a></li>
 </ul>
 
@@ -140,9 +143,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../reference.html">Reference documentation</a> &raquo;</li>
-      <li>Converters</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../reference.html">Reference documentation</a></li>
+      <li class="breadcrumb-item active">Converters</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/reference/converters.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -153,17 +156,17 @@
            <div itemprop="articleBody">
              
   <section id="converters">
-<span id="id1"></span><h1>Converters<a class="headerlink" href="#converters" title="Permalink to this headline"></a></h1>
+<span id="id1"></span><h1>Converters<a class="headerlink" href="#converters" title="Link to this heading"></a></h1>
 <section id="default-converters">
-<h2>Default converters<a class="headerlink" href="#default-converters" title="Permalink to this headline"></a></h2>
+<h2>Default converters<a class="headerlink" href="#default-converters" title="Link to this heading"></a></h2>
 <p>The following types are convertible</p>
-<table class="colwidths-given docutils align-default" id="id2">
-<caption><span class="caption-text">Default converters</span><a class="headerlink" href="#id2" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text">Default converters</span><a class="headerlink" href="#id2" title="Link to this table"></a></caption>
 <colgroup>
-<col style="width: 29%" />
-<col style="width: 24%" />
-<col style="width: 24%" />
-<col style="width: 24%" />
+<col style="width: 28.6%" />
+<col style="width: 23.8%" />
+<col style="width: 23.8%" />
+<col style="width: 23.8%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>C++ type</p></th>
@@ -244,31 +247,31 @@
 so <code class="code docutils literal notranslate"><span class="pre">std::vector&lt;std::tuple&lt;T,</span> <span class="pre">U</span> <span class="pre">,</span> <span class="pre">W&gt;&gt;</span></code> is if <code class="code docutils literal notranslate"><span class="pre">T,U,W</span></code> are.</p>
 </section>
 <section id="py-converter">
-<h2>py_converter<a class="headerlink" href="#py-converter" title="Permalink to this headline"></a></h2>
+<h2>py_converter<a class="headerlink" href="#py-converter" title="Link to this heading"></a></h2>
 <p>In order to define a custom converter,  specialize the <code class="code docutils literal notranslate"><span class="pre">c2py::py_converter</span></code> struct.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">py_converter</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">py_converter</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">  </span><span class="c1">// C++ to python.</span>
-<span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="nf">c2py</span><span class="p">(</span><span class="k">auto</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="n">x</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="nf">c2py</span><span class="p">(</span><span class="k">auto</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="n">x</span><span class="p">);</span>
 
 <span class="w">  </span><span class="c1">// Python to C++</span>
 <span class="w">  </span><span class="c1">// Return true iif the object can A PRIORI be converted.</span>
 <span class="w">  </span><span class="c1">// It is a normally type check.</span>
 <span class="w">  </span><span class="c1">// An error may still occurr in the conversion, e.g. int overflow.</span>
 <span class="w">  </span><span class="c1">// raise_exception : in case of failure, sets an error message as a python exception.</span>
-<span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="nf">is_convertible</span><span class="p">(</span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">ob</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">raise_exception</span><span class="p">)</span><span class="w"> </span><span class="k">noexcept</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="nf">is_convertible</span><span class="p">(</span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">ob</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">raise_exception</span><span class="p">)</span><span class="w"> </span><span class="k">noexcept</span><span class="p">;</span>
 
 <span class="w">  </span><span class="c1">// Python to C++</span>
 <span class="w">  </span><span class="c1">// Convert, assuming that is_convertible is true</span>
 <span class="w">  </span><span class="c1">// Can still throw C++ exception.</span>
 <span class="w">  </span><span class="c1">// Returns a T or a T &amp; (for wrapped types).</span>
-<span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="p">[</span><span class="n">T</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">T</span><span class="p">]</span><span class="w"> </span><span class="n">py2c</span><span class="p">(</span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">ob</span><span class="p">);</span><span class="w"></span>
-<span class="p">};</span><span class="w"></span>
+<span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="p">[</span><span class="n">T</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">T</span><span class="p">]</span><span class="w"> </span><span class="n">py2c</span><span class="p">(</span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">ob</span><span class="p">);</span>
+<span class="p">};</span>
 </pre></div>
 </div>
 </section>
 <section id="third-party-library-developer-corner">
-<h2>Third party library [developer corner]<a class="headerlink" href="#third-party-library-developer-corner" title="Permalink to this headline"></a></h2>
+<h2>Third party library [developer corner]<a class="headerlink" href="#third-party-library-developer-corner" title="Link to this heading"></a></h2>
 <p>In order for a third party library to provide converters</p>
 <ul class="simple">
 <li><p>Write the specialization of the converters for the types provided by the library in e.g. <cite>converters.hpp</cite></p></li>
@@ -278,15 +281,15 @@ so <code class="code docutils literal notranslate"><span class="pre">std::vector
 <span class="c1">// ...</span>
 <span class="c1">//</span>
 <span class="cp">#ifdef C2PY_INCLUDED</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;my_library/converters.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;my_library/converters.hpp&gt;</span>
 <span class="cp">#endif</span>
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>The <cite>c2py</cite> library defines the <cite>C2PY_INCLUDED</cite> macro, so including the library like</p></li>
 </ul>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span><span class="cp"></span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;my_library/my_library.hpp&gt;</span><span class="cp"></span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;my_library/my_library.hpp&gt;</span>
 </pre></div>
 </div>
 <p>will <strong>automatically</strong> include the converters when <cite>c2py</cite> is included.

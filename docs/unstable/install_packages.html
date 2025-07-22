@@ -1,20 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Packages &mdash; clair - Automatic Python/C++ bindings  documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
-      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=f7f783a0" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=8f9e6779" />
+
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/clipboard.min.js"></script>
-        <script src="_static/copybutton.js"></script>
+  
+        <script src="_static/jquery.js?v=8dae8fb0"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=66b4909c"></script>
+        <script src="_static/copybutton.js?v=71494f10"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -28,14 +31,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search"  style="background: #7E588A" >
-            <a href="index.html" class="icon icon-home"> clair - Automatic Python/C++ bindings
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            clair - Automatic Python/C++ bindings
           </a>
               <div class="version">
                 0.1.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -63,16 +70,13 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="gettingstarted.html">Getting started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#starting-example">Starting example</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="gettingstarted.html#what-happened">What happened ?</a></li>
-<li class="toctree-l3"><a class="reference internal" href="gettingstarted.html#reusing-the-bindings-without-clang">Reusing the bindings without clang</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gettingstarted.html#what-happened">What happened?</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="cmake.html">CMake integration</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cmake.html#compiling-with-clang-and-the-clair-plugin">Compiling with clang and the clair plugin</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmake.html#a-more-general-setup">A more general setup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmake.html#a-variant-avoiding-the-installation-of-c2py">A variant avoiding the installation of c2py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cmake.html">CMake Integration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cmake.html#compiling">Compiling</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a><ul>
@@ -123,7 +127,6 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="notebook.html">Notebook integration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="issues.html">Reporting issues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ChangeLog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About clair/c2py</a></li>
 </ul>
 
@@ -140,9 +143,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="install.html">Installation</a> &raquo;</li>
-      <li>Packages</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="install.html">Installation</a></li>
+      <li class="breadcrumb-item active">Packages</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/install_packages.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -153,29 +156,22 @@
            <div itemprop="articleBody">
              
   <section id="packages">
-<span id="install-package"></span><h1>Packages<a class="headerlink" href="#packages" title="Permalink to this headline"></a></h1>
+<span id="install-package"></span><h1>Packages<a class="headerlink" href="#packages" title="Link to this heading"></a></h1>
 <section id="os-x-brew">
-<h2>OS X (brew)<a class="headerlink" href="#os-x-brew" title="Permalink to this headline"></a></h2>
+<h2>OS X (brew)<a class="headerlink" href="#os-x-brew" title="Link to this heading"></a></h2>
 <p>Experimental packages of <code class="docutils literal notranslate"><span class="pre">c2py</span></code> and <code class="docutils literal notranslate"><span class="pre">clair</span></code> are:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>brew install parcollet/ccq/c2py  parcollet/ccq/clair
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>brew<span class="w"> </span>install<span class="w"> </span>parcollet/ccq/c2py<span class="w">  </span>parcollet/ccq/clair
 </pre></div>
 </div>
 <p>They are built from source from the GitHub parcollet/ccq repository.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>To use the plugin as in the example below,
-the DYLD_LIBRARY_PATH must be set e.g.:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span>/opt/homebrew/lib/:<span class="nv">$DYLD_LIBRARY_PATH</span>
-</pre></div>
-</div>
-<p>for clang to find its plugins in the brew directory as in the documentation examples.
-Alternatively, you can provide the full path to the plugin.
-This setup is not necessary to use the CMake targets.</p>
+<p>TO BE UPDATED: the packages with tools are not yet available on the <cite>parcollet/ccq</cite> tap.</p>
 </div>
 <section id="uninstalling">
-<h3>Uninstalling<a class="headerlink" href="#uninstalling" title="Permalink to this headline"></a></h3>
+<h3>Uninstalling<a class="headerlink" href="#uninstalling" title="Link to this heading"></a></h3>
 <p>In order to uninstall all formulas from the <cite>parcollet/ccq</cite> tap, you can use:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>brew uninstall <span class="sb">`</span>brew list --full-name -1<span class="p">|</span>grep ccq<span class="sb">`</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>brew<span class="w"> </span>uninstall<span class="w"> </span><span class="sb">`</span>brew<span class="w"> </span>list<span class="w"> </span>--full-name<span class="w"> </span>-1<span class="p">|</span>grep<span class="w"> </span>ccq<span class="sb">`</span>
 </pre></div>
 </div>
 </section>

@@ -1,20 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>API of the c2py_module &mdash; clair - Automatic Python/C++ bindings  documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=f7f783a0" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=8f9e6779" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
+  
+        <script src="../_static/jquery.js?v=8dae8fb0"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/clipboard.min.js?v=66b4909c"></script>
+        <script src="../_static/copybutton.js?v=71494f10"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
@@ -28,14 +31,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search"  style="background: #7E588A" >
-            <a href="../index.html" class="icon icon-home"> clair - Automatic Python/C++ bindings
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            clair - Automatic Python/C++ bindings
           </a>
               <div class="version">
                 0.1.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -63,16 +70,13 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../gettingstarted.html">Getting started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../gettingstarted.html#starting-example">Starting example</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../gettingstarted.html#what-happened">What happened ?</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../gettingstarted.html#reusing-the-bindings-without-clang">Reusing the bindings without clang</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../gettingstarted.html#what-happened">What happened?</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../cmake.html">CMake integration</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../cmake.html#compiling-with-clang-and-the-clair-plugin">Compiling with clang and the clair plugin</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../cmake.html#a-more-general-setup">A more general setup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../cmake.html#a-variant-avoiding-the-installation-of-c2py">A variant avoiding the installation of c2py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cmake.html">CMake Integration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../cmake.html#compiling">Compiling</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a><ul>
@@ -123,7 +127,6 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../notebook.html">Notebook integration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../issues.html">Reporting issues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ChangeLog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../about.html">About clair/c2py</a></li>
 </ul>
 
@@ -140,10 +143,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../reference.html">Reference documentation</a> &raquo;</li>
-          <li><a href="customize.html">Customization</a> &raquo;</li>
-      <li>API of the c2py_module</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../reference.html">Reference documentation</a></li>
+          <li class="breadcrumb-item"><a href="customize.html">Customization</a></li>
+      <li class="breadcrumb-item active">API of the c2py_module</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/reference/api.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -154,7 +157,7 @@
            <div itemprop="articleBody">
              
   <section id="api-of-the-c2py-module">
-<span id="api"></span><h1>API of the c2py_module<a class="headerlink" href="#api-of-the-c2py-module" title="Permalink to this headline"></a></h1>
+<span id="api"></span><h1>API of the c2py_module<a class="headerlink" href="#api-of-the-c2py-module" title="Link to this heading"></a></h1>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span><span class="c1">// ==========  Module declaration ==========</span>
 <span class="linenos">  2</span>
 <span class="linenos">  3</span><span class="c1">// Configuration of the module in the namespace c2py_module</span>
@@ -163,13 +166,13 @@
 <span class="linenos">  6</span><span class="c1">//  * Only the following variables, declarations, are authorized in this namespace,</span>
 <span class="linenos">  7</span><span class="c1">//       anything else is an error (except &quot;using namespace&quot; clauses).</span>
 <span class="linenos">  8</span><span class="c1">//</span>
-<span class="linenos">  9</span><span class="k">namespace</span><span class="w"> </span><span class="nn">c2py_module</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">  9</span><span class="k">namespace</span><span class="w"> </span><span class="nn">c2py_module</span><span class="w"> </span><span class="p">{</span>
 <span class="linenos"> 10</span>
 <span class="linenos"> 11</span><span class="w">  </span><span class="c1">// Name of the package if any. Default is &quot;&quot;</span>
 <span class="linenos"> 12</span><span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">package_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Package&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// the module will be Package.MyModule</span>
 <span class="linenos"> 13</span>
 <span class="linenos"> 14</span><span class="w">  </span><span class="c1">// The documentation string of the module. Default = &quot;&quot;</span>
-<span class="linenos"> 15</span><span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">documentation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Module documentation&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="linenos"> 15</span><span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">documentation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Module documentation&quot;</span><span class="p">;</span>
 <span class="linenos"> 16</span>
 <span class="linenos"> 17</span><span class="w">  </span><span class="c1">// -------- Automatic selection of function, classes, enums -----------</span>
 <span class="linenos"> 18</span><span class="w">  </span><span class="c1">//</span>
@@ -180,9 +183,9 @@
 <span class="linenos"> 23</span><span class="w">  </span><span class="c1">// if match_names and not match_names match Qname : skip X</span>
 <span class="linenos"> 24</span><span class="w">  </span><span class="c1">// if reject_names and reject_names match Qname : skip X</span>
 <span class="linenos"> 25</span><span class="w">  </span><span class="c1">// else keep X.</span>
-<span class="linenos"> 26</span><span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">match_names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;a regex&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="linenos"> 26</span><span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">match_names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;a regex&quot;</span><span class="p">;</span>
 <span class="linenos"> 27</span>
-<span class="linenos"> 28</span><span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">reject_names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;a regex&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="linenos"> 28</span><span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">reject_names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;a regex&quot;</span><span class="p">;</span>
 <span class="linenos"> 29</span>
 <span class="linenos"> 30</span><span class="w">  </span><span class="c1">// Only keep elements which are declared in files matching the pattern</span>
 <span class="linenos"> 31</span><span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">match_files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;a regex&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// TODO implement.</span>
@@ -191,14 +194,14 @@
 <span class="linenos"> 34</span><span class="w">  </span><span class="c1">// An optional function `module_init` to be executed at the start of the module</span>
 <span class="linenos"> 35</span><span class="w">  </span><span class="c1">// Signature must be () -&gt; void</span>
 <span class="linenos"> 36</span><span class="w">  </span><span class="c1">// nb : can be a function, or a lambda ...</span>
-<span class="linenos"> 37</span><span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">module_init</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[]()</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
+<span class="linenos"> 37</span><span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">module_init</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[]()</span><span class="w"> </span><span class="p">{};</span>
 <span class="linenos"> 38</span>
 <span class="linenos"> 39</span><span class="w">  </span><span class="c1">// -----------------------------------------------------</span>
 <span class="linenos"> 40</span><span class="w">  </span><span class="c1">// Add in this namespace the function, classes</span>
 <span class="linenos"> 41</span><span class="w">  </span><span class="c1">// to be manually added (or renamed) to the automatic detection.</span>
 <span class="linenos"> 42</span><span class="w">  </span><span class="c1">// in particular the template instantiation</span>
 <span class="linenos"> 43</span>
-<span class="linenos"> 44</span><span class="w">  </span><span class="k">namespace</span><span class="w"> </span><span class="nn">add</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos"> 44</span><span class="w">  </span><span class="k">namespace</span><span class="w"> </span><span class="nn">add</span><span class="w"> </span><span class="p">{</span>
 <span class="linenos"> 45</span>
 <span class="linenos"> 46</span><span class="w">    </span><span class="c1">// ----------------------------------------------------------</span>
 <span class="linenos"> 47</span><span class="w">    </span><span class="c1">// List of Python functions to be added explicitly to the module</span>
@@ -213,19 +216,19 @@
 <span class="linenos"> 56</span>
 <span class="linenos"> 57</span><span class="w">    </span><span class="c1">// Examples:</span>
 <span class="linenos"> 58</span><span class="w">    </span><span class="c1">// declares a function h, dispatching the 2 instantiations.</span>
-<span class="linenos"> 59</span><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c2py</span><span class="o">::</span><span class="n">dispatch</span><span class="o">&lt;</span><span class="n">N</span><span class="o">::</span><span class="n">h</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="o">::</span><span class="n">h</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="linenos"> 59</span><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c2py</span><span class="o">::</span><span class="n">dispatch</span><span class="o">&lt;</span><span class="n">N</span><span class="o">::</span><span class="n">h</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="o">::</span><span class="n">h</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;&gt;</span><span class="p">;</span>
 <span class="linenos"> 60</span>
 <span class="linenos"> 61</span><span class="w">    </span><span class="c1">// A function fg in Python which dynamically dispatch N::f, and N::g</span>
 <span class="linenos"> 62</span><span class="w">    </span><span class="c1">// We can regroup any set of functions we want in a dispatch, mixing template instantiation, ordinary function, etc...</span>
-<span class="linenos"> 63</span><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">fg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c2py</span><span class="o">::</span><span class="n">dispatch</span><span class="o">&lt;</span><span class="n">N</span><span class="o">::</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="o">::</span><span class="n">g</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="linenos"> 63</span><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">fg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c2py</span><span class="o">::</span><span class="n">dispatch</span><span class="o">&lt;</span><span class="n">N</span><span class="o">::</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="o">::</span><span class="n">g</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="linenos"> 64</span>
 <span class="linenos"> 65</span><span class="w">    </span><span class="c1">// Simply rename a function. NB: we should also reject N::f from automatic detection,</span>
 <span class="linenos"> 66</span><span class="w">    </span><span class="c1">// as this declaration does not remove the `f` function</span>
-<span class="linenos"> 67</span><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">f_new_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c2py</span><span class="o">::</span><span class="n">dispatch</span><span class="o">&lt;</span><span class="n">N</span><span class="o">::</span><span class="n">f</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="linenos"> 67</span><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">f_new_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c2py</span><span class="o">::</span><span class="n">dispatch</span><span class="o">&lt;</span><span class="n">N</span><span class="o">::</span><span class="n">f</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="linenos"> 68</span>
 <span class="linenos"> 69</span><span class="w">    </span><span class="c1">// ---------- Properties ----------------</span>
 <span class="linenos"> 70</span>
-<span class="linenos"> 71</span><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">prop1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c2py</span><span class="o">::</span><span class="n">property</span><span class="o">&lt;</span><span class="n">x_getter</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="o">::</span><span class="n">x_setter</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="linenos"> 71</span><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">prop1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c2py</span><span class="o">::</span><span class="n">property</span><span class="o">&lt;</span><span class="n">x_getter</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="o">::</span><span class="n">x_setter</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="linenos"> 72</span><span class="w">    </span><span class="c1">//</span>
 <span class="linenos"> 73</span><span class="w">    </span><span class="c1">// Or tag a getter function with</span>
 <span class="linenos"> 74</span><span class="w">    </span><span class="c1">// C2PY_PROPERTY</span>
@@ -239,23 +242,23 @@
 <span class="linenos"> 82</span><span class="w">    </span><span class="c1">// struct NameInPython = c2py::wrap&lt;NameinC++&gt;{};</span>
 <span class="linenos"> 83</span><span class="w">    </span><span class="c1">// some additional methods can be added to the class</span>
 <span class="linenos"> 84</span>
-<span class="linenos"> 85</span><span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="n">ClsPythonName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ClsCppName</span><span class="p">;</span><span class="w"></span>
+<span class="linenos"> 85</span><span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="n">ClsPythonName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ClsCppName</span><span class="p">;</span>
 <span class="linenos"> 86</span><span class="w">    </span><span class="c1">// .e.g ...</span>
-<span class="linenos"> 87</span><span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="n">A</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">N</span><span class="o">::</span><span class="n">A</span><span class="p">;</span><span class="w"></span>
-<span class="linenos"> 88</span><span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="n">Bi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">N</span><span class="o">::</span><span class="n">B</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="linenos"> 87</span><span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="n">A</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">N</span><span class="o">::</span><span class="n">A</span><span class="p">;</span>
+<span class="linenos"> 88</span><span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="n">Bi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">N</span><span class="o">::</span><span class="n">B</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="linenos"> 89</span>
 <span class="linenos"> 90</span><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="c1">// namespace add</span>
 <span class="linenos"> 91</span>
 <span class="linenos"> 92</span><span class="w">  </span><span class="c1">/// Additional methods to add to the Python class</span>
 <span class="linenos"> 93</span><span class="w">  </span><span class="c1">/// e.g. method template instantiation, or new injected function h</span>
-<span class="linenos"> 94</span><span class="w">  </span><span class="k">template</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">add_methods_to</span><span class="o">&lt;</span><span class="n">A</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos"> 94</span><span class="w">  </span><span class="k">template</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">add_methods_to</span><span class="o">&lt;</span><span class="n">A</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
 <span class="linenos"> 95</span><span class="w">    </span><span class="c1">// NB : for some obscure reason, C++ requires the &amp; for a template method, but it can be omitted for regular functions</span>
-<span class="linenos"> 96</span><span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c2py</span><span class="o">::</span><span class="n">dispatch</span><span class="o">&lt;&amp;</span><span class="n">N</span><span class="o">::</span><span class="n">A</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;::</span><span class="n">h</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="o">::</span><span class="n">h</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="linenos"> 96</span><span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c2py</span><span class="o">::</span><span class="n">dispatch</span><span class="o">&lt;&amp;</span><span class="n">N</span><span class="o">::</span><span class="n">A</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;::</span><span class="n">h</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="o">::</span><span class="n">h</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;&gt;</span><span class="p">;</span>
 <span class="linenos"> 97</span>
 <span class="linenos"> 98</span><span class="w">    </span><span class="c1">// A static method.</span>
 <span class="linenos"> 99</span><span class="w">    </span><span class="c1">// TODO : implement and test</span>
-<span class="linenos">100</span><span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">h1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c2py</span><span class="o">::</span><span class="n">dispatch_static</span><span class="o">&lt;&amp;</span><span class="n">N</span><span class="o">::</span><span class="n">A</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;::</span><span class="n">h</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="o">::</span><span class="n">h</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;&gt;</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">101</span><span class="w">  </span><span class="p">};</span><span class="w"></span>
+<span class="linenos">100</span><span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">h1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c2py</span><span class="o">::</span><span class="n">dispatch_static</span><span class="o">&lt;&amp;</span><span class="n">N</span><span class="o">::</span><span class="n">A</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;::</span><span class="n">h</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="o">::</span><span class="n">h</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;&gt;</span><span class="p">;</span>
+<span class="linenos">101</span><span class="w">  </span><span class="p">};</span>
 <span class="linenos">102</span>
 <span class="linenos">103</span><span class="w">  </span><span class="c1">// Note. One can also make a derived struct in C++</span>
 <span class="linenos">104</span><span class="w">  </span><span class="c1">// with the additional methods, and wrap it, merging the parent methods by blacklisting the parent.</span>
@@ -267,12 +270,12 @@
 <span class="linenos">110</span><span class="w">  </span><span class="c1">// TODO make the arithmetic depends on a string for clearer syntax.</span>
 <span class="linenos">111</span>
 <span class="linenos">112</span><span class="w">  </span><span class="c1">// Enumerate all the triplet A op B -&gt; ReturnType for every op, and every class</span>
-<span class="linenos">113</span><span class="w">  </span><span class="k">template</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">arithmetic</span><span class="o">&lt;</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;+&quot;</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">tuple</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">tuple</span><span class="o">&lt;</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">R</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="o">&gt;</span><span class="p">{};</span><span class="w"></span>
+<span class="linenos">113</span><span class="w">  </span><span class="k">template</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">arithmetic</span><span class="o">&lt;</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;+&quot;</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">tuple</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">tuple</span><span class="o">&lt;</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">R</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="o">&gt;</span><span class="p">{};</span>
 <span class="linenos">114</span><span class="w">  </span><span class="c1">// ... other operators.</span>
 <span class="linenos">115</span>
 <span class="linenos">116</span><span class="w">  </span><span class="c1">// Short cuts</span>
 <span class="linenos">117</span><span class="w">  </span><span class="c1">// TODO implement</span>
-<span class="linenos">118</span><span class="w">  </span><span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">auto</span><span class="w"> </span><span class="n">op</span><span class="o">&gt;</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">arithmetic</span><span class="o">&lt;</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">op</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c2py</span><span class="o">::</span><span class="n">arithmetic</span><span class="o">::</span><span class="n">algebra</span><span class="o">&lt;</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="n">op</span><span class="o">&gt;</span><span class="p">{};</span><span class="w"></span>
+<span class="linenos">118</span><span class="w">  </span><span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">auto</span><span class="w"> </span><span class="n">op</span><span class="o">&gt;</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">arithmetic</span><span class="o">&lt;</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">op</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c2py</span><span class="o">::</span><span class="n">arithmetic</span><span class="o">::</span><span class="n">algebra</span><span class="o">&lt;</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="n">op</span><span class="o">&gt;</span><span class="p">{};</span>
 <span class="linenos">119</span>
 <span class="linenos">120</span><span class="p">}</span><span class="w"> </span><span class="c1">// namespace c2py_module</span>
 </pre></div>

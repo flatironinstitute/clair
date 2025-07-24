@@ -34,6 +34,9 @@ static const cl::opt<bool> opt_gen_default_config("gen-default-config", cl::desc
                                                   cl::cat(c2py_opt_category));
 static const cl::opt<bool> opt_update_config("update-config", cl::desc("Update the TOML configuration file for each source file."),
                                              cl::cat(c2py_opt_category));
+static const cl::opt<str_t> opt_depfile("generate-depfile",
+                                        cl::desc(R"RAW(Generates the depfile for CMake (encodes the dependencies of the bindings) )RAW"),
+                                        cl::cat(c2py_opt_category));
 
 //====================   main    ==========================================
 
@@ -76,6 +79,7 @@ int main(int argc, const char **argv) try {
   configuration config{fs::path{source0}.filename()};
   if (auto config_filename = fs::path{source0}.replace_extension(".toml").string(); fs::exists(config_filename))
     config = read_configuration(config_filename);
+  config._depfile_name = opt_depfile;
 
   // ------- main tool
 

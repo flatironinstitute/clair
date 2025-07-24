@@ -22,6 +22,7 @@ struct worker_t {
   // Preprocessor will detect if the input has included the generated cxx file
   // and store the result in this variable.
   bool input_has_included_generated_cxx = false;
+  std::vector<std::string> deps; // dependencies collected by the preprocessor
 
   // All the information about the module including the classes, methods, etc.
   module_info_t module_info;

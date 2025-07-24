@@ -5,7 +5,7 @@
 
 struct configuration {
 
-  configuration(str_t module_filename) : match_files(std::move(module_filename)) {}
+  configuration(str_t const &module_filename) : match_files(module_filename), _module_filename{module_filename} {}
 
   str_t package_name  = {};
   str_t documentation = {};
@@ -20,6 +20,8 @@ struct configuration {
 
   // Processed values
   std::vector<std::vector<str_t>> _namespaces_list; // list of namespaces, e.g. [ ["A"], ["A", "B"], ...] if namespace is "A A::B"
+  str_t _module_filename;
+  str_t _depfile_name; // name of the depfile, if any
 };
 
 configuration read_configuration(std::string const &toml_file_name);

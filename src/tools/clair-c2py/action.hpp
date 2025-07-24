@@ -18,6 +18,7 @@
 #include "clu/clang_format.hpp"
 #include "pp_include_callback.hpp"
 
+///---------------------------------------------
 class custom_action : public clang::ASTFrontendAction {
   std::shared_ptr<worker_t> worker;
   configuration config;
@@ -28,16 +29,16 @@ class custom_action : public clang::ASTFrontendAction {
   custom_action(configuration config) : config{std::move(config)} {}
 
   // --------------------------
-  // Skip function bodies, it gains parsing time, and we do not need them.
   bool BeginInvocation(clang::CompilerInstance &CI) override {
+    // Skip function bodies, it gains parsing time, and we do not need them.
     CI.getInvocation().getFrontendOpts().SkipFunctionBodies = 1;
-    return true;
+    return true; // keep going
   }
 
   // --------------------------
 
-  ASTConsumerPointer CreateASTConsumer(clang::CompilerInstance &compiler, llvm::StringRef) override {
-    worker = std::make_unique<worker_t>(&compiler, config);
+  ASTConsumerPointer CreateASTConsumer(clang::CompilerInstance &CI, llvm::StringRef) override {
+    worker = std::make_unique<worker_t>(&CI, config);
 
     auto outfilename = worker->module_info.sourcefile_full_stem + ".wrap.cxx";
     if (not std::filesystem::exists(outfilename)) std::ofstream{outfilename};
@@ -86,7 +87,9 @@ class custom_action : public clang::ASTFrontendAction {
     code_hxx = clu::clang_format(code_hxx, clang_format_style);
     std::ofstream(outfilename) << code;
     std::ofstream(outfilename_hxx) << code_hxx;
-    log(fmt::format("Generated Python bindings in files: {} and {}", outfilename, outfilename_hxx));
+    log(fmt::format("\033[1;34m[Success] \033[0m"));
+    log(fmt::format("   Generated Python bindings: {} [included in {}]", outfilename, worker->module_info.sourcefile));
+    log(fmt::format("             headers        : {} [to be used with other modules, cf doc]", outfilename_hxx));
 
     // Examine if the preprocessor has found the include of the generated file in the module.
     if (not worker->input_has_included_generated_cxx) {
@@ -95,7 +98,19 @@ class custom_action : public clang::ASTFrontendAction {
       rewriter->InsertTextBefore(worker->ci->getSourceManager().getLocForEndOfFile(worker->ci->getSourceManager().getMainFileID()),
                                  include_directive);
       rewriter->overwriteChangedFiles();
-      log(fmt::format("Adding the include directive for the generated file {}\n in the main module file\n", include_directive));
+      log(fmt::format("   Adding the include directive for the generated file {}\n in the main module file\n", include_directive));
+    }
+
+    // If a depfile is specified, write the dependencies
+    if (not config._depfile_name.empty()) {
+      std::ofstream depfile(config._depfile_name);
+      depfile << outfilename << ":";
+      static const char *BR = "\\\n  ";
+      depfile << BR << worker->module_info.sourcefile;
+      if (auto toml = worker->module_info.sourcefile_full_stem + ".toml"; std::filesystem::exists(toml)) depfile << BR << toml;
+      for (const auto &dep : worker->deps) { depfile << BR << dep; }
+      depfile << "\n";
+      log(fmt::format("   Generated the depfile {}\n", config._depfile_name));
     }
   }
 };

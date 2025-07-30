@@ -62,24 +62,22 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
   // There are many possible matchers, and their types are different.
   // I use a chain of lambda to build the correct call to FunctionDecl et al
   // in each case by progressively accumulating the arguments in a parameter pack.
-  // This is not the most efficient way, but it is the most readable.
-  // It is in fact more readable than multiple if, besides all attempts (including with AI)
+  // It is more readable than multiple if, besides all attempts
   // to use e.g. ternary have failed as matcher type vary
-  // nb the order of the chain is unimportant.
 
-  // add the arguments for namespace if the option is set
-  auto add_ns = [&](auto l, auto... x) {
-    if (not worker->config._namespaces_list.empty()) {
-      return l(hasDeclContext(make_ns_matcher()), std::move(x)...);
-    } else
-      return l(std::move(x)...);
-  };
   // add the arguments for the names if the option is set
   auto add_name = [&](auto l, auto... x) {
     if (auto &s = worker->config.match_names; !s.empty())
-      return add_ns(l, matchesName(s), std::move(x)...);
+      return l(std::move(x)..., matchesName(s));
     else
-      return add_ns(l, std::move(x)...);
+      return l(std::move(x)...);
+  };
+  // add the arguments for namespace if the option is set
+  auto add_ns = [&](auto l, auto... x) {
+    if (not worker->config._namespaces_list.empty()) {
+      return add_name(l, std::move(x)..., hasDeclContext(make_ns_matcher()));
+    } else
+      return add_name(l, std::move(x)...);
   };
   // add the arguments for the file if the option is set
   auto add_match_files = [&](auto l, auto... x) {
@@ -88,28 +86,30 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
       //llvm::errs() << "Match files: " << worker->config.match_files << "\n";
       // optimization : if the match file is exactly the main file, we can use isExpansionInMainFile which is much faster
       if (fs::path{worker->module_info.sourcefile}.filename() == s)
-        return add_name(l, isExpansionInMainFile(), std::move(x)...);
+        return add_ns(l, std::move(x)..., isExpansionInMainFile());
       else
-        return add_name(l, isExpansionInFileMatching(s), std::move(x)...);
+        return add_ns(l, std::move(x)..., isExpansionInFileMatching(s));
     } else {
-      return add_name(l, std::move(x)...);
+      return add_ns(l, std::move(x)...);
     }
   };
-
+  // add the arguments for the names if the option is set
+  auto add_excludes = [&](auto l) {
+    if (auto &s = worker->config.exclude_system_headers)
+      return add_match_files(l, unless(isExpansionInSystemHeader()));
+    else
+      return add_match_files(l);
+  };
   // Final call of the chain, for classes, enums and functions
   // Function are special, as we have to exclude methods and friend declarations
   auto call_cls = [&](auto... x) {
-    auto excludes = unless(isExpansionInSystemHeader());
-    return cxxRecordDecl(std::move(x)..., excludes);
+    return cxxRecordDecl(std::move(x)...); //excludes);
   };
-
   auto call_enum = [&](auto... x) {
-    auto excludes = unless(isExpansionInSystemHeader());
-    return enumDecl(std::move(x)..., excludes);
+    return enumDecl(std::move(x)...); //excludes);
   };
-
   auto call_fun = [&](auto... x) {
-    auto excludes = unless(anyOf(isExpansionInSystemHeader(), cxxMethodDecl(), hasAncestor(friendDecl())));
+    auto excludes = unless(anyOf(cxxMethodDecl(), hasAncestor(friendDecl())));
     return functionDecl(std::move(x)..., excludes);
   };
 
@@ -121,9 +121,9 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
   matcher<mtch::Fnt> ma_f{worker};
   matcher<mtch::ModuleClsWrap> ma_using{worker};
 
-  mf.addMatcher(add_match_files(call_cls).bind("class"), &ma_cls);
-  mf.addMatcher(add_match_files(call_enum).bind("en"), &ma_enum);
-  mf.addMatcher(add_match_files(call_fun).bind("func"), &ma_f);
+  mf.addMatcher(add_excludes(call_cls).bind("class"), &ma_cls);
+  mf.addMatcher(add_excludes(call_enum).bind("en"), &ma_enum);
+  mf.addMatcher(add_excludes(call_fun).bind("func"), &ma_f);
 
   mf.addMatcher(namespaceDecl(isExpansionInMainFile(), hasName("c2py_module"), //
                               forEach(typeAliasDecl().bind("decl"))),

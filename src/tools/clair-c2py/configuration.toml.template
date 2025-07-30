@@ -1,4 +1,5 @@
-# Name of the package if any. Package.ModuleName will be the module name 
+# Name of the package [optional].
+# Name of the module will be package_name.module_filename
 package_name = "{0}"
 
 # The documentation string of the module. 
@@ -24,3 +25,7 @@ match_files = "{5}" # String must be a regex
 
 # If true, transform methods with no arguments into a read only property
 wrap_no_arg_methods_as_properties = {6}
+
+# [Advanced] If yes (default), all elements (class/enum/functions)
+# declared in headers included with -isystem are ignored for better performance.
+# exclude_system_headers = {7}

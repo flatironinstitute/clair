@@ -17,6 +17,7 @@ struct configuration {
   str_t match_files  = {};
 
   bool wrap_no_arg_methods_as_properties = false;
+  bool exclude_system_headers            = true;
 
   // Processed values
   std::vector<std::vector<str_t>> _namespaces_list; // list of namespaces, e.g. [ ["A"], ["A", "B"], ...] if namespace is "A A::B"

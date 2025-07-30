@@ -70,10 +70,12 @@ configuration read_configuration(std::string const &toml_file_name) try {
 
   // TO BE DISCUSSED
   config.wrap_no_arg_methods_as_properties = get_toml_value_or_default<bool>(table, "wrap_no_arg_methods_as_properties", false);
+  config.exclude_system_headers            = get_toml_value_or_default<bool>(table, "exclude_system_headers", true);
 
   // -------  Check that TOML entries are valid entries
-  std::set<std::string> const valid_keys{"package_name", "documentation", "namespaces",      "match_names",
-                                         "reject_names", "match_files",   "has_module_init", "wrap_no_arg_methods_as_properties"};
+  std::set<std::string> const valid_keys{"package_name",          "documentation", "namespaces",      "match_names",
+                                         "reject_names",          "match_files",   "has_module_init", "wrap_no_arg_methods_as_properties",
+                                         "exclude_system_headers"};
 
   bool ok = true;
   for (const auto &[key, value] : table) {
@@ -145,5 +147,6 @@ void write_configuration(configuration const &config, std::string const &toml_fi
   auto l = [](const std::string &s) -> std::string { return (s.find('\n') != std::string::npos) ? "\"\"" + s + "\"\"" : s; };
 
   std::ofstream{toml_file_name} << fmt::format(config_default, config.package_name, l(config.documentation), config.namespaces, config.match_names,
-                                               config.reject_names, config.match_files, config.wrap_no_arg_methods_as_properties);
+                                               config.reject_names, config.match_files, config.wrap_no_arg_methods_as_properties,
+                                               config.exclude_system_headers);
 }

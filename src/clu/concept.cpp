@@ -7,7 +7,7 @@
 bool clu::satisfy_concept(clang::QualType const &ty, clang::ConceptDecl const *cpt, clang::CompilerInstance *ci) {
   EXPECTS(cpt);
 
-  if (ty->isUndeducedAutoType()) return false;
+  if (ty.isNull() or ty->isUndeducedAutoType()) return false;
   //ty.dump();
 
   // auto return type, peel it

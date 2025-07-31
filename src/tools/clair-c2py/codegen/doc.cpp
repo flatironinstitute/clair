@@ -8,23 +8,56 @@
 #include <string>
 using namespace fmt::literals;
 #include <numeric>
+#include <itertools/itertools.hpp>
+#include "utility/streams.hpp"
 
-std::string pydoc(fnt_info_t const &f) {
-  auto doc = clu::doc_string_t{f.ptr};
+// static const struct {
+//   util::logger error = util::logger{&std::cout, "-- ", "\033[1;32mClass: \033[0m"};
+// } logs;
+
+std::string pydoc(std::vector<fnt_info_t> const &f_list) {
+
+  // extract doxygen doc from each function
+  std::vector<clu::doc_string_t> docs;
+  for (auto const &f : f_list) docs.emplace_back(f.ptr);
+
   std::stringstream fs;
-  if (not doc.brief.empty()) fs << doc.brief << "\n\n";
-  if (not doc.content.empty()) fs << doc.content << "\n\n";
-  if (doc.params.size()) {
-    fs << "Parameters\n----------\n\n";
-    for (auto const &[n, d] : doc.params) fs << n << ":\n" << util::indent_string(d, "   ") << '\n';
+  auto out  = triqs::indented_ostream{fs, 3};   // Indent all lines with 3 spaces
+  auto out2 = triqs::indented_ostream{out, 3};  // 3 more spaces
+  auto out3 = triqs::indented_ostream{out2, 3}; // 3 more spaces
+
+  // brief
+  for (auto const &[n, doc] : itertools::enumerate(docs)) { out << "[" << n << "]" << doc.get_brief() << '\n'; }
+
+  // content
+  for (auto const &[doc, f] : itertools::zip(docs, f_list)) {
+    if (not doc.content.empty()) out << doc.content << "\n\n";
   }
-  if (doc.misc.contains("return")) {
-    fs << "\nReturns\n-------\n\n";
-    fs << util::indent_string(doc.misc["return"], "   ") << '\n';
+
+  // params
+  // maybe check that there are some parameters or do nothing ?
+  out << "Parameters\n----------\n\n";
+  std::map<str_t, str_t> params_seen;
+  for (auto const &[doc, f] : itertools::zip(docs, f_list)) {
+    for (auto const &[n, d] : doc.params) {
+      if (params_seen.contains(n)) continue; // already seen
+      // TODO : CHECK consistency ??
+      params_seen[n] = d;
+      out2 << n << ":\n";
+      out3 << d << '\n';
+      //clu::emit_warning(f.ptr, "Inconsistent doc !");
+    }
   }
-  // Add here other \commands ... Cf doc_string.cpp. Register them as block command first.
-  return util::indent_string(util::trim(fs.str()), "   ");
+  out << "\nReturns\n-------\n\n";
+  for (auto const &[n, doc] : itertools::enumerate(docs)) {
+    if (doc.misc.contains("return")) out2 << "[" << n << "]" << doc.misc["return"] << '\n';
+  }
+
+  // Add here treatment of custom \commands if any...
+  // Cf doc_string.cpp. Register them as block command first.
+  return fs.str();
 }
+
 //---------------------------------------------------------
 std::string doc_of_synthetized_constructor(cls_info_t const &cls_info);
 

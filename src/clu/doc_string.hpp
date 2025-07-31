@@ -17,6 +17,7 @@ namespace clu {
     std::vector<std::pair<str_t, str_t>> params, tparams;
     std::unordered_map<str_t, str_t> misc;
 
+    str_t get_brief() { return util::trim(misc.contains("brief") ? misc["brief"] : brief); }
     doc_string_t() = default;
     doc_string_t(const clang::Decl *d);
   };

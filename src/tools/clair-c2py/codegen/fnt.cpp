@@ -59,6 +59,7 @@ str_t fnt_params_with_default(clang::FunctionDecl const *f) {
     if (auto *decl = llvm::dyn_cast_or_null<clang::DeclRefExpr>(defarg)) { return decl->getFoundDecl()->getQualifiedNameAsString(); }
 
     // default solution : just extract the source code.
+    //llvm::errs() << "DEFAULT =" << clu::get_source_range_as_string(p->getDefaultArgRange(), ctx) << "\n";
     return clu::get_source_range_as_string(p->getDefaultArgRange(), ctx);
   };
   // --------
@@ -159,16 +160,7 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
   // ---- write the doc  ----
   // We generate a simple code in case the flist is of size 1
   // to make it more readable
-  if (flist.size() == 1) {
-    doc << fmt::format(R"RAW( static const auto doc_d_{0} = fun_{0}.doc({{ R"DOC({1})DOC" }}); )RAW", fun_counter, pydoc(flist[0]));
-  } else {
-
-    for (auto const &[i, fi] : itertools::enumerate(flist)) {
-      doc << fmt::format(R"RAW( static constexpr auto doc_f_{}_{} = R"DOC({})DOC"; )RAW", fun_counter, i, pydoc(fi));
-    }
-    doc << fmt::format(R"RAW( static const auto doc_d_{0} = fun_{0}.doc({{ {1} }}); )RAW", fun_counter,
-                       join(itertools::range(long(flist.size())), [c = fun_counter](int i) { return fmt::format("doc_f_{}_{}", c, i); }, ','));
-  }
+  doc << fmt::format(R"RAW( static const auto doc_d_{0} = fun_{0}.doc( R"DOC({1})DOC"); )RAW", fun_counter, pydoc(flist));
 
   // ---- put if in the table ----
   // the call function are special

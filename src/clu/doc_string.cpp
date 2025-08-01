@@ -28,6 +28,7 @@ namespace clu {
       //cmd.registerBlockCommand("merge");
       cmd.registerBlockCommand("return");
       cmd.registerBlockCommand("brief");
+      cmd.registerBlockCommand("details");
     }
 
     // Grabs one paragraph into a string. Need to iterate on childs (??).

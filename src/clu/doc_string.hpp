@@ -18,6 +18,7 @@ namespace clu {
     std::unordered_map<str_t, str_t> misc;
 
     str_t get_brief() { return util::trim(misc.contains("brief") ? misc["brief"] : brief); }
+    str_t get_details() { return util::trim(misc.contains("details") ? misc["details"] + "\n\n" + content : content); }
     doc_string_t() = default;
     doc_string_t(const clang::Decl *d);
   };

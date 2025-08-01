@@ -20,7 +20,7 @@ static const struct {
 
 std::string pydoc(std::vector<fnt_info_t> const &f_list) {
   // extract and format relevant doc strings (function, parameter and return descriptions)
-  std::map<str_t, str_t> param_docs;
+  std::vector<std::pair<str_t, str_t>> param_docs;
   std::vector<std::pair<str_t, std::vector<long>>> func_docs, ret_docs;
   for (auto const &[n, f] : itertools::enumerate(f_list)) {
     auto doc = clu::doc_string_t{f.ptr};
@@ -42,13 +42,16 @@ std::string pydoc(std::vector<fnt_info_t> const &f_list) {
 
     // get parameter doc strings
     for (auto const &[pname, pdoc] : doc.params) {
-      if (param_docs.contains(pname) && param_docs[pname] != pdoc) {
-        // if a parameter with the same name but different doc string is found, warn the user
-        logs.warn(
-           fmt::format("Multiple parameter descriptions given for parameter {} in overloaded function {}", pname, f.ptr->getQualifiedNameAsString()));
+      // check if a parameter name has already been encountered
+      auto it = std::ranges::find_if(param_docs, [&pname](auto const &p) { return p.first == pname; });
+      if (it != param_docs.end()) {
+        // if so, check if the doc string is the same --> if not, warn the user
+        if (it->second != pdoc)
+          logs.warn(fmt::format("Multiple parameter descriptions given for parameter {} in overloaded function {}", pname,
+                                f.ptr->getQualifiedNameAsString()));
       } else {
         // otherwise, add the parameter name + doc string
-        param_docs[pname] = pdoc;
+        param_docs.emplace_back(pname, pdoc);
       }
     }
 
@@ -77,17 +80,17 @@ std::string pydoc(std::vector<fnt_info_t> const &f_list) {
 
   // write function doc strings
   if (not func_docs.empty()) {
-    for (auto const &[str, vec] : func_docs) {
-      fs << (func_docs.size() == 1 ? fmt::format("\n{}", str) : fmt::format("\n[{}] {}", util::join(vec, ", "), str)) << "\n\n" << hline;
+    for (auto const &[fdoc, vec] : func_docs) {
+      fs << (func_docs.size() == 1 ? fmt::format("\n{}", fdoc) : fmt::format("\n[{}] {}", util::join(vec, ", "), fdoc)) << "\n\n" << hline;
     }
   }
 
   // write parameter doc strings
   if (not param_docs.empty()) {
     fs << "\n**Parameters**\n";
-    for (auto const &[pname, pdesc] : param_docs) {
+    for (auto const &[pname, pdoc] : param_docs) {
       out << ':' << pname << ":\n";
-      out2 << pdesc << '\n';
+      out2 << pdoc << '\n';
     }
     out << '\n' << hline;
   }
@@ -95,8 +98,8 @@ std::string pydoc(std::vector<fnt_info_t> const &f_list) {
   // write return doc strings
   if (not ret_docs.empty()) {
     fs << "\n**Returns**";
-    for (auto const &[str, vec] : ret_docs) {
-      out << (ret_docs.size() == 1 ? fmt::format("\n{}", str) : fmt::format("\n[{}] {}", util::join(vec, ", "), str)) << '\n';
+    for (auto const &[rdoc, vec] : ret_docs) {
+      out << (ret_docs.size() == 1 ? fmt::format("\n{}", rdoc) : fmt::format("\n[{}] {}", util::join(vec, ", "), rdoc)) << '\n';
     }
     out << '\n' << hline;
   }

@@ -6,51 +6,99 @@
 #include <fmt/core.h>
 #include <fmt/format.h>
 #include <string>
-using namespace fmt::literals;
-#include <numeric>
 #include <itertools/itertools.hpp>
 #include "utility/streams.hpp"
+#include "utility/string_tools.hpp"
+#include <algorithm>
+#include <regex>
 
-// static const struct {
-//   util::logger error = util::logger{&std::cout, "-- ", "\033[1;32mClass: \033[0m"};
-// } logs;
+using namespace fmt::literals;
+
+static const struct {
+  util::logger warn = util::logger{&std::cout, "-- ", "\033[1;31mDoc warning: \033[0m"};
+} logs;
 
 std::string pydoc(std::vector<fnt_info_t> const &f_list) {
+  // extract and format relevant doc strings (function, parameter and return descriptions)
+  std::map<str_t, str_t> param_docs;
+  std::vector<std::pair<str_t, std::vector<long>>> func_docs, ret_docs;
+  for (auto const &[n, f] : itertools::enumerate(f_list)) {
+    auto doc = clu::doc_string_t{f.ptr};
 
-  // extract doxygen doc from each function
-  std::vector<clu::doc_string_t> docs;
-  for (auto const &f : f_list) docs.emplace_back(f.ptr);
+    // get function doc string
+    auto fdoc = doc.get_brief().empty() ? "" : fmt::format("{}", doc.get_brief());
+    fdoc += doc.get_details().empty() ? "" : (fdoc.empty() ? fmt::format("{}", doc.get_details()) : fmt::format("\n\n{}", doc.get_details()));
+    if (not fdoc.empty()) {
+      // check if an overload already has the same function doc string
+      auto it = std::ranges::find_if(func_docs, [&fdoc](auto const &p) { return p.first == fdoc; });
+      if (it != func_docs.end()) {
+        // if so, add the overload index to the existing entry
+        it->second.push_back(n);
+      } else {
+        // otherwise, create a new entry with the doc string and the overload index
+        func_docs.emplace_back(fdoc, std::vector<long>{n});
+      }
+    }
 
+    // get parameter doc strings
+    for (auto const &[pname, pdoc] : doc.params) {
+      if (param_docs.contains(pname) && param_docs[pname] != pdoc) {
+        // if a parameter with the same name but different doc string is found, warn the user
+        logs.warn(
+           fmt::format("Multiple parameter descriptions given for parameter {} in overloaded function {}", pname, f.ptr->getQualifiedNameAsString()));
+      } else {
+        // otherwise, add the parameter name + doc string
+        param_docs[pname] = pdoc;
+      }
+    }
+
+    // get return doc strings
+    if (doc.misc.contains("return")) {
+      // check if an overload already has the same return doc string
+      auto it = std::ranges::find_if(ret_docs, [&doc](auto const &p) { return p.first == doc.misc["return"]; });
+      if (it != ret_docs.end()) {
+        // if so, add the overload index to the existing entry
+        it->second.push_back(n);
+      } else {
+        // otherwise, create a new entry with the doc string and the overload index
+        ret_docs.emplace_back(doc.misc["return"], std::vector<long>{n});
+      }
+    }
+  }
+
+  // output streams
   std::stringstream fs;
   auto out  = triqs::indented_ostream{fs, 3};   // Indent all lines with 3 spaces
   auto out2 = triqs::indented_ostream{out, 3};  // 3 more spaces
   auto out3 = triqs::indented_ostream{out2, 3}; // 3 more spaces
 
-  // brief
-  for (auto const &[n, doc] : itertools::enumerate(docs)) { out << "[" << n << "]" << doc.get_brief() << '\n'; }
+  // horizontal line in rst files
+  constexpr auto hline = ".. raw:: html\n\n   <hr>\n";
 
-  // content
-  for (auto const &[doc, f] : itertools::zip(docs, f_list)) {
-    if (not doc.content.empty()) out << doc.content << "\n\n";
-  }
-
-  // params
-  // maybe check that there are some parameters or do nothing ?
-  out << "Parameters\n----------\n\n";
-  std::map<str_t, str_t> params_seen;
-  for (auto const &[doc, f] : itertools::zip(docs, f_list)) {
-    for (auto const &[n, d] : doc.params) {
-      if (params_seen.contains(n)) continue; // already seen
-      // TODO : CHECK consistency ??
-      params_seen[n] = d;
-      out2 << n << ":\n";
-      out3 << d << '\n';
-      //clu::emit_warning(f.ptr, "Inconsistent doc !");
+  // write function doc strings
+  if (not func_docs.empty()) {
+    for (auto const &[str, vec] : func_docs) {
+      fs << (func_docs.size() == 1 ? fmt::format("\n{}", str) : fmt::format("\n[{}] {}", util::join(vec, ", "), str)) << "\n\n" << hline;
     }
   }
-  out << "\nReturns\n-------\n\n";
-  for (auto const &[n, doc] : itertools::enumerate(docs)) {
-    if (doc.misc.contains("return")) out2 << "[" << n << "]" << doc.misc["return"] << '\n';
+
+  // write parameter doc strings
+  if (not param_docs.empty()) {
+    fs << "\n**Parameters**\n";
+    for (auto const &[pname, pdesc] : param_docs) {
+      out << ':' << pname << ":\n";
+      out2 << pdesc << '\n';
+    }
+    out << '\n' << hline;
+  }
+
+  // write return doc strings
+  if (not ret_docs.empty()) {
+    fs << "\n**Returns**";
+    for (auto const &[str, vec] : ret_docs) {
+      out << (ret_docs.size() == 1 ? fmt::format("\n{}", str) : fmt::format("\n[{}] {}", util::join(vec, ", "), str)) << '\n';
+    }
+    out << '\n' << hline;
   }
 
   // Add here treatment of custom \commands if any...

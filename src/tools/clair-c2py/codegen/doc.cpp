@@ -18,20 +18,21 @@ static const struct {
   util::logger warn = util::logger{&std::cout, "-- ", "\033[1;31mDoc warning: \033[0m"};
 } logs;
 
+// -----------------------------------------------
+
 std::string pydoc(std::vector<fnt_info_t> const &f_list) {
   // extract and format relevant doc strings (function, parameter and return descriptions)
-  std::vector<std::pair<str_t, str_t>> param_docs;
-  std::vector<std::pair<str_t, std::vector<long>>> func_docs, ret_docs;
+  std::vector<std::pair<str_t, str_t>> param_docs;                      // parameter name -> doc string
+  std::vector<std::pair<str_t, std::vector<long>>> func_docs, ret_docs; // [brief docs of a function, idx of corresponding dispatched fun]
   for (auto const &[n, f] : itertools::enumerate(f_list)) {
     auto doc = clu::doc_string_t{f.ptr};
 
     // get function doc string
-    auto fdoc = doc.get_brief().empty() ? "" : fmt::format("{}", doc.get_brief());
+    auto fdoc = doc.get_brief().empty() ? "" : doc.get_brief();
     fdoc += doc.get_details().empty() ? "" : (fdoc.empty() ? fmt::format("{}", doc.get_details()) : fmt::format("\n\n{}", doc.get_details()));
     if (not fdoc.empty()) {
       // check if an overload already has the same function doc string
-      auto it = std::ranges::find_if(func_docs, [&fdoc](auto const &p) { return p.first == fdoc; });
-      if (it != func_docs.end()) {
+      if (auto it = std::ranges::find_if(func_docs, [&fdoc](auto const &p) { return p.first == fdoc; }); it != func_docs.end()) {
         // if so, add the overload index to the existing entry
         it->second.push_back(n);
       } else {
@@ -79,10 +80,8 @@ std::string pydoc(std::vector<fnt_info_t> const &f_list) {
   constexpr auto hline = ".. raw:: html\n\n   <hr>\n";
 
   // write function doc strings
-  if (not func_docs.empty()) {
-    for (auto const &[fdoc, vec] : func_docs) {
-      fs << (func_docs.size() == 1 ? fmt::format("\n{}", fdoc) : fmt::format("\n[{}] {}", util::join(vec, ", "), fdoc)) << "\n\n" << hline;
-    }
+  for (auto const &[fdoc, vec] : func_docs) {
+    fs << (func_docs.size() == 1 ? fmt::format("\n{}", fdoc) : fmt::format("\n[{}] {}", util::join(vec, ", "), fdoc)) << "\n\n" << hline;
   }
 
   // write parameter doc strings
@@ -112,6 +111,7 @@ std::string pydoc(std::vector<fnt_info_t> const &f_list) {
 //---------------------------------------------------------
 std::string doc_of_synthetized_constructor(cls_info_t const &cls_info);
 
+//---------------------------------------------------------
 std::string pydoc(cls_info_t const &cls) {
   std::stringstream fs;
   auto doc = clu::doc_string_t{cls.ptr};

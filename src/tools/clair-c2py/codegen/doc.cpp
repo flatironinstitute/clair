@@ -3,6 +3,7 @@
 #include "../data.hpp"
 #include "clu/fullqualifiedname.hpp"
 #include <clang/AST/DeclCXX.h>
+#include "clang/Lex/Lexer.h"
 #include <fmt/core.h>
 #include <fmt/format.h>
 #include <string>
@@ -23,26 +24,26 @@ static const struct {
 std::string pydoc(std::vector<fnt_info_t> const &f_list) {
   // extract and format relevant doc strings (function, parameter and return descriptions)
   std::vector<std::pair<str_t, str_t>> param_docs;                      // parameter name -> doc string
-  std::vector<std::pair<str_t, std::vector<long>>> func_docs, ret_docs; // [brief docs of a function, idx of corresponding dispatched fun]
+  std::vector<std::pair<str_t, std::vector<long>>> func_docs, ret_docs; // doc string -> overload indices with the same doc string
   for (auto const &[n, f] : itertools::enumerate(f_list)) {
     auto doc = clu::doc_string_t{f.ptr};
 
     // get function doc string
-    auto fdoc = doc.get_brief().empty() ? "" : doc.get_brief();
-    fdoc += doc.get_details().empty() ? "" : (fdoc.empty() ? fmt::format("{}", doc.get_details()) : fmt::format("\n\n{}", doc.get_details()));
+    auto fdoc = doc.brief_str;
+    fdoc += doc.details_str.empty() ? "" : (fdoc.empty() ? doc.details_str : fmt::format("\n\n{}", doc.details_str));
     if (not fdoc.empty()) {
       // check if an overload already has the same function doc string
       if (auto it = std::ranges::find_if(func_docs, [&fdoc](auto const &p) { return p.first == fdoc; }); it != func_docs.end()) {
         // if so, add the overload index to the existing entry
-        it->second.push_back(n);
+        it->second.push_back(n + 1);
       } else {
         // otherwise, create a new entry with the doc string and the overload index
-        func_docs.emplace_back(fdoc, std::vector<long>{n});
+        func_docs.emplace_back(fdoc, std::vector<long>{n + 1});
       }
     }
 
     // get parameter doc strings
-    for (auto const &[pname, pdoc] : doc.params) {
+    for (auto const &[pname, pdoc] : doc.params_vec) {
       // check if a parameter name has already been encountered
       auto it = std::ranges::find_if(param_docs, [&pname](auto const &p) { return p.first == pname; });
       if (it != param_docs.end()) {
@@ -57,15 +58,15 @@ std::string pydoc(std::vector<fnt_info_t> const &f_list) {
     }
 
     // get return doc strings
-    if (doc.misc.contains("return")) {
+    if (not doc.return_str.empty()) {
       // check if an overload already has the same return doc string
-      auto it = std::ranges::find_if(ret_docs, [&doc](auto const &p) { return p.first == doc.misc["return"]; });
+      auto it = std::ranges::find_if(ret_docs, [&doc](auto const &p) { return p.first == doc.return_str; });
       if (it != ret_docs.end()) {
         // if so, add the overload index to the existing entry
-        it->second.push_back(n);
+        it->second.push_back(n + 1);
       } else {
         // otherwise, create a new entry with the doc string and the overload index
-        ret_docs.emplace_back(doc.misc["return"], std::vector<long>{n});
+        ret_docs.emplace_back(doc.return_str, std::vector<long>{n + 1});
       }
     }
   }
@@ -73,34 +74,28 @@ std::string pydoc(std::vector<fnt_info_t> const &f_list) {
   // output streams
   std::stringstream fs;
   auto out  = triqs::indented_ostream{fs, 3};   // Indent all lines with 3 spaces
-  auto out2 = triqs::indented_ostream{out, 3};  // 3 more spaces
-  auto out3 = triqs::indented_ostream{out2, 3}; // 3 more spaces
-
-  // horizontal line in rst files
-  constexpr auto hline = ".. raw:: html\n\n   <hr>\n";
 
   // write function doc strings
-  for (auto const &[fdoc, vec] : func_docs) {
-    fs << (func_docs.size() == 1 ? fmt::format("\n{}", fdoc) : fmt::format("\n[{}] {}", util::join(vec, ", "), fdoc)) << "\n\n" << hline;
+  for (int i = 0; auto const &[fdoc, vec] : func_docs) {
+    if (i++ > 0) fs << "\n------\n";
+    fs << (func_docs.size() == 1 ? fmt::format("\n{}", fdoc) : fmt::format("\n[{}] {}", util::join(vec, ", "), fdoc)) << "\n";
   }
 
   // write parameter doc strings
   if (not param_docs.empty()) {
-    fs << "\n**Parameters**\n";
+    fs << "\nParameters\n----------\n";
     for (auto const &[pname, pdoc] : param_docs) {
-      out << ':' << pname << ":\n";
-      out2 << pdoc << '\n';
+      fs << pname << '\n';
+      out << pdoc << '\n';
     }
-    out << '\n' << hline;
   }
 
   // write return doc strings
   if (not ret_docs.empty()) {
-    fs << "\n**Returns**";
+    fs << "\nReturns\n-------";
     for (auto const &[rdoc, vec] : ret_docs) {
       out << (ret_docs.size() == 1 ? fmt::format("\n{}", rdoc) : fmt::format("\n[{}] {}", util::join(vec, ", "), rdoc)) << '\n';
     }
-    out << '\n' << hline;
   }
 
   // Add here treatment of custom \commands if any...
@@ -115,8 +110,8 @@ std::string doc_of_synthetized_constructor(cls_info_t const &cls_info);
 std::string pydoc(cls_info_t const &cls) {
   std::stringstream fs;
   auto doc = clu::doc_string_t{cls.ptr};
-  if (not doc.brief.empty()) fs << doc.brief << "\n\n";
-  if (not doc.content.empty()) fs << doc.content << "\n\n";
+  if (not doc.brief_str.empty()) fs << doc.brief_str << "\n\n";
+  if (not doc.details_str.empty()) fs << doc.details_str << "\n\n";
   if (cls.synthetize_init_from_pydict()) fs << doc_of_synthetized_constructor(cls);
   return util::indent_string(util::trim(fs.str()), "   ");
 }

@@ -9,6 +9,7 @@ using namespace fmt::literals;
 #include "clu/fullqualifiedname.hpp"
 #include "clu/misc.hpp"
 #include "utility/logger.hpp"
+#include "utility/string_tools.hpp"
 #include <clang/AST/DeclTemplate.h>
 #include "./doc.hpp"
 
@@ -160,7 +161,21 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
   // ---- write the doc  ----
   // We generate a simple code in case the flist is of size 1
   // to make it more readable
-  doc << fmt::format(R"RAW( static const auto doc_d_{0} = fun_{0}.doc( R"DOC({1})DOC"); )RAW", fun_counter, pydoc(flist));
+  auto [fdoc, param_types, return_types] = pydoc(flist);
+
+  // vector of cpp type strings to a string containing a comma separated list of python types
+  auto cpp_to_py = [](std::vector<std::string> const &cpp_types) {
+    if (cpp_types.empty()) return std::string{};
+    return std::format(R"RAW(c2py::join(std::vector<std::string>{{c2py::python_typename<{}>()}}, ", "))RAW",
+                       util::join(cpp_types, ">(), c2py::python_typename<"));
+  };
+  doc << '\n'
+      << fmt::format(
+            R"RAW( static const auto doc_d_{0} = fun_{0}.doc(R"DOC({1})DOC", std::vector<std::string>{{{2}}}, std::vector<std::string>{{{3}}}); )RAW",
+            fun_counter, fdoc,
+            util::join(
+               param_types, [cpp_to_py](auto const &vec) { return cpp_to_py(vec); }, ", "),
+            util::join(return_types, [cpp_to_py](auto const &vec) { return cpp_to_py(vec); }, ", "));
 
   // ---- put if in the table ----
   // the call function are special

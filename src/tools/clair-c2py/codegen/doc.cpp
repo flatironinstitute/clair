@@ -12,6 +12,7 @@
 #include "utility/string_tools.hpp"
 #include <algorithm>
 #include <regex>
+#include <set>
 
 using namespace fmt::literals;
 
@@ -21,9 +22,9 @@ static const struct {
 
 // -----------------------------------------------
 
-std::string pydoc(std::vector<fnt_info_t> const &f_list) {
+std::tuple<str_t, std::vector<std::vector<str_t>>, std::vector<std::vector<str_t>>> pydoc(std::vector<fnt_info_t> const &f_list) {
   // extract and format relevant doc strings (function, parameter and return descriptions)
-  std::vector<std::pair<str_t, str_t>> param_docs;                      // parameter name -> doc string
+  std::vector<std::tuple<str_t, str_t, std::vector<long>>> param_docs;  // parameter name -> doc string -> overload indices with the same doc string
   std::vector<std::pair<str_t, std::vector<long>>> func_docs, ret_docs; // doc string -> overload indices with the same doc string
   for (auto const &[n, f] : itertools::enumerate(f_list)) {
     auto doc = clu::doc_string_t{f.ptr};
@@ -45,15 +46,19 @@ std::string pydoc(std::vector<fnt_info_t> const &f_list) {
     // get parameter doc strings
     for (auto const &[pname, pdoc] : doc.params_vec) {
       // check if a parameter name has already been encountered
-      auto it = std::ranges::find_if(param_docs, [&pname](auto const &p) { return p.first == pname; });
+      auto it = std::ranges::find_if(param_docs, [&pname](auto const &p) { return std::get<0>(p) == pname; });
       if (it != param_docs.end()) {
         // if so, check if the doc string is the same --> if not, warn the user
-        if (it->second != pdoc)
+        if (std::get<1>(*it) != pdoc) {
           logs.warn(fmt::format("Multiple parameter descriptions given for parameter {} in overloaded function {}", pname,
                                 f.ptr->getQualifiedNameAsString()));
+        } else {
+          // if the doc string is the same, just add the overload index to the existing entry
+          std::get<2>(*it).push_back(n);
+        }
       } else {
-        // otherwise, add the parameter name + doc string
-        param_docs.emplace_back(pname, pdoc);
+        // otherwise, create a new entry with the parameter name, doc string and the overload index
+        param_docs.emplace_back(pname, pdoc, std::vector<long>{n});
       }
     }
 
@@ -73,7 +78,7 @@ std::string pydoc(std::vector<fnt_info_t> const &f_list) {
 
   // output streams
   std::stringstream fs;
-  auto out  = triqs::indented_ostream{fs, 3};   // Indent all lines with 3 spaces
+  auto out = triqs::indented_ostream{fs, 3}; // Indent all lines with 3 spaces
 
   // write function doc strings
   for (int i = 0; auto const &[fdoc, vec] : func_docs) {
@@ -81,26 +86,43 @@ std::string pydoc(std::vector<fnt_info_t> const &f_list) {
     fs << (func_docs.size() == 1 ? fmt::format("\n{}", fdoc) : fmt::format("\n[{}] {}", util::join(vec, ", "), fdoc)) << "\n";
   }
 
-  // write parameter doc strings
+  // write parameter doc strings and get parameter types
+  std::vector<std::vector<str_t>> param_types;
   if (not param_docs.empty()) {
     fs << "\nParameters\n----------\n";
-    for (auto const &[pname, pdoc] : param_docs) {
-      fs << pname << '\n';
+    for (int i = 0; auto const &[pname, pdoc, vec] : param_docs) {
+      param_types.emplace_back();
+      for (auto n : vec) {
+        auto *f             = f_list[n].ptr;
+        auto fparams        = f->parameters();
+        auto it             = std::ranges::find_if(fparams, [&pname](auto const &param) { return param->getNameAsString() == pname; });
+        auto const type_str = clu::get_fully_qualified_name((*it)->getType(), f->getASTContext());
+        if (std::ranges::find(param_types.back(), type_str) == param_types.back().end()) param_types.back().emplace_back(type_str);
+      }
+      fs << fmt::format("{} : {{par_{}}}\n", pname, i++);
       out << pdoc << '\n';
     }
   }
 
-  // write return doc strings
+  // write return doc strings and get return types
+  std::vector<std::vector<str_t>> return_types;
   if (not ret_docs.empty()) {
     fs << "\nReturns\n-------";
-    for (auto const &[rdoc, vec] : ret_docs) {
+    for (int i = 0; auto const &[rdoc, vec] : ret_docs) {
+      return_types.emplace_back();
+      for (auto n : vec) {
+        auto *f             = f_list[n - 1].ptr;
+        auto const type_str = clu::get_fully_qualified_name(f->getReturnType(), f->getASTContext());
+        if (std::ranges::find(return_types.back(), type_str) == return_types.back().end()) return_types.back().emplace_back(type_str);
+      }
+      fs << fmt::format("\n{{ret_{}}}", i++);
       out << (ret_docs.size() == 1 ? fmt::format("\n{}", rdoc) : fmt::format("\n[{}] {}", util::join(vec, ", "), rdoc)) << '\n';
     }
   }
 
   // Add here treatment of custom \commands if any...
   // Cf doc_string.cpp. Register them as block command first.
-  return fs.str();
+  return {fs.str(), param_types, return_types};
 }
 
 //---------------------------------------------------------

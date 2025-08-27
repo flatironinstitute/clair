@@ -81,9 +81,9 @@ std::tuple<str_t, std::vector<std::vector<str_t>>, std::vector<std::vector<str_t
   auto out = triqs::indented_ostream{fs, 3}; // Indent all lines with 3 spaces
 
   // write function doc strings
-  for (int i = 0; auto const &[fdoc, vec] : func_docs) {
-    if (i++ > 0) fs << "\n------\n";
+  for (auto const &[fdoc, vec] : func_docs) {
     fs << (func_docs.size() == 1 ? fmt::format("\n{}", fdoc) : fmt::format("\n[{}] {}", util::join(vec, ", "), fdoc)) << "\n";
+    if (func_docs.size() > 1) fs << "\n------\n";
   }
 
   // write parameter doc strings and get parameter types

@@ -22,10 +22,11 @@ static const struct {
 
 // -----------------------------------------------
 
-std::tuple<str_t, std::vector<std::vector<str_t>>, std::vector<std::vector<str_t>>> pydoc(std::vector<fnt_info_t> const &f_list) {
+std::tuple<str_t, std::vector<std::vector<str_t>>, std::vector<str_t>> pydoc(std::vector<fnt_info_t> const &f_list) {
   // extract and format relevant doc strings (function, parameter and return descriptions)
-  std::vector<std::tuple<str_t, str_t, std::vector<long>>> param_docs;  // parameter name -> doc string -> overload indices with the same doc string
-  std::vector<std::pair<str_t, std::vector<long>>> func_docs, ret_docs; // doc string -> overload indices with the same doc string
+  std::vector<std::tuple<str_t, str_t, std::vector<long>>> param_docs; // parameter name -> doc string -> overload indices with the same doc string
+  std::vector<std::tuple<str_t, str_t, std::vector<long>>> ret_docs;   // return type -> doc string -> overload indices with the same doc string
+  std::vector<std::pair<str_t, std::vector<long>>> func_docs;          // doc string -> overload indices with the same doc string
   for (auto const &[n, f] : itertools::enumerate(f_list)) {
     auto doc = clu::doc_string_t{f.ptr};
 
@@ -64,14 +65,18 @@ std::tuple<str_t, std::vector<std::vector<str_t>>, std::vector<std::vector<str_t
 
     // get return doc strings
     if (not doc.return_str.empty()) {
-      // check if an overload already has the same return doc string
-      auto it = std::ranges::find_if(ret_docs, [&doc](auto const &p) { return p.first == doc.return_str; });
+      // get return type
+      auto const type_str = clu::get_fully_qualified_name(f.ptr->getReturnType(), f.ptr->getASTContext());
+
+      // check if an overload already has the same return doc string + type
+      auto it = std::ranges::find_if(
+         ret_docs, [&doc, &type_str](auto const &tup) { return std::get<0>(tup) == type_str && std::get<1>(tup) == doc.return_str; });
       if (it != ret_docs.end()) {
         // if so, add the overload index to the existing entry
-        it->second.push_back(n + 1);
+        std::get<2>(*it).push_back(n + 1);
       } else {
         // otherwise, create a new entry with the doc string and the overload index
-        ret_docs.emplace_back(doc.return_str, std::vector<long>{n + 1});
+        ret_docs.emplace_back(type_str, doc.return_str, std::vector<long>{n + 1});
       }
     }
   }
@@ -105,18 +110,13 @@ std::tuple<str_t, std::vector<std::vector<str_t>>, std::vector<std::vector<str_t
   }
 
   // write return doc strings and get return types
-  std::vector<std::vector<str_t>> return_types;
+  std::vector<str_t> return_types;
   if (not ret_docs.empty()) {
     fs << "\nReturns\n-------";
-    for (int i = 0; auto const &[rdoc, vec] : ret_docs) {
-      return_types.emplace_back();
-      for (auto n : vec) {
-        auto *f             = f_list[n - 1].ptr;
-        auto const type_str = clu::get_fully_qualified_name(f->getReturnType(), f->getASTContext());
-        if (std::ranges::find(return_types.back(), type_str) == return_types.back().end()) return_types.back().emplace_back(type_str);
-      }
-      fs << fmt::format("\n{{ret_{}}}", i++);
-      out << (ret_docs.size() == 1 ? fmt::format("\n{}", rdoc) : fmt::format("\n[{}] {}", util::join(vec, ", "), rdoc)) << '\n';
+    for (int i = 0; auto const &[rtype, rdoc, vec] : ret_docs) {
+      return_types.emplace_back(rtype);
+      fs << (ret_docs.size() == 1 ? fmt::format("\n{{ret_{}}}\n", i++) : fmt::format("\n[{}] : {{ret_{}}}\n", util::join(vec, ", "), i++));
+      out << rdoc << '\n';
     }
   }
 

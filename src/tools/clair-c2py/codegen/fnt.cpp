@@ -159,23 +159,19 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
   code << join(flist, l, ',') << " };\n";
 
   // ---- write the doc  ----
-  // We generate a simple code in case the flist is of size 1
-  // to make it more readable
-  auto [fdoc, param_types, return_types] = pydoc(flist);
-
-  // vector of cpp type strings to a string containing a comma separated list of python types
+  // given a vector of cpp types, generate code that turns it into a vector of python types
   auto cpp_to_py = [](std::vector<std::string> const &cpp_types) {
     if (cpp_types.empty()) return std::string{};
-    return std::format(R"RAW(c2py::join(std::vector<std::string>{{c2py::python_typename<{}>()}}, ", "))RAW",
-                       util::join(cpp_types, ">(), c2py::python_typename<"));
+    return std::format(R"RAW(std::vector<std::string>{{c2py::python_typename<{}>()}})RAW", util::join(cpp_types, ">(), c2py::python_typename<"));
   };
+  auto [fdoc, param_types, return_types] = pydoc(flist);
   doc << '\n'
       << fmt::format(
             R"RAW( static const auto doc_d_{0} = fun_{0}.doc(R"DOC({1})DOC", std::vector<std::string>{{{2}}}, std::vector<std::string>{{{3}}}); )RAW",
             fun_counter, fdoc,
             util::join(
-               param_types, [cpp_to_py](auto const &vec) { return cpp_to_py(vec); }, ", "),
-            util::join(return_types, [cpp_to_py](auto const &vec) { return cpp_to_py(vec); }, ", "));
+               param_types, [cpp_to_py](auto const &vec) { return std::format(R"RAW(c2py::join({}, ", "))RAW", cpp_to_py(vec)); }, ", "),
+            cpp_to_py(return_types));
 
   // ---- put if in the table ----
   // the call function are special

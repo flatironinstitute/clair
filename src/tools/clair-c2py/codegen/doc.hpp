@@ -5,5 +5,5 @@
 #include <tuple>
 #include <vector>
 
-[[nodiscard]] std::tuple<str_t, std::vector<std::vector<str_t>>, std::vector<std::vector<str_t>>> pydoc(std::vector<fnt_info_t> const &f_list);
+[[nodiscard]] std::tuple<str_t, std::vector<std::vector<str_t>>, std::vector<str_t>> pydoc(std::vector<fnt_info_t> const &f_list);
 [[nodiscard]] str_t pydoc(cls_info_t const &cls);

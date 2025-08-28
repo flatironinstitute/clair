@@ -228,8 +228,8 @@ void codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const 
   // -- first declaration
   code << fmt::format(R"RAW(
 
-       template <> inline constexpr auto c2py::tp_name<{0}>      = "{3}.{1}";
-       template <> inline constexpr const char *c2py::tp_doc<{0}> = {2};
+       template <> inline constexpr auto c2py::tp_name<{0}> = "{3}.{1}";
+       template <> const std::string c2py::tp_doc<{0}>      = {2};
 
      )RAW",
                       cls_name, cls_py_name, fmt::format(R"RAW( R"DOC({})DOC" )RAW", pydoc(cls_info)), full_module_name);

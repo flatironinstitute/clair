@@ -1,4 +1,5 @@
 #include "./fnt.hpp"
+#include "./utils.hpp"
 #include <fmt/core.h>
 #include <fmt/format.h>
 using namespace fmt::literals;
@@ -87,6 +88,12 @@ void codegen_synth_constructor(std::ostream &code, cls_info_t const &cls_info) {
    )RAW",
                       clu::get_fully_qualified_name(cls), counter);
 
+  // doc string for synthesized constructor
+  auto [doc, field_types] = pydoc_of_synthetized_constructor(cls_info);
+  code << '\n'
+       << fmt::format(R"RAW(template <> const std::string c2py::tp_ctor_doc<{0}> = c2py::replace_tags()RAW", cls_name)
+       << fmt::format(R"RAW(R"DOC({0})DOC", "par", std::vector<std::string>{{{1}}});)RAW", doc, codegen::cpp_to_py_types(field_types));
+
   ++counter;
 }
 
@@ -139,7 +146,10 @@ void codegen_getter_setter(std::ostream &code, std::ostream &table, std::ostream
 )RAW",
                         "counter"_a = counter, "prop_name"_a = prop_name, "setter"_a = prop.setters[0].ptr->getQualifiedNameAsString());
 
-  doc << fmt::format(R"RAW( static constexpr auto prop_doc_{0} = R"DOC({1})DOC"; )RAW", counter, clu::get_raw_comment(prop.getter.ptr));
+  auto gsdoc   = clu::doc_string_t{prop.getter.ptr};
+  auto doc_str = gsdoc.brief_str;
+  doc_str += gsdoc.details_str.empty() ? "" : (doc_str.empty() ? gsdoc.details_str : fmt::format("\n\n{}", gsdoc.details_str));
+  doc << fmt::format(R"RAW( static constexpr auto prop_doc_{0} = R"DOC({1})DOC"; )RAW", counter, doc_str);
 
   // Put in the table
   auto m = prop.getter.as_method();
@@ -225,14 +235,8 @@ void codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const 
   auto *cls     = cls_info.ptr;
   auto cls_name = clu::get_fully_qualified_name(cls); //cls->getQualifiedNameAsString();
 
-  // -- first declaration
-  code << fmt::format(R"RAW(
-
-       template <> inline constexpr auto c2py::tp_name<{0}> = "{3}.{1}";
-       template <> const std::string c2py::tp_doc<{0}>      = {2};
-
-     )RAW",
-                      cls_name, cls_py_name, fmt::format(R"RAW( R"DOC({})DOC" )RAW", pydoc(cls_info)), full_module_name);
+  // -- tp_name
+  code << '\n' << fmt::format(R"RAW(template <> inline constexpr auto c2py::tp_name<{0}> = "{1}.{2}";)RAW", cls_name, full_module_name, cls_py_name);
 
   // ---------- Methods ------------
   {
@@ -288,13 +292,11 @@ void codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const 
     auto is_const = f->getType().isConstQualified();
     if (is_const) type = "const " + type;
 
-    // FIXME Clean this, not great.
-    auto doc = clu::get_raw_comment(f);
-    // regex : replace ^  ///  by a space
-    //auto doc1 = clu::doc_string_t(f);
-    //auto doc = doc1.brief + " " + doc1.content;
+    auto fdoc     = clu::doc_string_t{f};
+    auto fdoc_str = fdoc.brief_str;
+    fdoc_str += fdoc.details_str.empty() ? "" : (fdoc_str.empty() ? fdoc.details_str : fmt::format("\n\n{}", fdoc.details_str));
 
-    MembersDoc << fmt::format(R"RAW( constexpr auto doc_member_{0} = R"DOC({1})DOC"; )RAW", member_counter, doc);
+    MembersDoc << fmt::format(R"RAW( constexpr auto doc_member_{0} = R"DOC({1})DOC"; )RAW", member_counter, fdoc_str);
 
     if (is_const)
       Members << fmt::format(R"RAW(
@@ -342,4 +344,10 @@ void codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const 
   codegen_getsetitem(code, cls_info);
 
   // ----------- import other modules
+
+  // -- tp_doc
+  auto cls_doc = pydoc(cls_info);
+  code << '\n'
+       << fmt::format(R"RAW(template <> const std::string c2py::tp_doc<{0}> = R"DOC({1})DOC" + )RAW", cls_name, cls_doc)
+       << (cls_doc.empty() ? "" : R"RAW( std::string{"\n\n----------\n\n"}  + )RAW") << fmt::format(R"RAW(c2py::tp_ctor_doc<{0}>;)RAW", cls_name);
 }

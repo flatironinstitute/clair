@@ -126,16 +126,14 @@ std::tuple<str_t, std::vector<std::vector<str_t>>, std::vector<str_t>> pydoc(std
 }
 
 //---------------------------------------------------------
-std::string doc_of_synthetized_constructor(cls_info_t const &cls_info);
 
-//---------------------------------------------------------
-std::string pydoc(cls_info_t const &cls) {
+str_t pydoc(cls_info_t const &cls) {
+  // only extract the brief and details sections (the constructors are done in the codegen routines)
   std::stringstream fs;
   auto doc = clu::doc_string_t{cls.ptr};
-  if (not doc.brief_str.empty()) fs << doc.brief_str << "\n\n";
-  if (not doc.details_str.empty()) fs << doc.details_str << "\n\n";
-  if (cls.synthetize_init_from_pydict()) fs << doc_of_synthetized_constructor(cls);
-  return util::indent_string(util::trim(fs.str()), "   ");
+  fs << doc.brief_str;
+  fs << (doc.details_str.empty() ? "" : (doc.brief_str.empty() ? doc.details_str : fmt::format("\n\n{}", doc.details_str)));
+  return fs.str();
 }
 
 // ----------------------------------------------
@@ -150,7 +148,7 @@ std::vector<std::vector<std::string>> get_fields_info(cls_info_t const &cls_info
   for (auto *f : cls_info.fields) {
     std::vector<std::string> m(4);
     m[0] = f->getNameAsString();
-    m[1] = clu::get_fully_qualified_name(f->getType(), *ctx, /*canonical*/ false);
+    m[1] = clu::get_fully_qualified_name(f->getType(), *ctx);
 
     if (clang::Expr *init = f->getInClassInitializer()) {
       llvm::StringRef s =
@@ -161,12 +159,10 @@ std::vector<std::vector<std::string>> get_fields_info(cls_info_t const &cls_info
       } else
         m[2] = s.ltrim().str();
     }
-    if (auto *rc = ctx->getRawCommentForDeclNoCache(f)) {
-      //m[3] = rc->getBriefText(*ctx);
-      // Choice here. First line of doc ? or full doc and wrap the lines
-      // use llvm::stringRef::trim function ?
-      m[3] = rc->getRawText(ctx->getSourceManager());
-    }
+
+    auto fdoc = clu::doc_string_t{f};
+    m[3] = fdoc.brief_str;
+    m[3] += fdoc.details_str.empty() ? "" : (m[3].empty() ? fdoc.details_str : fmt::format("\n\n{}", fdoc.details_str));
     res.push_back(std::move(m));
   }
   // regroup the field without initializer first
@@ -176,23 +172,26 @@ std::vector<std::vector<std::string>> get_fields_info(cls_info_t const &cls_info
 
 //---------------------------------------------------------
 
-std::string doc_of_synthetized_constructor(cls_info_t const &cls_info) {
-  std::stringstream doc;
-  // doc << '\n';
-  static std::regex start1(R"RAW(^\s*\/*\s*)RAW");
-  static std::regex start2(R"RAW(\n\s*\/*\s*)RAW");
-  // FIXME : clean when upgrading
-  // gcc 11 does not have the multline implemented ...
-  //static std::regex start(R"RAW(^\s*\/*\s*)RAW", std::regex_constants::multiline);
-  for (auto const &f : get_fields_info(cls_info)) {
-    doc << "* " << f[0] << ": " << f[1];
-    if (not f[2].empty()) doc << " = " << f[2];
-    doc << "\n" << std::regex_replace(std::regex_replace(f[3], start1, "   "), start2, "\n   ");
-    //doc << "\n" << std::regex_replace(f[3], start, "   ");
-    doc << "\n\n";
+std::tuple<str_t, std::vector<str_t>> pydoc_of_synthetized_constructor(cls_info_t const &cls_info) {
+  // output streams
+  std::stringstream fs;
+  auto out = triqs::indented_ostream{fs, 3}; // Indent all lines with 3 spaces
+
+  fs << "Synthesized constructor with the following keyword arguments:\n";
+
+  // write field doc strings and store field types
+  auto info_vec = get_fields_info(cls_info);
+  std::vector<str_t> field_types;
+  if (not info_vec.empty()) {
+    fs << "\nParameters\n----------\n";
+    for (int i = 0; auto const &info : info_vec) {
+      field_types.push_back({info[1]});
+      fs << fmt::format("{} : {{par_{}}}{}\n\n", info[0], i++, info[2].empty() ? "" : fmt::format(", default={}", info[2]));
+      // out << (info[3].empty() ? fmt::format("Initial value for attribute `{}`", info[0]) : info[3]) << '\n';
+    }
   }
-  //llvm::errs() << doc.str();
-  return doc.str();
+
+  return {fs.str(), field_types};
 }
 
 // //----------------------------------

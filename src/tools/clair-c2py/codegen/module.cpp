@@ -107,11 +107,15 @@ str_t codegen_module(module_info_t const &m) {
 
 // =========== wrp info generation ==============
 
-str_t codegen_wrap_info(module_info_t const &m) {
+str_t codegen_wrap_info(module_info_t const &m, bool write_header) {
   std::stringstream wrap_info;
-  for (auto const &[_, cls_info] : m.classes) {
-    wrap_info << fmt::format(R"RAW( template <> constexpr bool c2py::is_wrapped<{0}>   = true;)RAW", //
-                             clu::get_fully_qualified_name(cls_info.ptr));
+  auto full_module_name = m.package_name.empty() ? m.module_name : m.package_name + '.' + m.module_name;
+  for (auto const &[cls_py_name, cls_info] : m.classes) {
+    wrap_info << fmt::format(R"RAW( template <> constexpr bool c2py::is_wrapped<{0}>   = true;)RAW", clu::get_fully_qualified_name(cls_info.ptr));
+    if (write_header) {
+      wrap_info << fmt::format(R"RAW(template <> inline constexpr auto c2py::tp_name<{0}> = "{1}.{2}";)RAW",
+                               clu::get_fully_qualified_name(cls_info.ptr), full_module_name, cls_py_name);
+    }
   }
   return wrap_info.str();
 }
@@ -126,7 +130,7 @@ str_t codegen_hxx(module_info_t const &m) {
     #define C2PY_HXX_DECLARATION_{0}_GUARDS
     )RAW",
                      m.module_name);
-  hxx << codegen_wrap_info(m);
+  hxx << codegen_wrap_info(m, true);
   hxx << "\n#endif";
 
   return hxx.str();

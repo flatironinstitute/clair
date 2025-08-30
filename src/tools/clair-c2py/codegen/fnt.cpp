@@ -166,7 +166,7 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
             R"RAW( static const auto doc_d_{0} = fun_{0}.doc(R"DOC({1})DOC", std::vector<std::string>{{{2}}}, std::vector<std::string>{{{3}}}); )RAW",
             fun_counter, fdoc,
             util::join(
-               param_types, [](auto const &vec) { return std::format(R"RAW(c2py::join({}, ", "))RAW", codegen::cpp_to_py_types(vec)); }, ", "),
+               param_types, [](auto const &vec) { return fmt::format(R"RAW(c2py::join({}, ", "))RAW", codegen::cpp_to_py_types(vec)); }, ", "),
             codegen::cpp_to_py_types(return_types));
 
   // ---- put if in the table ----
@@ -235,7 +235,7 @@ void codegen::write_dispatch_constructors(std::ostream &code, std::string const 
        << fmt::format(R"RAW(template <> const std::string c2py::tp_ctor_doc<{0}> = init_{1}.doc()RAW", cls_cpp_name, counter)
        << fmt::format(
              R"RAW(R"DOC({0})DOC", std::vector<std::string>{{{1}}}, std::vector<std::string>{{}});)RAW", doc,
-             util::join(param_types, [](auto const &vec) { return std::format(R"RAW(c2py::join({}, ", "))RAW", cpp_to_py_types(vec)); }, ", "));
+             util::join(param_types, [](auto const &vec) { return fmt::format(R"RAW(c2py::join({}, ", "))RAW", cpp_to_py_types(vec)); }, ", "));
 
   counter++;
 }

@@ -129,7 +129,8 @@ namespace clu {
           block_command(it, misc_vec.back().second);
         } else {
           // other unsupported block commands
-          logs.warn(fmt::format("Unsupported BlockCommandComment {} at {}", cmd_name, bcc->getSourceRange().printToString(ctx_->getSourceManager())));
+          logs.warn(
+             fmt::format("Unsupported BlockCommandComment {} at {}", cmd_name.str(), bcc->getSourceRange().printToString(ctx_->getSourceManager())));
           misc_vec.emplace_back(cmd_name.str(), "");
           block_command(it, misc_vec.back().second);
         }
@@ -190,15 +191,15 @@ namespace clu {
         // HTML start tag comment
         add_new_lines(2, str);
         str += ".. raw:: html\n\n";
-        str += fmt::format("{:<3}<{}", "", hstc->getTagName());
+        str += fmt::format("{:<3}<{}", "", hstc->getTagName().str());
         for (int i = 0; i < hstc->getNumAttrs(); ++i) {
           auto const &attr = hstc->getAttr(i);
-          str += fmt::format(" {}=\"{}\"", attr.Name, attr.Value);
+          str += fmt::format(" {}=\"{}\"", attr.Name.str(), attr.Value.str());
         }
         str += ">";
       } else if (auto *hetc = llvm::dyn_cast_or_null<clang::comments::HTMLEndTagComment>(*it)) {
         // HTML end tag comment (has to be on the same line as the corresponding HTMLStartTagComment)
-        str += fmt::format("</{}>\n\n", hetc->getTagName());
+        str += fmt::format("</{}>\n\n", hetc->getTagName().str());
       }
 
       // update last source location

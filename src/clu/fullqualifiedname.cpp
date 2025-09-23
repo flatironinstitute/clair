@@ -28,7 +28,11 @@ namespace clu {
     if (t->getAs<clang::TypedefType>()) { return clang::TypeName::getFullyQualifiedName(t, ctx, policy); }
 
     // from now on, we only use the policy with canonical type, as a backup
+#if LLVM_VERSION_MAJOR >= 21
+    policy.PrintAsCanonical = true;
+#else
     policy.PrintCanonicalTypes = true;
+#endif
 
     // if the type is a template instantiation or specialization, we peel the template
     // and apply the function recursively to each types inside the <...>
@@ -92,7 +96,11 @@ namespace clu {
     policy.SuppressUnwrittenScope = false;
     policy.SuppressScope          = false;
     policy.FullyQualifiedName     = true;
+#if LLVM_VERSION_MAJOR >= 21
+    policy.PrintAsCanonical = true;
+#else
     policy.PrintCanonicalTypes    = true;
+#endif
 
     return clean_libc_mess(clang::TypeName::getFullyQualifiedName(t, ctx, policy));
 

@@ -30,17 +30,17 @@ bool clu::satisfy_concept(clang::QualType const &ty, clang::ConceptDecl const *c
   //return satisfy_concept(ty2->getPointeeType (), cpt, ci);
   //}
 
-  llvm::SmallVector<const clang::Expr *, 1> constraint_exprs{cpt->getConstraintExpr()};
+#if LLVM_VERSION_MAJOR >= 21
+  auto constraints = llvm::SmallVector{clang::AssociatedConstraint{cpt->getConstraintExpr()}};
+#else
+  auto constraints = llvm::SmallVector<const clang::Expr *>{cpt->getConstraintExpr()};
+#endif
   llvm::SmallVector<clang::TemplateArgument, 1> targs{{ty}};
   clang::ConstraintSatisfaction s;
 
   // API change for clang >= 16 for calling the CheckConstraintSatisfaction method
-#if LLVM_VERSION_MAJOR > 15
   clang::MultiLevelTemplateArgumentList targs_list{const_cast<clang::ConceptDecl *>(cpt), targs, true}; //NOLINT
-  bool error = ci->getSema().CheckConstraintSatisfaction(cpt, constraint_exprs, targs_list, cpt->getSourceRange(), s);
-#else
-  bool error = ci->getSema().CheckConstraintSatisfaction(cpt, constraint_exprs, targs, cpt->getSourceRange(), s);
-#endif
+  bool error = ci->getSema().CheckConstraintSatisfaction(cpt, constraints, targs_list, cpt->getSourceRange(), s);
   //EXPECTS_WITH_MESSAGE(not error, "CheckConstraintSatisfaction : internal error");
 
   //if (not s.IsSatisfied) ci->getSema().DiagnoseUnsatisfiedConstraint(s);

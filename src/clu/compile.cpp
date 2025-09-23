@@ -33,8 +33,12 @@ void clu::compile(clang::CompilerInstance &ci, std::string const &code) {
   bool cinvNewCreated = clang::CompilerInvocation::CreateFromArgs(*cinvNew, clargs2, Diagnostics);
   EXPECTS(cinvNewCreated);
 
+#if LLVM_VERSION_MAJOR >= 21
+  clang::CompilerInstance ciNew(cinvNew);
+#else
   clang::CompilerInstance ciNew;
   ciNew.setInvocation(cinvNew);
+#endif
   ciNew.setTarget(&Target);
 #if LLVM_VERSION_MAJOR >= 20
   ciNew.createDiagnostics(*llvm::vfs::getRealFileSystem());

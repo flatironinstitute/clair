@@ -98,11 +98,15 @@ std::tuple<str_t, std::vector<std::vector<str_t>>, std::vector<str_t>> pydoc(std
     for (int i = 0; auto const &[pname, pdoc, vec] : param_docs) {
       param_types.emplace_back();
       for (auto n : vec) {
-        auto *f             = f_list[n].ptr;
-        auto fparams        = f->parameters();
-        auto it             = std::ranges::find_if(fparams, [&pname](auto const &param) { return param->getNameAsString() == pname; });
-        auto const type_str = clu::get_fully_qualified_name((*it)->getType(), f->getASTContext());
-        if (std::ranges::find(param_types.back(), type_str) == param_types.back().end()) param_types.back().emplace_back(type_str);
+        auto *f      = f_list[n].ptr;
+        auto fparams = f->parameters();
+        auto it      = std::ranges::find_if(fparams, [&pname](auto const &param) { return param->getNameAsString() == pname; });
+        if (it == fparams.end()) {
+          logs.warn(fmt::format("Function {} contains a doc string for parameter {} which is not an argument", f->getQualifiedNameAsString(), pname));
+        } else {
+          auto const type_str = clu::get_fully_qualified_name((*it)->getType(), f->getASTContext());
+          if (std::ranges::find(param_types.back(), type_str) == param_types.back().end()) param_types.back().emplace_back(type_str);
+        }
       }
       fs << fmt::format("{} : {{par_{}}}\n", pname, i++);
       out << pdoc << '\n';
@@ -161,7 +165,7 @@ std::vector<std::vector<std::string>> get_fields_info(cls_info_t const &cls_info
     }
 
     auto fdoc = clu::doc_string_t{f};
-    m[3] = fdoc.brief_str;
+    m[3]      = fdoc.brief_str;
     m[3] += fdoc.details_str.empty() ? "" : (m[3].empty() ? fdoc.details_str : fmt::format("\n\n{}", fdoc.details_str));
     res.push_back(std::move(m));
   }

@@ -68,7 +68,7 @@ bool worker_t::check_convertibility(clang::FunctionDecl const *f, bool test_retu
   }
   if (test_return_type) {
     auto ty = f->getReturnType();
-    if (ty->isPointerType()) {
+    if (ty->isPointerType() and (ty->getPointeeType().getAsString() != "PyObject")) {
       if (emit_error) clu::emit_error(f, "c2py: Can not convert a raw C++ pointer to python");
       ok = false;
     } else if ((not ty->isVoidType()) and (not clu::satisfy_concept(ty, this->IsConvertibleC2Py, this->ci))

@@ -92,7 +92,7 @@ void codegen_synth_constructor(std::ostream &code, cls_info_t const &cls_info) {
   auto [doc, field_types] = pydoc_of_synthetized_constructor(cls_info);
   code << '\n'
        << fmt::format(R"RAW(template <> const std::string c2py::tp_ctor_doc<{0}> = c2py::replace_tags()RAW", cls_name)
-       << fmt::format(R"RAW(R"DOC({0})DOC", "par", std::vector<std::string>{{{1}}});)RAW", doc, codegen::cpp_to_py_types(field_types));
+       << fmt::format(R"RAW(R"DOC({0})DOC", "par", {{{1}}});)RAW", doc, codegen::cpp_to_py_types(field_types));
 
   ++counter;
 }

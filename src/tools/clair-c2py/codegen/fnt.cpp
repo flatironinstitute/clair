@@ -121,7 +121,7 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
     logs.fun(fmt::format("{}", pyname));
 
   code << '\n'
-       << fmt::format(R"RAW( // {}  
+       << fmt::format(R"RAW( // {}
                              static auto const fun_{} = c2py::dispatcher_f_kw_t{{ )RAW",
                       pyname, fun_counter);
 
@@ -161,13 +161,13 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
 
   // ---- write the doc  ----
   auto [fdoc, param_types, return_types] = pydoc(flist);
-  doc << '\n'
-      << fmt::format(
-            R"RAW( static const auto doc_d_{0} = fun_{0}.doc(R"DOC({1})DOC", std::vector<std::string>{{{2}}}, std::vector<std::string>{{{3}}}); )RAW",
-            fun_counter, fdoc,
-            util::join(
-               param_types, [](auto const &vec) { return fmt::format(R"RAW(c2py::join({}, ", "))RAW", codegen::cpp_to_py_types(vec)); }, ", "),
-            codegen::cpp_to_py_types(return_types));
+  doc << '\n' << fmt::format(R"RAW( static const auto doc_d_{0} = fun_{0}.doc(R"DOC({1})DOC")RAW", fun_counter, fdoc);
+  if (not param_types.empty() or not return_types.empty()) {
+    auto join_f = [](auto const &vec) { return fmt::format("{{{}}}", codegen::cpp_to_py_types(vec)); };
+    doc << (param_types.empty() ? ", {}" : fmt::format(", {{{}}}", util::join(param_types, join_f, ", ")))
+        << (return_types.empty() ? "" : fmt::format(", {{{}}}", codegen::cpp_to_py_types(return_types)));
+  }
+  doc << ");";
 
   // ---- put if in the table ----
   // the call function are special
@@ -231,11 +231,12 @@ void codegen::write_dispatch_constructors(std::ostream &code, std::string const 
 
   // doc string for dispatched constructors
   auto [doc, param_types, return_types] = pydoc(flist);
-  code << '\n'
-       << fmt::format(R"RAW(template <> const std::string c2py::tp_ctor_doc<{0}> = init_{1}.doc()RAW", cls_cpp_name, counter)
-       << fmt::format(
-             R"RAW(R"DOC({0})DOC", std::vector<std::string>{{{1}}}, std::vector<std::string>{{}});)RAW", doc,
-             util::join(param_types, [](auto const &vec) { return fmt::format(R"RAW(c2py::join({}, ", "))RAW", cpp_to_py_types(vec)); }, ", "));
+  code << '\n' << fmt::format(R"RAW(template <> const std::string c2py::tp_ctor_doc<{0}> = init_{1}.doc(R"DOC({2})DOC")RAW", cls_cpp_name, counter, doc);
+  if (not param_types.empty()) {
+    auto join_f = [](auto const &vec) { return fmt::format("{{{}}}", codegen::cpp_to_py_types(vec)); };
+    code << fmt::format(", {{{}}}", util::join(param_types, join_f, ", "));
+  }
+  code << ");";
 
   counter++;
 }

@@ -33,40 +33,13 @@ TOML input file
 The TOML file is required to have the same name as the C++ source file, except for the ``.cpp`` extension.
 For example, if the C++ source file given to ``clair-c2py`` is ``my_module.cpp``, the TOML file should be called ``my_module.toml``.
 
-Here is a template input file showing and explaining the available options:
+Here is an example TOML file showing and explaining the available options:
 
-.. literalinclude:: ../../src/tools/clair-c2py/configuration.toml.template
+.. literalinclude:: ../examples/toml/initial.toml
    :language: toml
 
+See :ref:`toml` for how these options affect the generated bindings.
 
-Filters
--------
-
-By default, ``clair`` will generate bindings for all non-template classes and functions,
-except those defined in `system` files, i.e. the standard library and more generally 
-anything the compiler includes via `-isystem` options.
-In order to refine this behaviour, several filters can be used.
-
-* ``match_names``, ``reject_names``. These **regular expressions** control which functions/classes/enums are exposed to Python.
-
-   The algorithm to determine if an element X of qualified name Xqname (i.e. the full name with the namespaces) should be exposed is:
-     
-     #. if ``match_names`` is defined and does not match Xqname then skip X
-     #. if ``reject_names`` is defined and matches Xqname then skip X
-     #. else expose X to Python. 
-
-Here is an example:
-
-.. literalinclude:: ../examples/filter.cpp
-   :language: cpp
-   
-In this example, the function ``f`` and the struct ``a_class`` are exposed to Python, 
-while the function ``g``, and the struct ``N::hidden`` are not.
-
-.. warning::
-
-   Be careful that these strings are Regex. For example, ``N::*`` does not match ``N::f``.
-   Also note that the qualified name starts with ``::``. So to match the start of a name, use ``^::N::f``. 
 
 Template instantiation. Explicitly wrapping a function
 ------------------------------------------------------

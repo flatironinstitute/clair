@@ -8,9 +8,9 @@ e.g. wrap only some functions and classes, choose template instantiation, and so
 This can be done
 
 * with code annotations or
-* with (compile time) declarations in the reserved namespace ``c2py_module``. 
+* with a TOML input file.
 
-The choice between the two approaches depends on the project and needs. The latter is more general and non intrusive, but slighly more complex.
+The choice between the two approaches depends on the project and needs.
 
 
 Code annotations
@@ -19,9 +19,25 @@ Code annotations
 ``clair``'s behaviour can be modified by simple annotations in the code.
 
 * ``C2PY_IGNORE``: Placed before a function or a class, ``clair`` ignores it.
-* ``C2PY_WRAP``: Placed before a function or a class, ``clair`` keeps it.  This can be used in combination with a ``reject_names`` filter ``.*``.
+* ``C2PY_WRAP_AS_METHOD``: Placed before a function, ``clair`` adds the function as a method to the first argument's class object.
+* ``C2PY_MODULE_INIT``: Placed before a function, ``clair`` uses this function as the module initialization function.
+* ``C2PY_RENAME(new_name)``: Placed before a function or a class, ``clair`` uses ``new_name`` as the name in Python.
 
-These annotations overrule any filter options in ``c2py_module``.
+These annotations overrule any filter options in the TOML file.
+
+See :ref:`code_annotations` for examples.
+
+TOML input file
+---------------
+
+The TOML file is required to have the same name as the C++ source file, except for the ``.cpp`` extension.
+For example, if the C++ source file given to ``clair-c2py`` is ``my_module.cpp``, the TOML file should be called ``my_module.toml``.
+
+Here is a template input file showing and explaining the available options:
+
+.. literalinclude:: ../../src/tools/clair-c2py/configuration.toml.template
+   :language: toml
+
 
 Filters
 -------
@@ -81,7 +97,7 @@ which consists in dispatching `f<int>` and `f<double>`.
 Class template instantiation
 ----------------------------
 
-Similar to functions, instantiations of class templates should be declared 
+Similar to functions, instantiations of class templates should be declared
 with a `using` command in the ``c2py_module::add`` namespace and a Python name should be provided:
 
 .. literalinclude:: ../examples/config_using.cpp
@@ -102,8 +118,8 @@ Additional information can be provided:
 .. literalinclude:: ../examples/config_misc.cpp
    :language: cpp
    :linenos:
- 
- 
+
+
 .. toctree::
    :maxdepth: 2
 

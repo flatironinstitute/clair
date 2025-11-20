@@ -98,7 +98,9 @@ class custom_action : public clang::ASTFrontendAction {
       rewriter->InsertTextBefore(worker->ci->getSourceManager().getLocForEndOfFile(worker->ci->getSourceManager().getMainFileID()),
                                  include_directive);
       rewriter->overwriteChangedFiles();
-      log(fmt::format("   Adding the include directive for the generated file {}\n in the main module file\n", include_directive));
+      log(fmt::format(
+         "\033[1;95mModified the source\033[0m to add the missing include directive for the bindings at the end of \"\033[3;30m{}\033[0m\": \033[3;30m{}\033[0m",
+         worker->module_info.sourcefile, include_directive));
     }
 
     // If a depfile is specified, write the dependencies

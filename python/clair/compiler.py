@@ -6,14 +6,17 @@ def print_out (m, out) :
    print(m + out)
 
 def execute(command, message, replacements):
+    env = os.environ.copy()
+    env["CLICOLOR_FORCE"] = "1"
+
     try:
-       out = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
+       out = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True, env=env)
        return
     except subprocess.CalledProcessError as E:
        err = E.output.decode('utf8')
        for (k,v) in replacements.items():
            err = err.replace(k,v)
-       print_out ("Error: \n" + message, err)
+       print_out ("Error using " + message, err)
     raise RuntimeError("Error in executing command: \n %s"%command)
 
 #------------------------------------------
@@ -23,7 +26,7 @@ class ClangInvocation:
        How to call the compiler 
     """
     def __init__(self, cpp_preamble = "", env_preamble = "", flags= ""):
-        self.commands =  ["clair-c2py {m}.cpp -- -std=c++23 -fcolor-diagnostics -fansi-escape-codes `c2py_flags -i`",
+        self.commands =  ["clair-c2py {m}.cpp -- -std=c++23 -fdiagnostics-color=always `c2py_flags -i`",
                           "clang++ -std=c++23 -shared -o {m}.so {m}.cpp `c2py_flags` -fdiagnostics-color=always %s "%(flags)]
         self.cpp_preamble = cpp_preamble
         self.env_preamble = "export PATH=%s:$PATH"%(os.environ["PATH"]) + "\n" + env_preamble
@@ -86,7 +89,9 @@ def compile(code, verbosity = 0, compile_instruction_name = 'default', only=(), 
                 cmd = '\n'.join([cl_invoc.env_preamble, command])
                 cmd_for_machine = cmd.format(m = module_name)
                 cmd_for_log = "Compilation command: " + cmd.format(m = "[Cell]") + '\n'
-                execute (cmd_for_machine, cmd_for_log if verbosity else "", {module_name:"[Cell]", module_dirname:""})
+                err_message = command.split(' ', 1)[0] + "\n"
+                if verbosity: err_message += cmd_for_log 
+                execute (cmd_for_machine, err_message, {module_name:"[Cell]", module_dirname:""})
 
         except: # we clean if fail
             os.chdir(old_cwd)

@@ -1,13 +1,9 @@
 import importlib, os, platform, sys, shutil, subprocess, hashlib, re, tempfile, copy
 
 debug = True
-dylib_ext = "dylib" if platform.system() == "Darwin" else "so"
-env_lib_path = "DYLD_LIBRARY_PATH" if platform.system() == "Darwin" else "LD_LIBRARY_PATH"
 
 def print_out (m, out) :
    print(m + out)
-   #l = (70 - len(m))//2
-   #print(l*'-' + m + l*'-' + '\n' + out)
 
 def execute(command, message, replacements):
     try:
@@ -26,12 +22,11 @@ class ClangInvocation:
     """
        How to call the compiler 
     """
-    def __init__(self, cpp_preamble = "", env_preamble = "", flags= "", command = None):
-        # FIXME : should I expand clair_flags ?
-        self.command =  command or "clang++ -fplugin=clair_c2py.%s -std=c++20 -shared -o {m}.so {m}.cpp `c2py_flags` -fdiagnostics-color=always %s "%(dylib_ext, flags)
+    def __init__(self, cpp_preamble = "", env_preamble = "", flags= ""):
+        self.commands =  ["clair-c2py {m}.cpp -- -std=c++23 -fcolor-diagnostics -fansi-escape-codes `c2py_flags -i`",
+                          "clang++ -std=c++23 -shared -o {m}.so {m}.cpp `c2py_flags` -fdiagnostics-color=always %s "%(flags)]
         self.cpp_preamble = cpp_preamble
-        # We export the (DY)LD_LIBRARY_PATH from the current shell to the subprocess...
-        self.env_preamble = "export %s=%s:$%s"%(env_lib_path, os.environ[env_lib_path], env_lib_path) + "\n" + env_preamble
+        self.env_preamble = "export PATH=%s:$PATH"%(os.environ["PATH"]) + "\n" + env_preamble
 
     def copy(self):
         copy.deepcopy(self)
@@ -87,10 +82,11 @@ def compile(code, verbosity = 0, compile_instruction_name = 'default', only=(), 
 
             with open('{}.cpp'.format(module_name), 'w') as f:
                 f.write(code)
-            cmd = '\n'.join([cl_invoc.env_preamble, cl_invoc.command])
-            cmd_for_machine = cmd.format(m = module_name)
-            cmd_for_log = "Compilation command: " + cmd.format(m = "[Cell]") + '\n'
-            execute (cmd_for_machine, cmd_for_log if verbosity else "", {module_name:"[Cell]", module_dirname:""})
+            for command in cl_invoc.commands:
+                cmd = '\n'.join([cl_invoc.env_preamble, command])
+                cmd_for_machine = cmd.format(m = module_name)
+                cmd_for_log = "Compilation command: " + cmd.format(m = "[Cell]") + '\n'
+                execute (cmd_for_machine, cmd_for_log if verbosity else "", {module_name:"[Cell]", module_dirname:""})
 
         except: # we clean if fail
             os.chdir(old_cwd)

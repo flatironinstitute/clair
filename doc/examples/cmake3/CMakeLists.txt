@@ -24,16 +24,18 @@ target_link_libraries(my_module PRIVATE c2py::c2py)
 option(Update_Python_Bindings "Use clair python bindings generators" OFF)
 
 if (Update_Python_Bindings)
-  find_program(clair-c2py clair-c2py REQUIRED)                      # locate clair-c2py in the path or fail
+  find_program(clair-c2py clair-c2py REQUIRED)                   # locate clair-c2py in the path or fail
+  set(wrap_cxx "${CMAKE_CURRENT_SOURCE_DIR}/my_module.wrap.cxx") # Python bindings file
+  set(depfile "${CMAKE_CURRENT_BINARY_DIR}/my_module.cpp.d")     # dependency file
 
   add_custom_command(
-    COMMAND ${clair-c2py} -p ${PROJECT_BINARY_DIR} my_module.cpp    # -p path/to/compile/commands
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}                   # Execute in source directory
-    OUTPUT my_module.wrap.cxx                                       # Generates the .wrap.cxx file
-    DEPENDS my_module.cpp                                           # which depends on the source (hence will be regenerated if it changes)
+    OUTPUT ${wrap_cxx} ${depfile}                                                               # Generates the .wrap.cxx and dependency files
+    COMMAND ${clair-c2py} -p ${PROJECT_BINARY_DIR} --generate-depfile ${depfile} my_module.cpp  # -p path/to/compile/commands
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}                                               # Execute in source directory
+    DEPFILE ${depfile}                                                                          # Specify dependency file
   )
- 
-  add_custom_target(bindings_generation DEPENDS my_module.wrap.cxx) # We make the module depend on the bindings
-  add_dependencies(my_module bindings_generation)                   # so that the generation happends before the compilation 
+
+  add_custom_target(bindings_generation DEPENDS ${wrap_cxx}) # We make the module depend on the bindings
+  add_dependencies(my_module bindings_generation)            # so that the generation happends before the compilation
 endif()
 

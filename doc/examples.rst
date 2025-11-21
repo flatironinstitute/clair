@@ -10,3 +10,5 @@ Examples
    examples/classes/classes
    examples/code_annotations/code_annotations
    examples/toml/toml
+   examples/function_templates/function_templates
+   examples/class_templates/class_templates

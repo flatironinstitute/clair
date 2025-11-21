@@ -88,5 +88,5 @@ or
 Template functions
 ------------------
 
-The instantiation of generic functions in discussed in :ref:`customize`.
+The instantiation of generic functions in discussed in :ref:`function_templates`.
 

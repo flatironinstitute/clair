@@ -50,13 +50,6 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install_packages.html">Packages</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="install_packages.html#os-x-brew">OS X (brew)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="install_packages.html#uninstalling">Uninstalling</a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="install_src.html">Compiling from source</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="install_src.html#clair">clair</a></li>
 <li class="toctree-l3"><a class="reference internal" href="install_src.html#c2py">c2py</a><ul>
@@ -85,14 +78,34 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="examples.html#functions">Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples.html#classes">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/functions/functions.html">Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/classes/classes.html">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/code_annotations/code_annotations.html">Code annotations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples/code_annotations/code_annotations.html#c2py-ignore">C2PY_IGNORE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/code_annotations/code_annotations.html#c2py-rename">C2PY_RENAME</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/code_annotations/code_annotations.html#c2py-module-init">C2PY_MODULE_INIT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/code_annotations/code_annotations.html#c2py-wrap-as-method">C2PY_WRAP_AS_METHOD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/code_annotations/code_annotations.html#compiling-the-examples">Compiling the examples</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="examples/toml/toml.html">TOML input file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples/toml/toml.html#basic-setup">Basic setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/toml/toml.html#filters">Filters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="examples/toml/toml.html#filtering-by-namespace">Filtering by namespace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/toml/toml.html#filtering-by-name">Filtering by name</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/toml/toml.html#filter-by-file-name">Filter by file name</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="examples/toml/toml.html#wrap-no-argument-methods-as-properties">Wrap no argument methods as properties</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/toml/toml.html#exclude-system-headers">Exclude system headers</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="reference.html">Reference documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="reference/customize.html">Customization</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="reference/customize.html#code-annotations">Code annotations</a></li>
-<li class="toctree-l3"><a class="reference internal" href="reference/customize.html#filters">Filters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/customize.html#toml-input-file">TOML input file</a></li>
 <li class="toctree-l3"><a class="reference internal" href="reference/customize.html#template-instantiation-explicitly-wrapping-a-function">Template instantiation. Explicitly wrapping a function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="reference/customize.html#class-template-instantiation">Class template instantiation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="reference/customize.html#modifying-classes">Modifying classes</a></li>
@@ -205,18 +218,20 @@
 <span class="linenos">24</span><span class="nb">option</span><span class="p">(</span><span class="s">Update_Python_Bindings</span><span class="w"> </span><span class="s2">&quot;Use clair python bindings generators&quot;</span><span class="w"> </span><span class="s">OFF</span><span class="p">)</span>
 <span class="linenos">25</span>
 <span class="linenos">26</span><span class="nb">if</span><span class="w"> </span><span class="p">(</span><span class="s">Update_Python_Bindings</span><span class="p">)</span>
-<span class="linenos">27</span><span class="w">  </span><span class="nb">find_program</span><span class="p">(</span><span class="s">clair-c2py</span><span class="w"> </span><span class="s">clair-c2py</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span><span class="w">                      </span><span class="c"># locate clair-c2py in the path or fail</span>
-<span class="linenos">28</span>
-<span class="linenos">29</span><span class="w">  </span><span class="nb">add_custom_command</span><span class="p">(</span>
-<span class="linenos">30</span><span class="w">    </span><span class="s">COMMAND</span><span class="w"> </span><span class="o">${</span><span class="nv">clair-c2py</span><span class="o">}</span><span class="w"> </span><span class="s">-p</span><span class="w"> </span><span class="o">${</span><span class="nv">PROJECT_BINARY_DIR</span><span class="o">}</span><span class="w"> </span><span class="s">my_module.cpp</span><span class="w">    </span><span class="c"># -p path/to/compile/commands</span>
-<span class="linenos">31</span><span class="w">    </span><span class="s">WORKING_DIRECTORY</span><span class="w"> </span><span class="o">${</span><span class="nv">CMAKE_CURRENT_SOURCE_DIR</span><span class="o">}</span><span class="w">                   </span><span class="c"># Execute in source directory</span>
-<span class="linenos">32</span><span class="w">    </span><span class="s">OUTPUT</span><span class="w"> </span><span class="s">my_module.wrap.cxx</span><span class="w">                                       </span><span class="c"># Generates the .wrap.cxx file</span>
-<span class="linenos">33</span><span class="w">    </span><span class="s">DEPENDS</span><span class="w"> </span><span class="s">my_module.cpp</span><span class="w">                                           </span><span class="c"># which depends on the source (hence will be regenerated if it changes)</span>
-<span class="linenos">34</span><span class="w">  </span><span class="p">)</span>
-<span class="linenos">35</span><span class="w"> </span>
-<span class="linenos">36</span><span class="w">  </span><span class="nb">add_custom_target</span><span class="p">(</span><span class="s">bindings_generation</span><span class="w"> </span><span class="s">DEPENDS</span><span class="w"> </span><span class="s">my_module.wrap.cxx</span><span class="p">)</span><span class="w"> </span><span class="c"># We make the module depend on the bindings</span>
-<span class="linenos">37</span><span class="w">  </span><span class="nb">add_dependencies</span><span class="p">(</span><span class="s">my_module</span><span class="w"> </span><span class="s">bindings_generation</span><span class="p">)</span><span class="w">                   </span><span class="c"># so that the generation happends before the compilation </span>
-<span class="linenos">38</span><span class="nb">endif</span><span class="p">()</span>
+<span class="linenos">27</span><span class="w">  </span><span class="nb">find_program</span><span class="p">(</span><span class="s">clair-c2py</span><span class="w"> </span><span class="s">clair-c2py</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span><span class="w">                   </span><span class="c"># locate clair-c2py in the path or fail</span>
+<span class="linenos">28</span><span class="w">  </span><span class="nb">set</span><span class="p">(</span><span class="s">wrap_cxx</span><span class="w"> </span><span class="s2">&quot;${CMAKE_CURRENT_SOURCE_DIR}/my_module.wrap.cxx&quot;</span><span class="p">)</span><span class="w"> </span><span class="c"># Python bindings file</span>
+<span class="linenos">29</span><span class="w">  </span><span class="nb">set</span><span class="p">(</span><span class="s">depfile</span><span class="w"> </span><span class="s2">&quot;${CMAKE_CURRENT_BINARY_DIR}/my_module.cpp.d&quot;</span><span class="p">)</span><span class="w">     </span><span class="c"># dependency file</span>
+<span class="linenos">30</span>
+<span class="linenos">31</span><span class="w">  </span><span class="nb">add_custom_command</span><span class="p">(</span>
+<span class="linenos">32</span><span class="w">    </span><span class="s">OUTPUT</span><span class="w"> </span><span class="o">${</span><span class="nv">wrap_cxx</span><span class="o">}</span><span class="w"> </span><span class="o">${</span><span class="nv">depfile</span><span class="o">}</span><span class="w">                                                               </span><span class="c"># Generates the .wrap.cxx and dependency files</span>
+<span class="linenos">33</span><span class="w">    </span><span class="s">COMMAND</span><span class="w"> </span><span class="o">${</span><span class="nv">clair-c2py</span><span class="o">}</span><span class="w"> </span><span class="s">-p</span><span class="w"> </span><span class="o">${</span><span class="nv">PROJECT_BINARY_DIR</span><span class="o">}</span><span class="w"> </span><span class="s">--generate-depfile</span><span class="w"> </span><span class="o">${</span><span class="nv">depfile</span><span class="o">}</span><span class="w"> </span><span class="s">my_module.cpp</span><span class="w">  </span><span class="c"># -p path/to/compile/commands</span>
+<span class="linenos">34</span><span class="w">    </span><span class="s">WORKING_DIRECTORY</span><span class="w"> </span><span class="o">${</span><span class="nv">CMAKE_CURRENT_SOURCE_DIR</span><span class="o">}</span><span class="w">                                               </span><span class="c"># Execute in source directory</span>
+<span class="linenos">35</span><span class="w">    </span><span class="s">DEPFILE</span><span class="w"> </span><span class="o">${</span><span class="nv">depfile</span><span class="o">}</span><span class="w">                                                                          </span><span class="c"># Specify dependency file</span>
+<span class="linenos">36</span><span class="w">  </span><span class="p">)</span>
+<span class="linenos">37</span>
+<span class="linenos">38</span><span class="w">  </span><span class="nb">add_custom_target</span><span class="p">(</span><span class="s">bindings_generation</span><span class="w"> </span><span class="s">DEPENDS</span><span class="w"> </span><span class="o">${</span><span class="nv">wrap_cxx</span><span class="o">}</span><span class="p">)</span><span class="w"> </span><span class="c"># We make the module depend on the bindings</span>
+<span class="linenos">39</span><span class="w">  </span><span class="nb">add_dependencies</span><span class="p">(</span><span class="s">my_module</span><span class="w"> </span><span class="s">bindings_generation</span><span class="p">)</span><span class="w">            </span><span class="c"># so that the generation happends before the compilation</span>
+<span class="linenos">40</span><span class="nb">endif</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>Brief explanation of the CMake file:</p>
@@ -231,7 +246,7 @@ are built with consistent compiler options and linked against the same Python in
 As <code class="docutils literal notranslate"><span class="pre">c2py</span></code> compiles quickly, it does not add significant overhead to the build process.</p></li>
 </ul>
 </li>
-<li><p><strong>[Line 23-end]</strong> This is the <code class="docutils literal notranslate"><span class="pre">clair-c2py</span></code> specific part, which is trigged if the option <code class="docutils literal notranslate"><span class="pre">Update_Python_Bindings</span></code> is set to <code class="docutils literal notranslate"><span class="pre">ON</span></code>:</p>
+<li><p><strong>[Line 23-end]</strong> This is the <code class="docutils literal notranslate"><span class="pre">clair-c2py</span></code> specific part, which is triggered if the option <code class="docutils literal notranslate"><span class="pre">Update_Python_Bindings</span></code> is set to <code class="docutils literal notranslate"><span class="pre">ON</span></code>:</p>
 <blockquote>
 <div><ol class="arabic simple">
 <li><p>Find the <code class="docutils literal notranslate"><span class="pre">clair-c2py</span></code> executable.</p></li>
@@ -245,8 +260,9 @@ As <code class="docutils literal notranslate"><span class="pre">c2py</span></cod
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">clair-c2py</span></code> automatically uses the <cite>compile_commands.json</cite> file generated by CMake for the file <code class="docutils literal notranslate"><span class="pre">my_module.cpp</span></code> to detect all include flags from the project’s linked libraries (targets).</p></li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">-p</span></code> option is used to specify the path to the <cite>compile_commands.json</cite> file (in the build directory).</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">--generate-depfile</span></code> option is used to generate a dependency file, which ensures that the bindings are regenerated only when necessary.</p></li>
 <li><p>However the tools acts <strong>in the source directory</strong>, producing some additional <code class="docutils literal notranslate"><span class="pre">.cxx</span></code> source files.</p></li>
-<li><p>An additionnal <code class="docutils literal notranslate"><span class="pre">my_module.wrap.hxx</span></code> file is also generated, only used in multiple module situations, cf <span class="xref std std-ref">multiple_modules</span>.</p></li>
+<li><p>An additionnal <code class="docutils literal notranslate"><span class="pre">my_module.wrap.hxx</span></code> file is also generated, only used in multiple module situations.</p></li>
 </ul>
 </div>
 </section>

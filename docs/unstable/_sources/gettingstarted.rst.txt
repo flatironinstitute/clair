@@ -103,22 +103,26 @@ using the standard `numpydoc` format.
 
    >>> help(M.add)
        add(...)
-           Dispatched C++ function
-           [1]  (x: int, y: int) -> int
-
-              Some documentation
-
-              Parameters
-              ----------
-
-              x:
-                 First value
-              y:
-                 Second value
-
-              Returns
-              -------
-
+           Dispatched C++ function(s).
+  
+           ::
+  
+              [1] (x: int, y: int)
+                 -> int
+  
+  
+           Some documentation
+  
+           Parameters
+           ----------
+           x : int
+              First value
+           y : int
+              Second value
+  
+           Returns
+           -------
+           int
               The result
 
 

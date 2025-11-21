@@ -8,9 +8,9 @@ e.g. wrap only some functions and classes, choose template instantiation, and so
 This can be done
 
 * with code annotations or
-* with (compile time) declarations in the reserved namespace ``c2py_module``. 
+* with a TOML input file.
 
-The choice between the two approaches depends on the project and needs. The latter is more general and non intrusive, but slighly more complex.
+The choice between the two approaches depends on the project and needs.
 
 
 Code annotations
@@ -19,38 +19,27 @@ Code annotations
 ``clair``'s behaviour can be modified by simple annotations in the code.
 
 * ``C2PY_IGNORE``: Placed before a function or a class, ``clair`` ignores it.
-* ``C2PY_WRAP``: Placed before a function or a class, ``clair`` keeps it.  This can be used in combination with a ``reject_names`` filter ``.*``.
+* ``C2PY_WRAP_AS_METHOD``: Placed before a function, ``clair`` adds the function as a method to the first argument's class object.
+* ``C2PY_MODULE_INIT``: Placed before a function, ``clair`` uses this function as the module initialization function.
+* ``C2PY_RENAME(new_name)``: Placed before a function or a class, ``clair`` uses ``new_name`` as the name in Python.
 
-These annotations overrule any filter options in ``c2py_module``.
+These annotations overrule any filter options in the TOML file.
 
-Filters
--------
+See :ref:`code_annotations` for examples.
 
-By default, ``clair`` will generate bindings for all non-template classes and functions,
-except those defined in `system` files, i.e. the standard library and more generally 
-anything the compiler includes via `-isystem` options.
-In order to refine this behaviour, several filters can be used.
+TOML input file
+---------------
 
-* ``match_names``, ``reject_names``. These **regular expressions** control which functions/classes/enums are exposed to Python.
+The TOML file is required to have the same name as the C++ source file, except for the ``.cpp`` extension.
+For example, if the C++ source file given to ``clair-c2py`` is ``my_module.cpp``, the TOML file should be called ``my_module.toml``.
 
-   The algorithm to determine if an element X of qualified name Xqname (i.e. the full name with the namespaces) should be exposed is:
-     
-     #. if ``match_names`` is defined and does not match Xqname then skip X
-     #. if ``reject_names`` is defined and matches Xqname then skip X
-     #. else expose X to Python. 
+Here is an example TOML file showing and explaining the available options:
 
-Here is an example:
+.. literalinclude:: ../examples/toml/initial.toml
+   :language: toml
 
-.. literalinclude:: ../examples/filter.cpp
-   :language: cpp
-   
-In this example, the function ``f`` and the struct ``a_class`` are exposed to Python, 
-while the function ``g``, and the struct ``N::hidden`` are not.
+See :ref:`toml` for how these options affect the generated bindings.
 
-.. warning::
-
-   Be careful that these strings are Regex. For example, ``N::*`` does not match ``N::f``.
-   Also note that the qualified name starts with ``::``. So to match the start of a name, use ``^::N::f``. 
 
 Template instantiation. Explicitly wrapping a function
 ------------------------------------------------------
@@ -81,7 +70,7 @@ which consists in dispatching `f<int>` and `f<double>`.
 Class template instantiation
 ----------------------------
 
-Similar to functions, instantiations of class templates should be declared 
+Similar to functions, instantiations of class templates should be declared
 with a `using` command in the ``c2py_module::add`` namespace and a Python name should be provided:
 
 .. literalinclude:: ../examples/config_using.cpp
@@ -102,8 +91,8 @@ Additional information can be provided:
 .. literalinclude:: ../examples/config_misc.cpp
    :language: cpp
    :linenos:
- 
- 
+
+
 .. toctree::
    :maxdepth: 2
 

@@ -22,7 +22,7 @@
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Packages" href="install_packages.html" />
+    <link rel="next" title="Compiling from source" href="install_src.html" />
     <link rel="prev" title="clair/c2y" href="index.html" /> 
 </head>
 
@@ -50,13 +50,6 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install_packages.html">Packages</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="install_packages.html#os-x-brew">OS X (brew)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="install_packages.html#uninstalling">Uninstalling</a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="install_src.html">Compiling from source</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="install_src.html#clair">clair</a></li>
 <li class="toctree-l3"><a class="reference internal" href="install_src.html#c2py">c2py</a><ul>
@@ -85,14 +78,34 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="examples.html#functions">Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples.html#classes">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/functions/functions.html">Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/classes/classes.html">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/code_annotations/code_annotations.html">Code annotations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples/code_annotations/code_annotations.html#c2py-ignore">C2PY_IGNORE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/code_annotations/code_annotations.html#c2py-rename">C2PY_RENAME</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/code_annotations/code_annotations.html#c2py-module-init">C2PY_MODULE_INIT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/code_annotations/code_annotations.html#c2py-wrap-as-method">C2PY_WRAP_AS_METHOD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/code_annotations/code_annotations.html#compiling-the-examples">Compiling the examples</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="examples/toml/toml.html">TOML input file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples/toml/toml.html#basic-setup">Basic setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/toml/toml.html#filters">Filters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="examples/toml/toml.html#filtering-by-namespace">Filtering by namespace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/toml/toml.html#filtering-by-name">Filtering by name</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/toml/toml.html#filter-by-file-name">Filter by file name</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="examples/toml/toml.html#wrap-no-argument-methods-as-properties">Wrap no argument methods as properties</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/toml/toml.html#exclude-system-headers">Exclude system headers</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="reference.html">Reference documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="reference/customize.html">Customization</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="reference/customize.html#code-annotations">Code annotations</a></li>
-<li class="toctree-l3"><a class="reference internal" href="reference/customize.html#filters">Filters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/customize.html#toml-input-file">TOML input file</a></li>
 <li class="toctree-l3"><a class="reference internal" href="reference/customize.html#template-instantiation-explicitly-wrapping-a-function">Template instantiation. Explicitly wrapping a function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="reference/customize.html#class-template-instantiation">Class template instantiation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="reference/customize.html#modifying-classes">Modifying classes</a></li>
@@ -181,10 +194,6 @@ It depends only on the Python/Numpy C API and can be used with any C++20 complia
 </ul>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="install_packages.html">Packages</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install_packages.html#os-x-brew">OS X (brew)</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="install_src.html">Compiling from source</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="install_src.html#clair">clair</a></li>
 <li class="toctree-l2"><a class="reference internal" href="install_src.html#c2py">c2py</a></li>
@@ -200,7 +209,7 @@ It depends only on the Python/Numpy C API and can be used with any C++20 complia
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="index.html" class="btn btn-neutral float-left" title="clair/c2y" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="install_packages.html" class="btn btn-neutral float-right" title="Packages" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="install_src.html" class="btn btn-neutral float-right" title="Compiling from source" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

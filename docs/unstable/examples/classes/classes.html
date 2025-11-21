@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Classes &mdash; clair - Automatic Python/C++ bindings  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=f7f783a0" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=8f9e6779" />
+
+  
+  
+        <script src="../../_static/jquery.js?v=8dae8fb0"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=66b4909c"></script>
+        <script src="../../_static/copybutton.js?v=71494f10"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Code annotations" href="../code_annotations/code_annotations.html" />
+    <link rel="prev" title="Functions" href="../functions/functions.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7E588A" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            clair - Automatic Python/C++ bindings
+          </a>
+              <div class="version">
+                0.3.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../install_src.html">Compiling from source</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../install_src.html#clair">clair</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../install_src.html#c2py">c2py</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../install_src.html#cmake-options">CMake options</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../install_src.html#set-environment-variables">Set environment variables</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../gettingstarted.html">Getting started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../gettingstarted.html#starting-example">Starting example</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../gettingstarted.html#python-c-bindings-generation">Python C++ Bindings Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../gettingstarted.html#compilation">Compilation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../gettingstarted.html#documentation">Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../gettingstarted.html#what-is-a-binding-code-exactly">What is a binding code exactly ?</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../cmake.html">CMake Integration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../cmake.html#cmake-configuration">CMake configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../cmake.html#compiling">Compiling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../cmake.html#workflow">Workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../examples.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../functions/functions.html">Functions</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../code_annotations/code_annotations.html">Code annotations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../code_annotations/code_annotations.html#c2py-ignore">C2PY_IGNORE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../code_annotations/code_annotations.html#c2py-rename">C2PY_RENAME</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../code_annotations/code_annotations.html#c2py-module-init">C2PY_MODULE_INIT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../code_annotations/code_annotations.html#c2py-wrap-as-method">C2PY_WRAP_AS_METHOD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../code_annotations/code_annotations.html#compiling-the-examples">Compiling the examples</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../toml/toml.html">TOML input file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../toml/toml.html#basic-setup">Basic setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toml/toml.html#filters">Filters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toml/toml.html#filtering-by-namespace">Filtering by namespace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toml/toml.html#filtering-by-name">Filtering by name</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toml/toml.html#filter-by-file-name">Filter by file name</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toml/toml.html#wrap-no-argument-methods-as-properties">Wrap no argument methods as properties</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toml/toml.html#exclude-system-headers">Exclude system headers</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference.html">Reference documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/customize.html">Customization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/customize.html#code-annotations">Code annotations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/customize.html#toml-input-file">TOML input file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/customize.html#template-instantiation-explicitly-wrapping-a-function">Template instantiation. Explicitly wrapping a function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/customize.html#class-template-instantiation">Class template instantiation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/customize.html#modifying-classes">Modifying classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/customize.html#misc">Misc</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/api.html">API of the c2py_module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/fnt_basic.html">Function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/fnt_basic.html#type-conversion">Type conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/fnt_basic.html#dynamical-dispatch">Dynamical dispatch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/fnt_basic.html#template-functions">Template functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/classes.html">Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/classes.html#constructors">Constructors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/classes.html#methods">Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/classes.html#static-methods">Static Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/classes.html#operator">Operator()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/classes.html#id1">Operator[]</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/classes.html#iterable-object">Iterable object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/classes.html#str-and-repr">str and repr</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/classes.html#copy">Copy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/classes.html#operators">Operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/classes.html#hdf5">hdf5</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/enums.html">Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/converters.html">Converters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/converters.html#default-converters">Default converters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/converters.html#py-converter">py_converter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/converters.html#third-party-library-developer-corner">Third party library [developer corner]</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebook.html">Notebook integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../issues.html">Reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Change Logs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about.html">About clair/c2py</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7E588A" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">clair - Automatic Python/C++ bindings</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../examples.html">Examples</a></li>
+      <li class="breadcrumb-item active">Classes</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/examples/classes/classes.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="classes">
+<span id="id1"></span><h1>Classes<a class="headerlink" href="#classes" title="Link to this heading"></a></h1>
+<p>The following example shows a simple C++ struct and how to make it printable in Python:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// struct1.cpp</span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span>
+
+<span class="k">struct</span><span class="w"> </span><span class="nc">S</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+
+<span class="w">  </span><span class="n">S</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">i</span><span class="p">{</span><span class="n">i</span><span class="p">}</span><span class="w"> </span><span class="p">{}</span>
+
+<span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">m</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="p">};</span>
+
+<span class="c1">// A function using S</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">S</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">&amp;</span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">i</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+
+<span class="c1">// make S printable in C++</span>
+<span class="n">std</span><span class="o">::</span><span class="n">ostream</span><span class="w"> </span><span class="o">&amp;</span><span class="k">operator</span><span class="o">&lt;&lt;</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">ostream</span><span class="w"> </span><span class="o">&amp;</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">S</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">&amp;</span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">out</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;S struct with i=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+<p>We can again generate the Python bindings for this function and compile them with (assuming OS X and clang):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>clair-c2py<span class="w"> </span>struct1.cpp<span class="w"> </span>--<span class="w"> </span>-std<span class="o">=</span>c++20<span class="w"> </span><span class="sb">`</span>c2py_flags<span class="w"> </span>-i<span class="sb">`</span>
+clang++<span class="w"> </span>struct1.cpp<span class="w"> </span>-std<span class="o">=</span>c++20<span class="w"> </span>-shared<span class="w"> </span>-o<span class="w"> </span>struct1.so<span class="w"> </span><span class="sb">`</span>c2py_flags<span class="sb">`</span>
+</pre></div>
+</div>
+<p>Finally, we use the module in Python:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt; import struct1 as M</span>
+<span class="go">&gt;&gt;&gt; s = M.S(2)</span>
+<span class="go">&gt;&gt;&gt; s.i</span>
+<span class="go">2</span>
+<span class="go">&gt;&gt;&gt; s.m()</span>
+<span class="go">2</span>
+<span class="go">&gt;&gt;&gt; print(s)</span>
+<span class="go">S struct with i=2</span>
+<span class="go">&gt;&gt;&gt; M.f(s)</span>
+<span class="go">2</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../functions/functions.html" class="btn btn-neutral float-left" title="Functions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../code_annotations/code_annotations.html" class="btn btn-neutral float-right" title="Code annotations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, The Simons Foundation, author: O. Parcollet.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

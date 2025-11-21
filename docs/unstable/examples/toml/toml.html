@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TOML input file &mdash; clair - Automatic Python/C++ bindings  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=f7f783a0" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=8f9e6779" />
+
+  
+  
+        <script src="../../_static/jquery.js?v=8dae8fb0"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=66b4909c"></script>
+        <script src="../../_static/copybutton.js?v=71494f10"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Reference documentation" href="../../reference.html" />
+    <link rel="prev" title="Code annotations" href="../code_annotations/code_annotations.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7E588A" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            clair - Automatic Python/C++ bindings
+          </a>
+              <div class="version">
+                0.3.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../install_src.html">Compiling from source</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../install_src.html#clair">clair</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../install_src.html#c2py">c2py</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../install_src.html#cmake-options">CMake options</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../install_src.html#set-environment-variables">Set environment variables</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../gettingstarted.html">Getting started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../gettingstarted.html#starting-example">Starting example</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../gettingstarted.html#python-c-bindings-generation">Python C++ Bindings Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../gettingstarted.html#compilation">Compilation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../gettingstarted.html#documentation">Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../gettingstarted.html#what-is-a-binding-code-exactly">What is a binding code exactly ?</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../cmake.html">CMake Integration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../cmake.html#cmake-configuration">CMake configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../cmake.html#compiling">Compiling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../cmake.html#workflow">Workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../examples.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../functions/functions.html">Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../classes/classes.html">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../code_annotations/code_annotations.html">Code annotations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../code_annotations/code_annotations.html#c2py-ignore">C2PY_IGNORE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../code_annotations/code_annotations.html#c2py-rename">C2PY_RENAME</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../code_annotations/code_annotations.html#c2py-module-init">C2PY_MODULE_INIT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../code_annotations/code_annotations.html#c2py-wrap-as-method">C2PY_WRAP_AS_METHOD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../code_annotations/code_annotations.html#compiling-the-examples">Compiling the examples</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">TOML input file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#basic-setup">Basic setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#filters">Filters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#filtering-by-namespace">Filtering by namespace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#filtering-by-name">Filtering by name</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#filter-by-file-name">Filter by file name</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#wrap-no-argument-methods-as-properties">Wrap no argument methods as properties</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#exclude-system-headers">Exclude system headers</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference.html">Reference documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/customize.html">Customization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/customize.html#code-annotations">Code annotations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/customize.html#toml-input-file">TOML input file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/customize.html#template-instantiation-explicitly-wrapping-a-function">Template instantiation. Explicitly wrapping a function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/customize.html#class-template-instantiation">Class template instantiation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/customize.html#modifying-classes">Modifying classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/customize.html#misc">Misc</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/api.html">API of the c2py_module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/fnt_basic.html">Function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/fnt_basic.html#type-conversion">Type conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/fnt_basic.html#dynamical-dispatch">Dynamical dispatch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/fnt_basic.html#template-functions">Template functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/classes.html">Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/classes.html#constructors">Constructors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/classes.html#methods">Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/classes.html#static-methods">Static Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/classes.html#operator">Operator()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/classes.html#id1">Operator[]</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/classes.html#iterable-object">Iterable object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/classes.html#str-and-repr">str and repr</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/classes.html#copy">Copy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/classes.html#operators">Operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/classes.html#hdf5">hdf5</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/enums.html">Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/converters.html">Converters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/converters.html#default-converters">Default converters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/converters.html#py-converter">py_converter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/converters.html#third-party-library-developer-corner">Third party library [developer corner]</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebook.html">Notebook integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../issues.html">Reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Change Logs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about.html">About clair/c2py</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7E588A" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">clair - Automatic Python/C++ bindings</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../examples.html">Examples</a></li>
+      <li class="breadcrumb-item active">TOML input file</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/examples/toml/toml.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="toml-input-file">
+<span id="toml"></span><h1>TOML input file<a class="headerlink" href="#toml-input-file" title="Link to this heading"></a></h1>
+<p>Here we demonstrate how a TOML input file can be used to customize the generated Python bindings.</p>
+<section id="basic-setup">
+<h2>Basic setup<a class="headerlink" href="#basic-setup" title="Link to this heading"></a></h2>
+<p>In all examples we will work with the following 3 files:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// foo.hpp</span>
+
+<span class="k">namespace</span><span class="w"> </span><span class="nn">foo</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">f1</span><span class="p">();</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">f2</span><span class="p">();</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">g1</span><span class="p">();</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">g2</span><span class="p">();</span>
+
+<span class="w">  </span><span class="k">class</span><span class="w"> </span><span class="nc">A</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">x_</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">x_</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="n">set_x</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">x_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="p">};</span>
+<span class="p">}</span><span class="w"> </span><span class="c1">// namespace foo</span>
+</pre></div>
+</div>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// bar.hpp</span>
+
+<span class="k">namespace</span><span class="w"> </span><span class="nn">bar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">h1</span><span class="p">();</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">h2</span><span class="p">();</span>
+<span class="p">}</span><span class="w"> </span><span class="c1">// namespace bar</span>
+</pre></div>
+</div>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// my_module.cpp</span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;foo.hpp&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;bar.hpp&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+
+<span class="k">namespace</span><span class="w"> </span><span class="nn">foo</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">f1</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;foo::f1&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">f2</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;foo::f2&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">g1</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;foo::g1&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">g2</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;foo::g2&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span><span class="w"> </span><span class="c1">// namespace foo</span>
+
+<span class="k">namespace</span><span class="w"> </span><span class="nn">bar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">h1</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;bar::h1&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">h2</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;bar::h2&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span><span class="w"> </span><span class="c1">// namespace bar</span>
+</pre></div>
+</div>
+<p>We declare some simple functions and a class in the namespaces <code class="docutils literal notranslate"><span class="pre">foo</span></code> and <code class="docutils literal notranslate"><span class="pre">bar</span></code> in the header files <code class="docutils literal notranslate"><span class="pre">foo.hpp</span></code> and <code class="docutils literal notranslate"><span class="pre">bar.hpp</span></code>, respectively.
+Their definitions are given in <code class="docutils literal notranslate"><span class="pre">my_module.cpp</span></code> which is also the file passed to <code class="docutils literal notranslate"><span class="pre">clair-c2py</span></code> to generate the Python bindings.</p>
+<p>Our initial TOML file looks as follows:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Name of the package [optional].</span>
+<span class="c1"># Name of the module will be package_name.module_filename</span>
+<span class="n">package_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my_package&quot;</span>
+
+<span class="c1"># The documentation string of the module. </span>
+<span class="n">documentation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;This is an awesome module generated by c2py/clair.&quot;</span>
+
+<span class="c1"># List of namespaces as a space separated string e.g. &quot;A A::B&quot;</span>
+<span class="c1"># If non-empty, only the elements declared in EXACTLY these namespaces are wrapped.</span>
+<span class="c1"># NB e.g. in previous example A::detail will be ignored, whatever match_names.</span>
+<span class="n">namespaces</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;foo bar&quot;</span>
+
+<span class="c1"># Match/reject elements according to a regex (LLVM regex)</span>
+<span class="c1"># If match_names/match_names are both set, the algorithm is </span>
+<span class="c1">#  for X of fully qualified name qname</span>
+<span class="c1">#    if match_names and match_names does not match Qname : skip X</span>
+<span class="c1">#    if reject_names and reject_names matches Qname : skip X</span>
+<span class="c1">#    else keep X.</span>
+<span class="c1">#</span>
+<span class="n">match_names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="n">reject_names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+
+<span class="c1"># Only keep elements declared in files matching the pattern</span>
+<span class="n">match_files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="c1"># String must be a regex</span>
+
+<span class="c1"># If true, transform methods with no arguments into a read only property</span>
+<span class="n">wrap_no_arg_methods_as_properties</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+
+<span class="c1"># [Advanced] If yes (default), all elements (class/enum/functions)</span>
+<span class="c1"># declared in headers included with -isystem are ignored for better performance.</span>
+<span class="n">exclude_system_headers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</pre></div>
+</div>
+<p>We can then generate the Python bindings and compile the extension module:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>clair-c2py<span class="w"> </span>my_module.cpp<span class="w"> </span>--<span class="w"> </span>-std<span class="o">=</span>c++20<span class="w"> </span><span class="sb">`</span>c2py_flags<span class="w"> </span>-i<span class="sb">`</span>
+clang++<span class="w"> </span>my_module.cpp<span class="w"> </span>-std<span class="o">=</span>c++20<span class="w"> </span>-shared<span class="w"> </span>-o<span class="w"> </span>my_module.so<span class="w"> </span><span class="sb">`</span>c2py_flags<span class="sb">`</span>
+</pre></div>
+</div>
+<p>Running <code class="docutils literal notranslate"><span class="pre">python</span></code> and importing <code class="docutils literal notranslate"><span class="pre">my_module</span></code>, we can see that everything in both namespaces has been wrapped:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt; import my_module</span>
+<span class="go">&gt;&gt;&gt; dir(my_module)</span>
+<span class="go">[&#39;A&#39;, &#39;__doc__&#39;, &#39;__file__&#39;, &#39;__loader__&#39;, &#39;__name__&#39;, &#39;__package__&#39;, &#39;__spec__&#39;, &#39;f1&#39;, &#39;f2&#39;, &#39;g1&#39;, &#39;g2&#39;, &#39;h1&#39;, &#39;h2&#39;]</span>
+<span class="go">&gt;&gt;&gt; print(my_module.__doc__)</span>
+<span class="go">This is an awesome module generated by c2py/clair.</span>
+</pre></div>
+</div>
+<p>For the rest of the examples, we will not repeat the binding generation and compilation commands.
+We will only show the modifications made to the TOML file and the resulting behavior in Python.</p>
+</section>
+<section id="filters">
+<h2>Filters<a class="headerlink" href="#filters" title="Link to this heading"></a></h2>
+<p>By default, <code class="docutils literal notranslate"><span class="pre">clair</span></code> will generate bindings for all non-template classes and functions,
+except those defined in <cite>system</cite> files, i.e. the standard library and more generally
+anything the compiler includes via <cite>-isystem</cite> options.
+In order to refine this behaviour, several filters can be used.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Be careful that some these strings are Regex. For example, <code class="docutils literal notranslate"><span class="pre">N::*</span></code> does not match <code class="docutils literal notranslate"><span class="pre">N::f</span></code>.
+Also note that the qualified name starts with <code class="docutils literal notranslate"><span class="pre">::</span></code>. So to match the start of a name, use <code class="docutils literal notranslate"><span class="pre">^::N::f</span></code>.</p>
+</div>
+<section id="filtering-by-namespace">
+<h3>Filtering by namespace<a class="headerlink" href="#filtering-by-namespace" title="Link to this heading"></a></h3>
+<p>We can restrict the wrapping to only functions declared in specific namespaces using the <code class="docutils literal notranslate"><span class="pre">namespaces</span></code> option.</p>
+<p>For example, to only wrap functions in the <code class="docutils literal notranslate"><span class="pre">foo</span></code> namespace, we modify the TOML file as follows:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="c1"># List of namespaces as a space separated string e.g. &quot;A A::B&quot;</span>
+<span class="c1"># If non-empty, only the elements declared in EXACTLY these namespaces are wrapped.</span>
+<span class="c1"># NB e.g. in previous example A::detail will be ignored, whatever match_names.</span>
+<span class="n">namespaces</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;foo&quot;</span>
+</pre></div>
+</div>
+<p>Now only the names in the <code class="docutils literal notranslate"><span class="pre">foo</span></code> namespace are available in Python:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt; import my_module</span>
+<span class="go">&gt;&gt;&gt; dir(my_module)</span>
+<span class="go">[&#39;A&#39;, &#39;__doc__&#39;, &#39;__file__&#39;, &#39;__loader__&#39;, &#39;__name__&#39;, &#39;__package__&#39;, &#39;__spec__&#39;, &#39;f1&#39;, &#39;f2&#39;, &#39;g1&#39;, &#39;g2&#39;]</span>
+</pre></div>
+</div>
+</section>
+<section id="filtering-by-name">
+<h3>Filtering by name<a class="headerlink" href="#filtering-by-name" title="Link to this heading"></a></h3>
+<p>A more fine-grained filtering can be achieved using the <code class="docutils literal notranslate"><span class="pre">match_names</span></code> and <code class="docutils literal notranslate"><span class="pre">reject_names</span></code> options.</p>
+<p>For example, to further restrict the wrapping to only functions whose name starts with <code class="docutils literal notranslate"><span class="pre">f</span></code>, we modify the TOML file as follows:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Match/reject elements according to a regex (LLVM regex)</span>
+<span class="c1"># If match_names/match_names are both set, the algorithm is</span>
+<span class="c1">#   for each element X of qualified name Qname:</span>
+<span class="c1">#    if match_names and not match_names matches Qname : skip X</span>
+<span class="c1">#    if reject_names and reject_names matches Qname : skip X</span>
+<span class="c1">#    else keep X.</span>
+<span class="c1">#</span>
+<span class="n">match_names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;foo::f.*&quot;</span>
+<span class="c1"># reject_names = &quot;&quot;</span>
+</pre></div>
+</div>
+<p>Now only the functions <code class="docutils literal notranslate"><span class="pre">f1</span></code> and <code class="docutils literal notranslate"><span class="pre">f2</span></code> are available in Python:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt; import my_module</span>
+<span class="go">&gt;&gt;&gt; dir(my_module)</span>
+<span class="go">[&#39;__doc__&#39;, &#39;__file__&#39;, &#39;__loader__&#39;, &#39;__name__&#39;, &#39;__package__&#39;, &#39;__spec__&#39;, &#39;f1&#39;, &#39;f2&#39;]</span>
+</pre></div>
+</div>
+<p>To only wrap the function <code class="docutils literal notranslate"><span class="pre">f1</span></code>, we can for example reject <code class="docutils literal notranslate"><span class="pre">foo::f2</span></code> explicitly:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Match/reject elements according to a regex (LLVM regex)</span>
+<span class="c1"># If match_names/match_names are both set, the algorithm is</span>
+<span class="c1">#   for each element X of qualified name Qname:</span>
+<span class="c1">#    if match_names and not match_names matches Qname : skip X</span>
+<span class="c1">#    if reject_names and reject_names matches Qname : skip X</span>
+<span class="c1">#    else keep X.</span>
+<span class="c1">#</span>
+<span class="n">match_names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;foo::f.*&quot;</span>
+<span class="n">reject_names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;foo::f2&quot;</span>
+</pre></div>
+</div>
+<p>This results in only <code class="docutils literal notranslate"><span class="pre">f1</span></code> being available in Python:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt; import my_module</span>
+<span class="go">&gt;&gt;&gt; dir(my_module)</span>
+<span class="go">[&#39;__doc__&#39;, &#39;__file__&#39;, &#39;__loader__&#39;, &#39;__name__&#39;, &#39;__package__&#39;, &#39;__spec__&#39;, &#39;f1&#39;]</span>
+</pre></div>
+</div>
+</section>
+<section id="filter-by-file-name">
+<h3>Filter by file name<a class="headerlink" href="#filter-by-file-name" title="Link to this heading"></a></h3>
+<p>Finally, we can restrict the wrapping to only elements declared in files matching a given regex using the <code class="docutils literal notranslate"><span class="pre">match_files</span></code> option.</p>
+<p>Let’s start again from our initial TOML file without any filtering.
+To only wrap functions declared in files whose name contains <code class="docutils literal notranslate"><span class="pre">foo</span></code>, we modify the TOML file as follows:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Only keep elements declared in files matching the pattern</span>
+<span class="n">match_files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;.*foo.*&quot;</span><span class="w"> </span><span class="c1"># String must be a regex</span>
+</pre></div>
+</div>
+<p>This should give us the same as filtering by namespace for <code class="docutils literal notranslate"><span class="pre">foo</span></code> only:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt; import my_module</span>
+<span class="go">&gt;&gt;&gt; dir(my_module)</span>
+<span class="go">[&#39;A&#39;, &#39;__doc__&#39;, &#39;__file__&#39;, &#39;__loader__&#39;, &#39;__name__&#39;, &#39;__package__&#39;, &#39;__spec__&#39;, &#39;f1&#39;, &#39;f2&#39;, &#39;g1&#39;, &#39;g2&#39;]</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="wrap-no-argument-methods-as-properties">
+<h2>Wrap no argument methods as properties<a class="headerlink" href="#wrap-no-argument-methods-as-properties" title="Link to this heading"></a></h2>
+<p>If we set the <code class="docutils literal notranslate"><span class="pre">wrap_no_arg_methods_as_properties</span></code> option to <code class="docutils literal notranslate"><span class="pre">true</span></code>, all methods of wrapped classes with no argument will be wrapped
+as Python properties.</p>
+<p>For example, our class <code class="docutils literal notranslate"><span class="pre">A</span></code> defined in <code class="docutils literal notranslate"><span class="pre">foo.hpp</span></code> has the getter method <code class="docutils literal notranslate"><span class="pre">A::x()</span></code> with no argument.
+By default, this method is wrapped as a normal method in Python:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt; import my_module</span>
+<span class="go">&gt;&gt;&gt; a = my_module.A()</span>
+<span class="go">&gt;&gt;&gt; a.x()</span>
+<span class="go">0</span>
+<span class="go">&gt;&gt;&gt; a.set_x(5)</span>
+<span class="go">&gt;&gt;&gt; a.x()</span>
+<span class="go">5</span>
+<span class="go">&gt;&gt;&gt; a.x</span>
+<span class="go">&lt;built-in method x of my_package.my_module.A object at 0x101248a10&gt;</span>
+</pre></div>
+</div>
+<p>To wrap it as a property instead, we modify the TOML file as follows:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="c1"># If true, all methods with no argument are wrapped as properties</span>
+<span class="n">wrap_no_arg_methods_as_properties</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</pre></div>
+</div>
+<p>Now the method <code class="docutils literal notranslate"><span class="pre">A::x()</span></code> is wrapped as a read-only property in Python:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt; import my_module</span>
+<span class="go">&gt;&gt;&gt; a = my_module.A()</span>
+<span class="go">&gt;&gt;&gt; a.x</span>
+<span class="go">0</span>
+<span class="go">&gt;&gt;&gt; a.set_x(5)</span>
+<span class="go">&gt;&gt;&gt; a.x</span>
+<span class="go">5</span>
+</pre></div>
+</div>
+</section>
+<section id="exclude-system-headers">
+<h2>Exclude system headers<a class="headerlink" href="#exclude-system-headers" title="Link to this heading"></a></h2>
+<p>The option <code class="docutils literal notranslate"><span class="pre">exclude_system_header</span></code> is an advanced feature and the default behavior is usually what you want.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../code_annotations/code_annotations.html" class="btn btn-neutral float-left" title="Code annotations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../reference.html" class="btn btn-neutral float-right" title="Reference documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, The Simons Foundation, author: O. Parcollet.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -22,7 +22,7 @@
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Reference documentation" href="reference.html" />
+    <link rel="next" title="Functions" href="examples/functions/functions.html" />
     <link rel="prev" title="CMake Integration" href="cmake.html" /> 
 </head>
 
@@ -50,13 +50,6 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install_packages.html">Packages</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="install_packages.html#os-x-brew">OS X (brew)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="install_packages.html#uninstalling">Uninstalling</a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="install_src.html">Compiling from source</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="install_src.html#clair">clair</a></li>
 <li class="toctree-l3"><a class="reference internal" href="install_src.html#c2py">c2py</a><ul>
@@ -85,14 +78,34 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#functions">Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/functions/functions.html">Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/classes/classes.html">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/code_annotations/code_annotations.html">Code annotations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples/code_annotations/code_annotations.html#c2py-ignore">C2PY_IGNORE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/code_annotations/code_annotations.html#c2py-rename">C2PY_RENAME</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/code_annotations/code_annotations.html#c2py-module-init">C2PY_MODULE_INIT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/code_annotations/code_annotations.html#c2py-wrap-as-method">C2PY_WRAP_AS_METHOD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/code_annotations/code_annotations.html#compiling-the-examples">Compiling the examples</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="examples/toml/toml.html">TOML input file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples/toml/toml.html#basic-setup">Basic setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/toml/toml.html#filters">Filters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="examples/toml/toml.html#filtering-by-namespace">Filtering by namespace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/toml/toml.html#filtering-by-name">Filtering by name</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/toml/toml.html#filter-by-file-name">Filter by file name</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="examples/toml/toml.html#wrap-no-argument-methods-as-properties">Wrap no argument methods as properties</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/toml/toml.html#exclude-system-headers">Exclude system headers</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="reference.html">Reference documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="reference/customize.html">Customization</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="reference/customize.html#code-annotations">Code annotations</a></li>
-<li class="toctree-l3"><a class="reference internal" href="reference/customize.html#filters">Filters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/customize.html#toml-input-file">TOML input file</a></li>
 <li class="toctree-l3"><a class="reference internal" href="reference/customize.html#template-instantiation-explicitly-wrapping-a-function">Template instantiation. Explicitly wrapping a function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="reference/customize.html#class-template-instantiation">Class template instantiation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="reference/customize.html#modifying-classes">Modifying classes</a></li>
@@ -163,72 +176,26 @@
   <section id="examples">
 <span id="id1"></span><h1>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples/functions/functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/classes/classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/code_annotations/code_annotations.html">Code annotations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/code_annotations/code_annotations.html#c2py-ignore">C2PY_IGNORE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/code_annotations/code_annotations.html#c2py-rename">C2PY_RENAME</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/code_annotations/code_annotations.html#c2py-module-init">C2PY_MODULE_INIT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/code_annotations/code_annotations.html#c2py-wrap-as-method">C2PY_WRAP_AS_METHOD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/code_annotations/code_annotations.html#compiling-the-examples">Compiling the examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/toml/toml.html">TOML input file</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/toml/toml.html#basic-setup">Basic setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/toml/toml.html#filters">Filters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/toml/toml.html#wrap-no-argument-methods-as-properties">Wrap no argument methods as properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/toml/toml.html#exclude-system-headers">Exclude system headers</a></li>
+</ul>
+</li>
+</ul>
 </div>
-<section id="functions">
-<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
-<p>The following example shows a C++ function that takes a <code class="docutils literal notranslate"><span class="pre">std::vector&lt;double&gt;</span></code> and returns the sum of its elements:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// fun2.cpp</span>
-
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;numeric&gt;</span>
-
-<span class="kt">double</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">&amp;</span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">accumulate</span><span class="p">(</span><span class="n">begin</span><span class="p">(</span><span class="n">v</span><span class="p">),</span><span class="w"> </span><span class="n">end</span><span class="p">(</span><span class="n">v</span><span class="p">),</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
-</pre></div>
-</div>
-<p>We can then generate the Python bindings for this function and compile them with (assuming OS X and clang):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>clair-c2py<span class="w"> </span>fun2.cpp<span class="w"> </span>--<span class="w"> </span>-std<span class="o">=</span>c++20<span class="w"> </span><span class="sb">`</span>c2py_flags<span class="w"> </span>-i<span class="sb">`</span>
-clang++<span class="w"> </span>fun2.cpp<span class="w"> </span>-std<span class="o">=</span>c++20<span class="w"> </span>-shared<span class="w"> </span>-o<span class="w"> </span>fun2.so<span class="w"> </span><span class="sb">`</span>c2py_flags<span class="sb">`</span>
-</pre></div>
-</div>
-<p>Finally, we use the module in Python:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt; import fun2 as M</span>
-<span class="go">&gt;&gt;&gt; M.sum([1.2, 2.3, 4.5])</span>
-<span class="go">8.0</span>
-</pre></div>
-</div>
-</section>
-<section id="classes">
-<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading"></a></h2>
-<p>The following example shows a simple C++ struct and how to make it printable in Python:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// struct1.cpp</span>
-
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span>
-
-<span class="k">struct</span><span class="w"> </span><span class="nc">S</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
-
-<span class="w">  </span><span class="n">S</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">i</span><span class="p">{</span><span class="n">i</span><span class="p">}</span><span class="w"> </span><span class="p">{}</span>
-
-<span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">m</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-<span class="p">};</span>
-
-<span class="c1">// A function using S</span>
-<span class="kt">int</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">S</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">&amp;</span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">i</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-
-<span class="c1">// make S printable in C++</span>
-<span class="n">std</span><span class="o">::</span><span class="n">ostream</span><span class="w"> </span><span class="o">&amp;</span><span class="k">operator</span><span class="o">&lt;&lt;</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">ostream</span><span class="w"> </span><span class="o">&amp;</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">S</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">&amp;</span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">out</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;S struct with i=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-</pre></div>
-</div>
-<p>We can again generate the Python bindings for this function and compile them with (assuming OS X and clang):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>clair-c2py<span class="w"> </span>struct1.cpp<span class="w"> </span>--<span class="w"> </span>-std<span class="o">=</span>c++20<span class="w"> </span><span class="sb">`</span>c2py_flags<span class="w"> </span>-i<span class="sb">`</span>
-clang++<span class="w"> </span>struct1.cpp<span class="w"> </span>-std<span class="o">=</span>c++20<span class="w"> </span>-shared<span class="w"> </span>-o<span class="w"> </span>struct1.so<span class="w"> </span><span class="sb">`</span>c2py_flags<span class="sb">`</span>
-</pre></div>
-</div>
-<p>Finally, we use the module in Python:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt; import struct1 as M</span>
-<span class="go">&gt;&gt;&gt; s = M.S(2)</span>
-<span class="go">&gt;&gt;&gt; s.i</span>
-<span class="go">2</span>
-<span class="go">&gt;&gt;&gt; s.m()</span>
-<span class="go">2</span>
-<span class="go">&gt;&gt;&gt; print(s)</span>
-<span class="go">S struct with i=2</span>
-<span class="go">&gt;&gt;&gt; M.f(s)</span>
-<span class="go">2</span>
-</pre></div>
-</div>
-</section>
 </section>
 
 
@@ -236,7 +203,7 @@ clang++<span class="w"> </span>struct1.cpp<span class="w"> </span>-std<span clas
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="cmake.html" class="btn btn-neutral float-left" title="CMake Integration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="reference.html" class="btn btn-neutral float-right" title="Reference documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="examples/functions/functions.html" class="btn btn-neutral float-right" title="Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

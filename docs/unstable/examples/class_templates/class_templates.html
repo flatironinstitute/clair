@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Functions &mdash; clair - Automatic Python/C++ bindings  documentation</title>
+  <title>Class templates &mdash; clair - Automatic Python/C++ bindings  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=f7f783a0" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=8f9e6779" />
@@ -22,8 +22,8 @@
     <link rel="author" title="About these documents" href="../../about.html" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Classes" href="../classes/classes.html" />
-    <link rel="prev" title="Examples" href="../../examples.html" /> 
+    <link rel="next" title="Reference documentation" href="../../reference.html" />
+    <link rel="prev" title="Function templates" href="../function_templates/function_templates.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -78,7 +78,7 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../examples.html">Examples</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../functions/functions.html">Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../classes/classes.html">Classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../code_annotations/code_annotations.html">Code annotations</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../code_annotations/code_annotations.html#c2py-ignore">C2PY_IGNORE</a></li>
@@ -101,7 +101,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../function_templates/function_templates.html">Function templates</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../class_templates/class_templates.html">Class templates</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Class templates</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../reference.html">Reference documentation</a><ul>
@@ -160,9 +160,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../examples.html">Examples</a></li>
-      <li class="breadcrumb-item active">Functions</li>
+      <li class="breadcrumb-item active">Class templates</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../_sources/examples/functions/functions.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/examples/class_templates/class_templates.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -170,27 +170,47 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="functions">
-<span id="id1"></span><h1>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h1>
-<p>The following example shows a C++ function that takes a <code class="docutils literal notranslate"><span class="pre">std::vector&lt;double&gt;</span></code> and returns the sum of its elements:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// fun2.cpp</span>
+  <section id="class-templates">
+<span id="id1"></span><h1>Class templates<a class="headerlink" href="#class-templates" title="Link to this heading"></a></h1>
+<p>Here we demonstrate how to generate Python bindings class templates.</p>
+<p>In contrast to <a class="reference internal" href="../function_templates/function_templates.html#function-templates"><span class="std std-ref">Function templates</span></a>, class templates need to be instanstiated in the special
+<code class="docutils literal notranslate"><span class="pre">c2py_module</span></code> namespace with a <code class="docutils literal notranslate"><span class="pre">using</span></code> declaration.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;c2py/c2py.hpp&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span>
 
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;numeric&gt;</span>
+<span class="c1">// A class template.</span>
+<span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">adder</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">T</span><span class="w"> </span><span class="n">a</span><span class="p">;</span>
+<span class="w">  </span><span class="n">adder</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">a</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">  </span><span class="n">T</span><span class="w"> </span><span class="n">add</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="p">};</span>
 
-<span class="kt">double</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">&amp;</span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">accumulate</span><span class="p">(</span><span class="n">begin</span><span class="p">(</span><span class="n">v</span><span class="p">),</span><span class="w"> </span><span class="n">end</span><span class="p">(</span><span class="n">v</span><span class="p">),</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<span class="k">namespace</span><span class="w"> </span><span class="nn">c2py_module</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// Using declarations to instantiate the class template for int, double and std::string.</span>
+<span class="w">  </span><span class="k">using</span><span class="w"> </span><span class="n">int_adder</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">adder</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">  </span><span class="k">using</span><span class="w"> </span><span class="n">double_adder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">adder</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">  </span><span class="k">using</span><span class="w"> </span><span class="n">string_adder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">adder</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="c1">// namespace c2py_module</span>
 </pre></div>
 </div>
-<p>We can then generate the Python bindings for this function and compile them with (assuming OS X and clang):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>clair-c2py<span class="w"> </span>fun2.cpp<span class="w"> </span>--<span class="w"> </span>-std<span class="o">=</span>c++20<span class="w"> </span><span class="sb">`</span>c2py_flags<span class="w"> </span>-i<span class="sb">`</span>
-clang++<span class="w"> </span>fun2.cpp<span class="w"> </span>-std<span class="o">=</span>c++20<span class="w"> </span>-shared<span class="w"> </span>-o<span class="w"> </span>fun2.so<span class="w"> </span><span class="sb">`</span>c2py_flags<span class="sb">`</span>
+<p><strong>clair</strong> performs the actual instantiation for us and gives it the desired Python name written on
+the left-hand side of the <code class="docutils literal notranslate"><span class="pre">using</span></code> declaration.</p>
+<p>After creating the Python bindings,</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>clair-c2py<span class="w"> </span>class_template.cpp<span class="w"> </span>--<span class="w"> </span>-std<span class="o">=</span>c++20<span class="w"> </span><span class="sb">`</span>c2py_flags<span class="w"> </span>-i<span class="sb">`</span>
+clang++<span class="w"> </span>class_template.cpp<span class="w"> </span>-std<span class="o">=</span>c++20<span class="w"> </span>-shared<span class="w"> </span>-o<span class="w"> </span>class_template.so<span class="w"> </span><span class="sb">`</span>c2py_flags<span class="sb">`</span>
 </pre></div>
 </div>
-<p>Finally, we use the module in Python:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt; import fun2 as M</span>
-<span class="go">&gt;&gt;&gt; M.sum([1.2, 2.3, 4.5])</span>
-<span class="go">8.0</span>
+<p>we can test the extension module in Python:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt; from class_template import *</span>
+<span class="go">&gt;&gt;&gt; a_i = int_adder(2)</span>
+<span class="go">&gt;&gt;&gt; a_i.add(5)</span>
+<span class="go">7</span>
+<span class="go">&gt;&gt;&gt; a_d = double_adder(3.14)</span>
+<span class="go">&gt;&gt;&gt; a_d.add(5.7)</span>
+<span class="go">8.84</span>
+<span class="go">&gt;&gt;&gt; a_s = string_adder(&quot;Hello ,&quot;)</span>
+<span class="go">&gt;&gt;&gt; a_s.add(&quot;clair!&quot;)</span>
+<span class="go">&#39;Hello ,clair!&#39;</span>
 </pre></div>
 </div>
 </section>
@@ -199,8 +219,8 @@ clang++<span class="w"> </span>fun2.cpp<span class="w"> </span>-std<span class="
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../../examples.html" class="btn btn-neutral float-left" title="Examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../classes/classes.html" class="btn btn-neutral float-right" title="Classes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../function_templates/function_templates.html" class="btn btn-neutral float-left" title="Function templates" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../reference.html" class="btn btn-neutral float-right" title="Reference documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

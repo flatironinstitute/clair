@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Customization &mdash; clair - Automatic Python/C++ bindings  documentation</title>
+  <title>Templates &mdash; clair - Automatic Python/C++ bindings  documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=f7f783a0" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=8f9e6779" />
@@ -22,8 +22,8 @@
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Templates" href="templates.html" />
-    <link rel="prev" title="Reference documentation" href="../reference.html" /> 
+    <link rel="next" title="Function" href="fnt_basic.html" />
+    <link rel="prev" title="Customization" href="customize.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -105,12 +105,12 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="../reference.html">Reference documentation</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Customization</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#code-annotations">Code annotations</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#toml-input-file">TOML input file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="customize.html">Customization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="customize.html#code-annotations">Code annotations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="customize.html#toml-input-file">TOML input file</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="templates.html">Templates</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Templates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fnt_basic.html">Function</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="fnt_basic.html#type-conversion">Type conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fnt_basic.html#dynamical-dispatch">Dynamical dispatch</a></li>
@@ -160,9 +160,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../reference.html">Reference documentation</a></li>
-      <li class="breadcrumb-item active">Customization</li>
+      <li class="breadcrumb-item active">Templates</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/reference/customize.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/reference/templates.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -170,76 +170,19 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="customization">
-<span id="customize"></span><h1>Customization<a class="headerlink" href="#customization" title="Link to this heading"></a></h1>
-<p>Many customization options of the bindings generation are available,
-e.g. wrap only some functions and classes, choose template instantiation, and so on.
-This can be done</p>
-<ul class="simple">
-<li><p>with code annotations or</p></li>
-<li><p>with a TOML input file.</p></li>
-</ul>
-<p>The choice between the two approaches depends on the project and needs.</p>
-<section id="code-annotations">
-<h2>Code annotations<a class="headerlink" href="#code-annotations" title="Link to this heading"></a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">clair</span></code>’s behaviour can be modified by simple annotations in the code.</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">C2PY_IGNORE</span></code>: Placed before a function or a class, <code class="docutils literal notranslate"><span class="pre">clair</span></code> ignores it.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">C2PY_WRAP_AS_METHOD</span></code>: Placed before a function, <code class="docutils literal notranslate"><span class="pre">clair</span></code> adds the function as a method to the first argument’s class object.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">C2PY_MODULE_INIT</span></code>: Placed before a function, <code class="docutils literal notranslate"><span class="pre">clair</span></code> uses this function as the module initialization function.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">C2PY_RENAME(new_name)</span></code>: Placed before a function or a class, <code class="docutils literal notranslate"><span class="pre">clair</span></code> uses <code class="docutils literal notranslate"><span class="pre">new_name</span></code> as the name in Python.</p></li>
-</ul>
-<p>These annotations overrule any filter options in the TOML file.</p>
-<p>See <a class="reference internal" href="../examples/code_annotations/code_annotations.html#code-annotations"><span class="std std-ref">Code annotations</span></a> for examples.</p>
-</section>
-<section id="toml-input-file">
-<h2>TOML input file<a class="headerlink" href="#toml-input-file" title="Link to this heading"></a></h2>
-<p>The TOML file is required to have the same name as the C++ source file, except for the <code class="docutils literal notranslate"><span class="pre">.cpp</span></code> extension.
-For example, if the C++ source file given to <code class="docutils literal notranslate"><span class="pre">clair-c2py</span></code> is <code class="docutils literal notranslate"><span class="pre">my_module.cpp</span></code>, the TOML file should be called <code class="docutils literal notranslate"><span class="pre">my_module.toml</span></code>.</p>
-<p>Here is an example TOML file showing and explaining the available options:</p>
-<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Name of the package [optional].</span>
-<span class="c1"># Name of the module will be package_name.module_filename</span>
-<span class="n">package_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my_package&quot;</span>
-
-<span class="c1"># The documentation string of the module. </span>
-<span class="n">documentation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;This is an awesome module generated by c2py/clair.&quot;</span>
-
-<span class="c1"># List of namespaces as a space separated string e.g. &quot;A A::B&quot;</span>
-<span class="c1"># If non-empty, only the elements declared in EXACTLY these namespaces are wrapped.</span>
-<span class="c1"># NB e.g. in previous example A::detail will be ignored, whatever match_names.</span>
-<span class="n">namespaces</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;foo bar&quot;</span>
-
-<span class="c1"># Match/reject elements according to a regex (LLVM regex)</span>
-<span class="c1"># If match_names/match_names are both set, the algorithm is </span>
-<span class="c1">#  for X of fully qualified name qname</span>
-<span class="c1">#    if match_names and match_names does not match Qname : skip X</span>
-<span class="c1">#    if reject_names and reject_names matches Qname : skip X</span>
-<span class="c1">#    else keep X.</span>
-<span class="c1">#</span>
-<span class="n">match_names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-<span class="n">reject_names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-
-<span class="c1"># Only keep elements declared in files matching the pattern</span>
-<span class="n">match_files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="c1"># String must be a regex</span>
-
-<span class="c1"># If true, transform methods with no arguments into a read only property</span>
-<span class="n">wrap_no_arg_methods_as_properties</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
-
-<span class="c1"># [Advanced] If yes (default), all elements (class/enum/functions)</span>
-<span class="c1"># declared in headers included with -isystem are ignored for better performance.</span>
-<span class="n">exclude_system_headers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
-</pre></div>
-</div>
-<p>See <a class="reference internal" href="../examples/toml/toml.html#toml"><span class="std std-ref">TOML input file</span></a> for how these options affect the generated bindings.</p>
-</section>
+  <section id="templates">
+<span id="id1"></span><h1>Templates<a class="headerlink" href="#templates" title="Link to this heading"></a></h1>
+<p>Templates are not wrapped automatically by <strong>clair</strong> unless they are explicitly instantiated.</p>
+<p>We refer the user to the examples for <a class="reference internal" href="../examples/function_templates/function_templates.html#function-templates"><span class="std std-ref">Function templates</span></a> and <a class="reference internal" href="../examples/class_templates/class_templates.html#class-templates"><span class="std std-ref">Class templates</span></a> for
+more details.</p>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../reference.html" class="btn btn-neutral float-left" title="Reference documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="templates.html" class="btn btn-neutral float-right" title="Templates" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="customize.html" class="btn btn-neutral float-left" title="Customization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="fnt_basic.html" class="btn btn-neutral float-right" title="Function" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

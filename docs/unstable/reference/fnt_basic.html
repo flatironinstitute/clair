@@ -23,7 +23,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Classes" href="classes.html" />
-    <link rel="prev" title="API of the c2py_module" href="api.html" /> 
+    <link rel="prev" title="Templates" href="templates.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -100,21 +100,17 @@
 <li class="toctree-l3"><a class="reference internal" href="../examples/toml/toml.html#exclude-system-headers">Exclude system headers</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/function_templates/function_templates.html">Function templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/class_templates/class_templates.html">Class templates</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="../reference.html">Reference documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="customize.html">Customization</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="customize.html#code-annotations">Code annotations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="customize.html#toml-input-file">TOML input file</a></li>
-<li class="toctree-l3"><a class="reference internal" href="customize.html#template-instantiation-explicitly-wrapping-a-function">Template instantiation. Explicitly wrapping a function</a></li>
-<li class="toctree-l3"><a class="reference internal" href="customize.html#class-template-instantiation">Class template instantiation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="customize.html#modifying-classes">Modifying classes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="customize.html#misc">Misc</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="api.html">API of the c2py_module</a></li>
 </ul>
 </li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html">Templates</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Function</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#type-conversion">Type conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#dynamical-dispatch">Dynamical dispatch</a></li>
@@ -202,11 +198,8 @@ If none applies, a Python exception is raised.</p>
 <p>Let us illustrate this with a simple example.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span>
 
-<span class="k">struct</span><span class="w"> </span><span class="nc">A</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
-<span class="w">  </span><span class="kt">double</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
-<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">s</span><span class="p">;</span>
-<span class="p">};</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">x</span><span class="p">;}</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">y</span><span class="p">;}</span>
 </pre></div>
 </div>
 <p>The compiler reports:</p>
@@ -252,7 +245,7 @@ If none applies, a Python exception is raised.</p>
 </section>
 <section id="template-functions">
 <h2>Template functions<a class="headerlink" href="#template-functions" title="Link to this heading"></a></h2>
-<p>The instantiation of generic functions in discussed in <a class="reference internal" href="customize.html#customize"><span class="std std-ref">Customization</span></a>.</p>
+<p>The instantiation of generic functions in discussed in <a class="reference internal" href="../examples/function_templates/function_templates.html#function-templates"><span class="std std-ref">Function templates</span></a>.</p>
 </section>
 </section>
 
@@ -260,7 +253,7 @@ If none applies, a Python exception is raised.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="api.html" class="btn btn-neutral float-left" title="API of the c2py_module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="templates.html" class="btn btn-neutral float-left" title="Templates" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="classes.html" class="btn btn-neutral float-right" title="Classes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

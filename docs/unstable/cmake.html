@@ -207,27 +207,20 @@
 <span class="linenos">17</span><span class="nb">FetchContent_MakeAvailable</span><span class="p">(</span><span class="s">c2py</span><span class="p">)</span>
 <span class="linenos">18</span>
 <span class="linenos">19</span><span class="c"># Build the Python C++ extension module</span>
-<span class="linenos">20</span><span class="nb">Python_add_library</span><span class="p">(</span><span class="s">my_module</span><span class="w"> </span><span class="s">MODULE</span><span class="w"> </span><span class="s">my_module.cpp</span><span class="p">)</span>
-<span class="linenos">21</span><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">my_module</span><span class="w"> </span><span class="s">PRIVATE</span><span class="w"> </span><span class="s">c2py::c2py</span><span class="p">)</span>
-<span class="linenos">22</span>
-<span class="linenos">23</span><span class="c"># clair-c2py: optionally regenerate bindings</span>
-<span class="linenos">24</span><span class="nb">option</span><span class="p">(</span><span class="s">Update_Python_Bindings</span><span class="w"> </span><span class="s2">&quot;Use clair python bindings generators&quot;</span><span class="w"> </span><span class="s">OFF</span><span class="p">)</span>
-<span class="linenos">25</span>
-<span class="linenos">26</span><span class="nb">if</span><span class="w"> </span><span class="p">(</span><span class="s">Update_Python_Bindings</span><span class="p">)</span>
-<span class="linenos">27</span><span class="w">  </span><span class="nb">find_program</span><span class="p">(</span><span class="s">clair-c2py</span><span class="w"> </span><span class="s">clair-c2py</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span><span class="w">                   </span><span class="c"># locate clair-c2py in the path or fail</span>
-<span class="linenos">28</span><span class="w">  </span><span class="nb">set</span><span class="p">(</span><span class="s">wrap_cxx</span><span class="w"> </span><span class="s2">&quot;${CMAKE_CURRENT_SOURCE_DIR}/my_module.wrap.cxx&quot;</span><span class="p">)</span><span class="w"> </span><span class="c"># Python bindings file</span>
-<span class="linenos">29</span><span class="w">  </span><span class="nb">set</span><span class="p">(</span><span class="s">depfile</span><span class="w"> </span><span class="s2">&quot;${CMAKE_CURRENT_BINARY_DIR}/my_module.cpp.d&quot;</span><span class="p">)</span><span class="w">     </span><span class="c"># dependency file</span>
+<span class="linenos">20</span><span class="c">#</span>
+<span class="linenos">21</span><span class="nb">Python_add_library</span><span class="p">(</span><span class="s">my_module</span><span class="w"> </span><span class="s">MODULE</span><span class="w"> </span><span class="s">my_module.cpp</span><span class="p">)</span>
+<span class="linenos">22</span><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">my_module</span><span class="w"> </span><span class="s">PRIVATE</span><span class="w"> </span><span class="s">c2py::c2py</span><span class="p">)</span>
+<span class="linenos">23</span>
+<span class="linenos">24</span><span class="c"># -----------------------------------------------</span>
+<span class="linenos">25</span><span class="c"># Optionally regenerate bindings with clair-c2py</span>
+<span class="linenos">26</span><span class="c"># -----------------------------------------------</span>
+<span class="linenos">27</span><span class="nb">include</span><span class="p">(</span><span class="o">${</span><span class="nv">c2py_SOURCE_DIR</span><span class="o">}</span><span class="s">/share/cmake/clair_c2py_generate_bindings.cmake</span><span class="p">)</span><span class="w">  </span>
+<span class="linenos">28</span>
+<span class="linenos">29</span><span class="nb">option</span><span class="p">(</span><span class="s">Update_Python_Bindings</span><span class="w"> </span><span class="s2">&quot;Use clair python bindings generators&quot;</span><span class="w"> </span><span class="s">ON</span><span class="p">)</span>
 <span class="linenos">30</span>
-<span class="linenos">31</span><span class="w">  </span><span class="nb">add_custom_command</span><span class="p">(</span>
-<span class="linenos">32</span><span class="w">    </span><span class="s">OUTPUT</span><span class="w"> </span><span class="o">${</span><span class="nv">wrap_cxx</span><span class="o">}</span><span class="w"> </span><span class="o">${</span><span class="nv">depfile</span><span class="o">}</span><span class="w">                                                               </span><span class="c"># Generates the .wrap.cxx and dependency files</span>
-<span class="linenos">33</span><span class="w">    </span><span class="s">COMMAND</span><span class="w"> </span><span class="o">${</span><span class="nv">clair-c2py</span><span class="o">}</span><span class="w"> </span><span class="s">-p</span><span class="w"> </span><span class="o">${</span><span class="nv">PROJECT_BINARY_DIR</span><span class="o">}</span><span class="w"> </span><span class="s">--generate-depfile</span><span class="w"> </span><span class="o">${</span><span class="nv">depfile</span><span class="o">}</span><span class="w"> </span><span class="s">my_module.cpp</span><span class="w">  </span><span class="c"># -p path/to/compile/commands</span>
-<span class="linenos">34</span><span class="w">    </span><span class="s">WORKING_DIRECTORY</span><span class="w"> </span><span class="o">${</span><span class="nv">CMAKE_CURRENT_SOURCE_DIR</span><span class="o">}</span><span class="w">                                               </span><span class="c"># Execute in source directory</span>
-<span class="linenos">35</span><span class="w">    </span><span class="s">DEPFILE</span><span class="w"> </span><span class="o">${</span><span class="nv">depfile</span><span class="o">}</span><span class="w">                                                                          </span><span class="c"># Specify dependency file</span>
-<span class="linenos">36</span><span class="w">  </span><span class="p">)</span>
-<span class="linenos">37</span>
-<span class="linenos">38</span><span class="w">  </span><span class="nb">add_custom_target</span><span class="p">(</span><span class="s">bindings_generation</span><span class="w"> </span><span class="s">DEPENDS</span><span class="w"> </span><span class="o">${</span><span class="nv">wrap_cxx</span><span class="o">}</span><span class="p">)</span><span class="w"> </span><span class="c"># We make the module depend on the bindings</span>
-<span class="linenos">39</span><span class="w">  </span><span class="nb">add_dependencies</span><span class="p">(</span><span class="s">my_module</span><span class="w"> </span><span class="s">bindings_generation</span><span class="p">)</span><span class="w">            </span><span class="c"># so that the generation happends before the compilation</span>
-<span class="linenos">40</span><span class="nb">endif</span><span class="p">()</span>
+<span class="linenos">31</span><span class="nb">if</span><span class="w"> </span><span class="p">(</span><span class="s">Update_Python_Bindings</span><span class="p">)</span>
+<span class="linenos">32</span><span class="w">  </span><span class="nb">clair_c2py_generate_bindings</span><span class="p">(</span><span class="s">my_module</span><span class="p">)</span>
+<span class="linenos">33</span><span class="nb">endif</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>Brief explanation of the CMake file:</p>

@@ -14,5 +14,8 @@ namespace clu {
   // include e.g. on stdlib will fail
   clang::tooling::CommandLineArguments get_clang_additional_args_from_env_variables();
 
+  // Get the path to the clang++ compiler used to build clair
+  std::string get_clang_compiler_path();
+
   std::string get_git_hash();
 } // namespace clu

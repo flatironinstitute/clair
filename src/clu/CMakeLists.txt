@@ -12,4 +12,5 @@ target_link_libraries(clu PRIVATE fmt::fmt clang_llvm)
 target_include_directories(clu PRIVATE ${PROJECT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_definitions(clu PRIVATE CLANG_RESOURCE_DIR="${CLANG_RESOURCE_DIR}" 
                                        SDKROOT="${SDKROOT}" 
+                                       CMAKE_CXX_COMPILER="${CMAKE_CXX_COMPILER}"
                                        GIT_HASH="${PROJECT_GIT_HASH}")

@@ -10,8 +10,11 @@ namespace fs = std::filesystem;
 using namespace std::string_literals;
 
 static const std::string resource_dir = CLANG_RESOURCE_DIR;
+static const std::string cxx_compiler = CMAKE_CXX_COMPILER;
 
 namespace clu {
+  std::string get_clang_compiler_path() { return cxx_compiler; }
+
   clang::tooling::CommandLineArguments get_clang_additional_args_from_env_variables() {
 
 #ifdef __APPLE__

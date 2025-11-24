@@ -5,6 +5,7 @@
 #include "clang/Tooling/CommonOptionsParser.h"
 #include "clang/Basic/Version.h"
 
+#include "clu/custom_compilation_database.hpp"
 #include "clu/cmd_line_arg.hpp"
 #include "utility/macros.hpp"
 #include "utility/logger.hpp"
@@ -81,9 +82,60 @@ int main(int argc, const char **argv) try {
     config = read_configuration(config_filename);
   config._depfile_name = opt_depfile;
 
-  // ------- main tool
+  // ---  Correct the compilation database
+  // Enforce that the compiler for source0 is the clang compiler used in compiling clair itself.
+  // This a ABSOLUTELY necessary to ensure clair sees the system paths, has the right -resource-dir.
+  // It is useful in at least 2 cases:
+  //  - call with -- options: the default "compiler" would be "clang-tool", and if the system path are not standard (i.e. in most cluster machine)
+  //    it would fail.
+  //  - when developing with another compiler, e.g. gcc.
 
-  clang::tooling::ClangTool main_tool(opt_parser->getCompilations(), opt_parser->getSourcePathList());
+  auto &current_compdb  = opt_parser->getCompilations();
+  auto all_compile_cmds = current_compdb.getAllCompileCommands();
+  // WARNING: Database behavior depends on the type of the compilation database:
+  // - JSONCompilationDatabase (from compile_commands.json): getAllCompileCommands() returns all entries
+  // - FixedCompilationDatabase (from -- arguments)        : getAllCompileCommands() returns empty always
+  //   it can generate commands for any file on-demand via getCompileCommands(filename), so there's no finite "all" to return.
+  // This seems to be a long-standing LLVM design choice [Cf Claude 4.5].
+  // If future LLVM versions change this behavior, adjust the logic below accordingly.
+  bool using_fixed_db = all_compile_cmds.empty();
+  if (using_fixed_db) {
+    llvm::errs() << "Calling with --. Getting compile commands for source file.\n";
+    all_compile_cmds = current_compdb.getCompileCommands(source0);
+    if (all_compile_cmds.empty())
+      throw std::runtime_error("Internal Error: no compilation commands found or for " + source0 + "\n     and none could be generated.");
+  }
+
+  // Now fix the compiler for the compile command corresponding to source0.
+  // Use canonical for comparison (to handle symlinks), but absolute for storage (ClangTool doesn't follow symlinks).
+  auto canonical_source0 = fs::canonical(source0).string();
+  for (auto &cmd : all_compile_cmds) {
+    if (fs::canonical(cmd.Filename).string() == canonical_source0) {
+      if (cmd.CommandLine.empty()) throw std::runtime_error("CompileCommand has empty CommandLine for " + source0);
+      auto expected_compiler = clu::get_clang_compiler_path();
+      if (cmd.CommandLine[0] != expected_compiler) {
+        if (opt_verbose)
+          llvm::errs() << "Warning: clair-c2py. When analyzing source file " << source0 << ", replacing compiler \n"
+                       << cmd.CommandLine[0] << "\n   with \n"
+                       << expected_compiler << "\n";
+        cmd.CommandLine[0] = expected_compiler;
+      }
+      // For FixedCompilationDatabase: update Filename to canonical path.
+      // For JSONCompilationDatabase: do nothing
+      if (using_fixed_db) {
+        cmd.Filename = canonical_source0;
+        source0      = canonical_source0;
+      }
+      break; // we found and fixed the command for source0. we are done.
+    }
+  }
+  // Finally we construct a custom compilation database with the fixed commands
+  auto custom_db = clu::custom_compilation_database(all_compile_cmds);
+
+  // ------- main tool
+  // For FixedCompilationDatabase, pass canonical path to ClangTool to match what's in the database
+  //auto source_for_tool = using_fixed_db ? canonical_source0 : source0;
+  clang::tooling::ClangTool main_tool(custom_db, {source0}); // we use the fixed compilation database
 
   // Additional Command line arguments to be given to the compiler, after all other options
   // from e.g. CXXFLAGS and co, and the -resource-dir.

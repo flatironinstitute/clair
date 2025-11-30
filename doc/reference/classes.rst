@@ -3,43 +3,17 @@
 Classes
 *******
 
-Classes are automatically wrapped by clair (according to the filter rule in the configuration :ref:`customize`).
+Classes are automatically wrapped by clair according to the filter rules in the configuration (:ref:`customize`).
+The wrapper exposes the class to Python with its constructors, methods, properties, and operators, enabling 
+seamless interoperability between C++ and Python code.
 
+.. toctree::
+   :maxdepth: 1
 
-Constructors
-------------
-
-* TODO example + the synthetize option for parameters.
-  specific file ?
-
-Methods
--------
-
-* TODO
-
-Static Methods
---------------
-
-* TODO : example
-
-
-Operator()
-----------
-
-Operator[]
-----------
-
-Iterable object
----------------
-
-str and repr
-------------
-
-Copy
-----
-
-Operators
----------
-
-hdf5
-----
+   classes/constructors
+   classes/methods
+   classes/operators
+   classes/iterable
+   classes/string_representation
+   classes/copy
+   classes/hdf5

@@ -1,7 +1,7 @@
 .. _welcome:
 
-clair/c2y
-*********
+clair/c2py
+**********
 
 .. sidebar:: clair |PROJECT_VERSION|
 

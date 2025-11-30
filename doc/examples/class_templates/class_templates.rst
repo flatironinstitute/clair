@@ -5,7 +5,7 @@ Class templates
 
 Here we demonstrate how to generate Python bindings class templates.
 
-In contrast to :ref:`function_templates`, class templates need to be instanstiated in the special 
+In contrast to :ref:`function_templates`, class templates need to be instantiated in the special 
 ``c2py_module`` namespace with a ``using`` declaration.
 
 .. literalinclude:: ./class_template.cpp

@@ -1,4 +1,4 @@
-.. _referemce:
+.. _reference:
 
 Reference documentation
 ***********************

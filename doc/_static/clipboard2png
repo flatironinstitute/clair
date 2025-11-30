@@ -1,0 +1,30 @@
+#!/bin/zsh
+# Save clipboard image to PNG file (resized to max 1000px width)
+# Usage: clipboard2png filename (without .png extension)
+
+if [[ -z "$1" ]]; then
+    echo "Usage: clipboard2png <filename>"
+    echo "Saves clipboard image to <filename>.png in current directory"
+    exit 1
+fi
+
+outfile="${1}.png"
+
+osascript -e "set theFile to (open for access POSIX file \"$(pwd)/$outfile\" with write permission)" \
+          -e 'try' \
+          -e 'write (the clipboard as «class PNGf») to theFile' \
+          -e 'end try' \
+          -e 'close access theFile'
+
+if [[ -s "$outfile" ]]; then
+    # Resize to max 1000px width if larger
+    # width=$(sips -g pixelWidth "$outfile" | awk '/pixelWidth/{print $2}')
+    # if [[ $width -gt 1000 ]]; then
+    #     sips --resampleWidth 1000 "$outfile" >/dev/null
+    # fi
+    echo "Saved to $outfile"
+else
+    rm -f "$outfile"
+    echo "Error: No image in clipboard"
+    exit 1
+fi

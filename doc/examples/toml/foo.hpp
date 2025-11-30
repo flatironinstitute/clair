@@ -1,11 +1,10 @@
 // foo.hpp
-
+#include <iostream>
 namespace foo {
-  void f1();
-  void f2();
-  void g1();
-  void g2();
-
+  inline void f1() { std::cout << "foo::f1" << std::endl; }
+  inline void f2() { std::cout << "foo::f2" << std::endl; }
+  inline void g1() { std::cout << "foo::g1" << std::endl; }
+  inline void g2() { std::cout << "foo::g2" << std::endl; }
   class A {
     int x_;
 

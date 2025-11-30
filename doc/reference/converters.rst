@@ -86,41 +86,51 @@ The following types are convertible
 Note that convertibility is composable: :code:`std::vector<T>` is convertible is :code:`T` is, 
 so :code:`std::vector<std::tuple<T, U , W>>` is if :code:`T,U,W` are.
 
-py_converter
-------------
+Custom converters for user-defined types
+----------------------------------------
 
-In order to define a custom converter,  specialize the :code:`c2py::py_converter` struct.
+In some cases, it may be necessary to define custom converters for user-defined types
+into some *existing* Python type. 
+Note that this is different from wrapping a C++ class to a Python, which creates a **new** Python type. 
+
+In order to define a custom converter, specialize the :code:`c2py::py_converter` struct.
 
 .. code-block:: cpp
 
    template <typename T> struct py_converter {
    
-     // C++ to python. 
+     // [Optional] Name of the Python type, used in error messages and docstrings.
+     // Can be a static constexpr string or a static function returning std::string.
+     static constexpr const char *tp_name = "...";
+     // or: static std::string tp_name() { return "..."; }
+   
+     // C++ to Python. 
      static PyObject *c2py(auto &&x);
      
      // Python to C++ 
-     // Return true iif the object can A PRIORI be converted.
-     // It is a normally type check.
-     // An error may still occurr in the conversion, e.g. int overflow.
-     // raise_exception : in case of failure, sets an error message as a python exception.
+     // Return true iff the object can A PRIORI be converted.
+     // This is normally a type check.
+     // An error may still occur in the conversion, e.g. int overflow.
+     // raise_exception: in case of failure, sets an error message as a Python exception.
      static bool is_convertible(PyObject *ob, bool raise_exception) noexcept;
      
      // Python to C++ 
-     // Convert, assuming that is_convertible is true
-     // Can still throw C++ exception.
-     // Returns a T or a T & (for wrapped types).
-     static [T & | T] py2c(PyObject *ob);
+     // Convert, assuming that is_convertible is true.
+     // Can still throw C++ exceptions.
+     // Returns a T or a T& (for wrapped types).
+     static [T& | T] py2c(PyObject *ob);
    };
  
 
-Third party library [developer corner]
---------------------------------------
+.. _third_party_lib:
 
-In order for a third party library to provide converters
+Set up for third party libraries
+--------------------------------
 
-* Write the specialization of the converters for the types provided by the library in e.g. `converters.hpp`
-
-* In the library includer e.g. `my_library/my_library.hpp`, include the converters conditionally
+If you are developing a third-party C++ library and 
+want to provide specializations for some of the types defined by the library, 
+we recommend placing them in a separate header file (e.g., `converters.hpp`). 
+To avoid polluting your library's main header for non-Python users, conditionally include this file only when building with clair/c2py:
 
 .. code-block:: cpp
 
@@ -142,4 +152,8 @@ will **automatically** include the converters when `c2py` is included.
 For a concrete example, cf e.g. the 
 `TRIQS nda <https://github.com/TRIQS/nda>`_ library.
 
+.. note::
 
+  The c2py library must be included **first**, hence before any library header that defines custom converters.
+  ``clair-c2py`` will *reject* the code otherwise, in order to ensure that the C2PY_INCLUDED macros is properly 
+  defined before any custom library headers are included.

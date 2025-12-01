@@ -40,7 +40,7 @@ clang::Expr const *get_field_initializer(clang::FieldDecl const *f) {
 void codegen_synth_constructor(std::ostream &code, cls_info_t const &cls_info) {
   auto const *cls = cls_info.ptr;
   auto cls_name   = clu::get_fully_qualified_name(cls); //cls->getQualifiedNameAsString();
-  if (cls_info.fields.empty()) return;                  // Nothing to construct from ?
+  EXPECTS(!cls_info.fields.empty());
 
   logs.cls_details(fmt::format("Synthesize constructor from pydict", cls_name));
   static long counter = 0;
@@ -243,7 +243,7 @@ void codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const 
     std::stringstream MethodDecls, MethodTable, MethodDocs;
 
     // ---- constructor
-    if (cls_info.synthetize_init_from_pydict()) {
+    if (cls_info.synthetize_init_from_pydict() and not(cls_info.fields.empty())) {
       codegen_synth_constructor(MethodDecls, cls_info);
     } else
       codegen::write_dispatch_constructors(MethodDecls, cls_name, cls_info.constructors);

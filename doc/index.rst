@@ -28,6 +28,7 @@ This project is in beta stage. Documentation in progress.
    gettingstarted
    cmake
    examples
+   compiling_examples
    reference
    notebook
    issues

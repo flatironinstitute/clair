@@ -25,7 +25,7 @@ This project is in beta stage. Documentation in progress.
    :hidden:
 
    install
-   gettingstarted
+   getting_started/index
    cmake
    gallery/index
    compiling_examples

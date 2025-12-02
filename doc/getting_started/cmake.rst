@@ -5,7 +5,7 @@ CMake Integration
 
 Let us consider a simple piece of C++ code:
 
-.. literalinclude:: getting_started/cmake3/my_module.cpp
+.. literalinclude:: cmake3/my_module.cpp
    :language: cpp
 
 CMake configuration

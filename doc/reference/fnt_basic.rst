@@ -1,7 +1,7 @@
 .. _fntref:
 
-Function
-********
+Functions
+*********
 
 
 Type conversion
@@ -35,8 +35,10 @@ Let us illustrate this with a simple example.
 
 .. literalinclude:: ../examples/fun1.cpp
    :language: cpp
+   :caption: fun1.cpp
+   :end-before: #include "fun1.wrap.cxx"
 
-The compiler reports:
+clair-c2py reports:
 
 .. code-block:: console
 
@@ -51,8 +53,8 @@ meaning that the two C++ overloads of ``f`` are "gathered" in one Python functio
    import sys
    import os
    # Add the examples build directory to Python path
-   # This assumes doctest is run from the build/doc directory
-   sys.path.insert(0, os.path.abspath('./examples'))
+   # Doctest runs from build/doc, examples are in build/doc/examples
+   sys.path.insert(0, os.path.abspath('examples'))
 
 .. doctest::
 
@@ -68,33 +70,49 @@ If no dispatch is possible for the arguments given, ``c2py`` reports a ``TypeErr
 
     >>> M.f(1,2,3)
     Traceback (most recent call last):
-      File "<stdin>", line 1, in <module>
+      ...
     TypeError: [c2py] Can not call the function with the arguments
-      - (1, 2, 3)
+       (1, 2, 3)
     The dispatch to C++ failed with the following error(s):
-    [1] (x: int, y: int) -> int 
-        Too many arguments. Expected at most 2 and got 3
-    [2] (x: int) -> int 
-        Too many arguments. Expected at most 1 and got 3
+    [1] (x: int)
+        -> int
+        -- Too many arguments. Expected at most 1 and got 3
+    <BLANKLINE>
+    [2] (x: int, y: int)
+        -> int
+        -- Too many arguments. Expected at most 2 and got 3
+    <BLANKLINE>
+    <BLANKLINE>
 
 or 
 
-.. code-block:: console
+.. doctest::
 
+    >>> import fun1 as M
     >>> M.f("abc")
-   Traceback (most recent call last):
-     File "<stdin>", line 1, in <module>
-   TypeError: [c2py] Can not call the function with the arguments
-     - ('abc',)
-   The dispatch to C++ failed with the following error(s):
-   [1] (x: int) -> int 
-       x: Cannot convert abc to integer type
-   [2] (x: int, y: int) -> int 
-       Too few arguments. Expected at least 2 and got 1
+    Traceback (most recent call last):
+      ...
+    TypeError: [c2py] Can not call the function with the arguments
+       ('abc',)
+    The dispatch to C++ failed with the following error(s):
+    [1] (x: int)
+        -> int
+        -- x: Cannot convert abc to integer type
+    <BLANKLINE>
+    [2] (x: int, y: int)
+        -> int
+        -- Too few arguments. Expected at least 2 and got 1
+    <BLANKLINE>
+    <BLANKLINE>
 
 
 Template functions
 ------------------
 
-The instantiation of generic functions in discussed in :ref:`function_templates`.
+The instantiation of generic functions is discussed in a :ref:`separate section <function_templates>`.
+
+.. toctree::
+   :maxdepth: 1
+
+   fnt_templates
 

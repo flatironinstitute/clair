@@ -3,26 +3,32 @@
 Function templates
 ******************
 
-Here we demonstrate how to generate Python bindings for function templates.
+In the case of generic (template) functions, 
+clair-c2py generate bindings only for 
+their **explicit instantiations**.
 
-Function templates can be wrapped by explicitly instantiating them:
+Example
+=======
 
-.. literalinclude:: ./function_template.cpp
+.. literalinclude:: ../examples/function_template.cpp
    :language: cpp
+   :caption: function_template.cpp
 
 Here, we define a function template ``add`` that adds two values of the same type.
 Then we explicitly instantiate the template for the types ``int``, ``double``, and ``std::string``.
 
-To generate the Python bindings, we follow the usual procedure:
+Usage in Python
+===============
 
-.. code-block:: bash
-   
-     clair-c2py function_template.cpp -- -std=c++20 `c2py_flags -i`
-     clang++ function_template.cpp -std=c++20 -shared -o function_template.so `c2py_flags`
+.. testsetup::
 
-We can then test the generated bindings in Python:
+   import sys
+   import os
+   # Add the examples build directory to Python path
+   # This assumes doctest is run from the build/doc directory
+   sys.path.insert(0, os.path.abspath('../examples'))
 
-.. code-block:: console
+.. doctest::
 
     >>> from function_template import add
     >>> add(1, 2)
@@ -37,27 +43,30 @@ We can then test the generated bindings in Python:
 **clair** dispatches the function calls to the appropriate instantiation based on the argument types.
 Adding two integers, doubles or strings works as expected.
 
-In case we pass two incompatible types, an informative error message is raised:
+Error handling
+==============
 
-.. code-block:: console
+In case we pass two incompatible types, the error message
+is similar to any other dynamical dispatch failure.
+
+.. doctest::
 
     >>> add(1, "hello")
     Traceback (most recent call last):
-    File "<python-input-7>", line 1, in <module>
-        add(1, "hello")
-        ~~~^^^^^^^^^^^^
+      ...
     TypeError: [c2py] Can not call the function with the arguments
-    (1, 'hello')
+       (1, 'hello')
     The dispatch to C++ failed with the following error(s):
     [1] (a: int, b: int)
         -> int
         -- b: Cannot convert hello to integer type
-
+    <BLANKLINE>
     [2] (a: float, b: float)
         -> float
         -- b: Cannot convert <class 'str'> to double
-
+    <BLANKLINE>
     [3] (a: str, b: str)
         -> str
         -- a: Cannot convert 1 to string
-
+    <BLANKLINE>
+    <BLANKLINE>

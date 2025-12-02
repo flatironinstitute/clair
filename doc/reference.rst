@@ -10,6 +10,7 @@ Reference documentation
    reference/fnt_basic
    reference/classes
    reference/enums
+   reference/multiple
    reference/customize
    reference/converters
 

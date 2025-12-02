@@ -3,22 +3,23 @@
 Functions
 *********
 
-The following example shows a C++ function that takes a ``std::vector<double>`` and returns the sum of its elements:
+A function using some STL containers and algorithm.
 
-.. literalinclude:: ./fun2.cpp
+
+.. literalinclude:: ../function_w_stl.cpp
    :language: cpp
+   :caption: function_w_stl.cpp
+   :end-before: #include "function_w_stl.wrap.cxx"
 
-We can then generate the Python bindings for this function and compile them with (assuming OS X and clang):
+In Python, we get:
 
-.. code-block:: bash
-   
-    clair-c2py fun2.cpp -- -std=c++20 `c2py_flags -i`
-    clang++ fun2.cpp -std=c++20 -shared -o fun2.so `c2py_flags`
+.. testsetup::
 
-Finally, we use the module in Python:
+   import sys, os
+   sys.path.insert(0, os.path.abspath('examples'))
 
-.. code-block:: console
+.. doctest::
 
-    >>> import fun2 as M
-    >>> M.sum([1.2, 2.3, 4.5])
-    8.0
+   >>> import function_w_stl as M
+   >>> M.sum([1.2, 2.3, 4.5])
+   8.0

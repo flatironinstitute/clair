@@ -1,3 +1,5 @@
+:orphan:
+
 .. _example_module_init:
 
 C2PY_MODULE_INIT

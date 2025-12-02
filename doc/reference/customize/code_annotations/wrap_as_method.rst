@@ -1,3 +1,5 @@
+:orphan:
+
 .. _example_wrap_as_method:
 
 C2PY_WRAP_AS_METHOD

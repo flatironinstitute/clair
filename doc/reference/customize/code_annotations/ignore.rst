@@ -1,3 +1,5 @@
+:orphan:
+
 .. _example_ignore:
 
 C2PY_IGNORE

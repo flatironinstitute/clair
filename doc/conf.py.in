@@ -9,6 +9,9 @@ sys.path.insert(0, "@CMAKE_CURRENT_SOURCE_DIR@/sphinxext/numpydoc")
 # exclude these folders from scanning by sphinx
 exclude_patterns = ['_templates']
 
+# Suppress toctree warnings for intentionally orphaned pages
+suppress_warnings = ['toc.not_readable', 'toc.excluded']
+
 extensions = ['sphinx.ext.autodoc',
               #'sphinx.ext.mathjax',
               #'sphinx.ext.intersphinx',
@@ -24,6 +27,11 @@ extensions = ['sphinx.ext.autodoc',
 
 # Copy button options
 copybutton_exclude = '.linenos, .gp'
+
+# Doctest configuration
+import doctest
+doctest_default_flags = doctest.ELLIPSIS  # Allow ... to match anything, but check exception details strictly
+doctest_test_doctest_blocks = ''  # Test all doctest blocks
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'

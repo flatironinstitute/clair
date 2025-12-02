@@ -1,3 +1,5 @@
+:orphan:
+
 .. _example_rename:
 
 C2PY_RENAME

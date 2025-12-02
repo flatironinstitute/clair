@@ -27,7 +27,7 @@ This project is in beta stage. Documentation in progress.
    install
    gettingstarted
    cmake
-   examples
+   gallery/index
    compiling_examples
    reference
    notebook

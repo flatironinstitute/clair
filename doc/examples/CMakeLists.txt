@@ -27,8 +27,9 @@ macro(add_clair_module module_name)
 endmacro()
 
 # Build the Python C++ extension module
+add_subdirectory(gallery)
+
 add_clair_module(fun1)
-add_clair_module(function_w_stl)
 add_clair_module(function_template)
 add_clair_module(my_enums)
 

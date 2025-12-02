@@ -6,7 +6,7 @@ Functions
 A function using some STL containers and algorithm.
 
 
-.. literalinclude:: ../function_w_stl.cpp
+.. literalinclude:: ../examples/gallery/function_w_stl.cpp
    :language: cpp
    :caption: function_w_stl.cpp
    :end-before: #include "function_w_stl.wrap.cxx"

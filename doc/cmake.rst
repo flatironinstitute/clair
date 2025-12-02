@@ -5,7 +5,7 @@ CMake Integration
 
 Let us consider a simple piece of C++ code:
 
-.. literalinclude:: examples/cmake3/my_module.cpp
+.. literalinclude:: getting_started/cmake3/my_module.cpp
    :language: cpp
 
 CMake configuration
@@ -13,7 +13,7 @@ CMake configuration
 
 A complete CMake configuration file for this module is:
 
-.. literalinclude:: examples/cmake3/CMakeLists.txt
+.. literalinclude:: getting_started/cmake3/CMakeLists.txt
    :language: cmake
    :linenos:
 

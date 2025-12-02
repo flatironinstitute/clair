@@ -46,7 +46,14 @@ The compiler reports:
    
 meaning that the two C++ overloads of ``f`` are "gathered" in one Python function ``f``.
 
-.. code-block:: console
+.. testsetup::
+
+   import sys
+   import os
+   # Add the examples build directory to Python path
+   sys.path.insert(0, os.path.abspath('../examples/build'))
+
+.. doctest::
 
    >>> import fun1 as M
    >>> M.f(1)
@@ -56,18 +63,18 @@ meaning that the two C++ overloads of ``f`` are "gathered" in one Python functio
 
 If no dispatch is possible for the arguments given, ``c2py`` reports a ``TypeError``, e.g.
 
-.. code-block:: console
+.. doctest::
 
     >>> M.f(1,2,3)
-   Traceback (most recent call last):
-     File "<stdin>", line 1, in <module>
-   TypeError: [c2py] Can not call the function with the arguments
-     - (1, 2, 3)
-   The dispatch to C++ failed with the following error(s):
-   [1] (x: int, y: int) -> int 
-       Too many arguments. Expected at most 2 and got 3
-   [2] (x: int) -> int 
-       Too many arguments. Expected at most 1 and got 3
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    TypeError: [c2py] Can not call the function with the arguments
+      - (1, 2, 3)
+    The dispatch to C++ failed with the following error(s):
+    [1] (x: int, y: int) -> int 
+        Too many arguments. Expected at most 2 and got 3
+    [2] (x: int) -> int 
+        Too many arguments. Expected at most 1 and got 3
 
 or 
 

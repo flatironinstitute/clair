@@ -14,6 +14,19 @@ add_custom_command(
   TARGET clair_docs_sphinx POST_BUILD
   COMMAND PYTHONPATH=${PROJECT_BINARY_DIR}/python:${h5_BINARY_DIR}/python:$ENV{PYTHONPATH} ${SPHINXBUILD_EXECUTABLE} -c . -j8 -b html ${CMAKE_CURRENT_SOURCE_DIR} html
 )
+# ---------------------------------
+# Compile the examples
+# ---------------------------------
+add_subdirectory(examples)
+
+# ---------------------------------
+# Doctest target
+# ---------------------------------
+add_custom_target(doctest
+  COMMAND PYTHONPATH=${PROJECT_BINARY_DIR}/python:${h5_BINARY_DIR}/python:$ENV{PYTHONPATH} ${SPHINXBUILD_EXECUTABLE} -c . -b doctest ${CMAKE_CURRENT_SOURCE_DIR} doctest
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+  COMMENT "Running doctests in documentation"
+)
 
 # ---------------------------------
 # Install

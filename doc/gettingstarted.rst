@@ -14,7 +14,7 @@ Starting example
 
 Let us begin with a simple example:
 
-.. literalinclude:: examples/gs1.cpp
+.. literalinclude:: getting_started/gs1.cpp
    :language: cpp
 
 We call the ``clair-c2py`` binding generator and the compiler.

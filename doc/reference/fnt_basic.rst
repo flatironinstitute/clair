@@ -51,7 +51,8 @@ meaning that the two C++ overloads of ``f`` are "gathered" in one Python functio
    import sys
    import os
    # Add the examples build directory to Python path
-   sys.path.insert(0, os.path.abspath('../examples/build'))
+   # This assumes doctest is run from the build/doc directory
+   sys.path.insert(0, os.path.abspath('./examples'))
 
 .. doctest::
 

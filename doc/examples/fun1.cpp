@@ -2,3 +2,5 @@
 
 int f(int x) { return -x;}
 int f(int x, int y) { return x + y;}
+
+#include "fun1.wrap.cxx"

@@ -28,6 +28,7 @@ endmacro()
 
 # Build the Python C++ extension module
 add_subdirectory(gallery)
+add_subdirectory(getting_started)
 
 add_clair_module(fun1)
 add_clair_module(function_template)

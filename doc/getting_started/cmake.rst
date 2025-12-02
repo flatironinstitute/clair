@@ -13,7 +13,7 @@ CMake configuration
 
 A complete CMake configuration file for this module is:
 
-.. literalinclude:: getting_started/cmake3/CMakeLists.txt
+.. literalinclude:: cmake3/CMakeLists.txt
    :language: cmake
    :linenos:
 

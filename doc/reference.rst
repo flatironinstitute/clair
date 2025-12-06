@@ -7,10 +7,11 @@ Reference documentation
 .. toctree::
    :maxdepth: 2
 
-   reference/fnt_basic
+   reference/basic_notions
+   reference/customize
+   reference/functions
    reference/classes
    reference/enums
    reference/multiple
-   reference/customize
    reference/converters
 

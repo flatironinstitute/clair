@@ -1,12 +1,12 @@
 .. _code_annotations:
 
-Code annotations
-****************
+Using annotations in the C++ sources
+************************************
 
 ``clair``'s behaviour can be modified by simple annotations to functions or classes
 directly in the C++ source code.
-These macros are simply short-cuts for C++ annotations, 
-which are ignored by the C++ compiler, but picked up by ``clair`` during the bindings generation.
+These macros are simple aliases for C++ annotations, 
+which are ignored by the C++ compiler, but picked up by ``clair`` during its analysis.
 
 
 .. list-table::

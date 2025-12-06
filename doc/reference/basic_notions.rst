@@ -1,7 +1,7 @@
-.. _fntref:
+.. _basic_notions:
 
-Functions
-*********
+Basic notions
+*************
 
 
 Type conversion
@@ -9,14 +9,21 @@ Type conversion
 
 Python and C++ types are different. 
 For example, a ``long`` in C++ is converted from/to a Python integer.
-In order to call a C++ function from Python, it is necessary to
+In order to call a C++ function from Python, it is necessary to:
 
-* convert its arguments to C++,
-* call it and
-* convert its return value to Python.
+    * convert its arguments to C++,
+    * call it and
+    * convert its return value to Python.
 
-Hence, only functions whose arguments and return value are of **convertible types** can be called across languages.
-``clair`` will report a compilation error for any attempt to wrap a function with an inconvertible type.
+This process is called *wrapping the function to Python*.
+Only functions whose arguments and return value are of **convertible types** can be wrapped and therefore 
+called across languages.
+
+The list of convertible types is given in :ref:`this section <converters>`.
+
+.. note::
+
+   ``clair`` issues a compilation error for any attempt to wrap a function with an inconvertible type.
 
 
 Dynamical dispatch
@@ -27,11 +34,14 @@ Dynamical dispatch
 
 As a result, several functions in C++ will typically be gathered into one Python function.
 
-When the Python function is called, the number and types of its arguments are analyzed (at runtime), 
-and the first C++ function for which the Python arguments can be converted to the C++ types is called.
-If none applies, a Python exception is raised.
+When the Python function is called:
 
-Let us illustrate this with a simple example.
+#. The number and types of its arguments are analyzed (at runtime), 
+#. The first C++ function for which the Python arguments can be converted to the C++ arguments is called.
+#. If none applies, a Python exception is raised.
+
+This process is called *dynamical dispatch*. 
+Let us illustrate it with a simple example.
 
 .. literalinclude:: ../examples/fun1.cpp
    :language: cpp
@@ -45,8 +55,9 @@ clair-c2py reports:
     -- Function: f
     --         . f(int x)
     --         . f(int x, int y)
-   
-meaning that the two C++ overloads of ``f`` are "gathered" in one Python function ``f``.
+    --         . f(const std::string& s)
+
+meaning that the 3 C++ overloads of ``f`` are "gathered" in one Python function ``f``.
 
 .. testsetup::
 
@@ -63,6 +74,8 @@ meaning that the two C++ overloads of ``f`` are "gathered" in one Python functio
    -1
    >>> M.f(1,2)
    3
+   >>> M.f("abc")
+   'abcabc'
 
 If no dispatch is possible for the arguments given, ``c2py`` reports a ``TypeError``, e.g.
 
@@ -82,37 +95,32 @@ If no dispatch is possible for the arguments given, ``c2py`` reports a ``TypeErr
         -> int
         -- Too many arguments. Expected at most 2 and got 3
     <BLANKLINE>
+    [3] (s: str)
+        -> str
+        -- Too many arguments. Expected at most 1 and got 3
+    <BLANKLINE>
     <BLANKLINE>
 
 or 
 
 .. doctest::
 
-    >>> import fun1 as M
-    >>> M.f("abc")
+    >>> M.f([1,2,3])
     Traceback (most recent call last):
       ...
     TypeError: [c2py] Can not call the function with the arguments
-       ('abc',)
+       ([1, 2, 3],)
     The dispatch to C++ failed with the following error(s):
     [1] (x: int)
         -> int
-        -- x: Cannot convert abc to integer type
+        -- x: Cannot convert [1, 2, 3] to integer type
     <BLANKLINE>
     [2] (x: int, y: int)
         -> int
         -- Too few arguments. Expected at least 2 and got 1
     <BLANKLINE>
+    [3] (s: str)
+        -> str
+        -- s: Cannot convert [1, 2, 3] to string
     <BLANKLINE>
-
-
-Template functions
-------------------
-
-The instantiation of generic functions is discussed in a :ref:`separate section <function_templates>`.
-
-.. toctree::
-   :maxdepth: 1
-
-   fnt_templates
-
+    <BLANKLINE>

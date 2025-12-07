@@ -13,6 +13,13 @@ Default behavior & customization
   (:ref:`see the list of convertible types <converters>`) can be wrapped. 
   Other functions will trigger a compilation error if they are not excluded.
 
+* If a function cannot be wrapped because its argument or return type is not convertible,
+  clair-c2py will generate a **compile-time error** with a clear diagnostic message, using the Clang diagnostic system:
+
+    .. image:: ../_static/compil_error_type.png
+         :alt: Compilation error for non-convertible type
+         :align: center
+         :width: 70%
 
 Template functions
 ------------------
@@ -21,10 +28,8 @@ For generic (template) functions,
 clair-c2py only generates bindings for their **explicit instantiations**, 
 subject to the same customization rules as the regular functions.
 
-Example
-.......
 
-In this example, we define a function template ``add`` that adds two values of the same type.
+In the following example, we define a function template ``add`` that adds two values of the same type.
 and explicitly instantiate it for 3 simple types. The dynamical dispatch in Python, 
 is done exactly like for regular functions.
 

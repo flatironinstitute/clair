@@ -1,11 +1,11 @@
 .. _multiple_modules:
 
-Multiple Modules
-****************
+Across multiple modules
+***********************
 
 When developing larger projects, you may need to create multiple C++ Python extension modules that communicate with each other. For example, module B might need to use a class defined and wrapped in module A.
 
-**clair-c2py** generates two files for each wrapped module:
+``clair-c2py`` generates two files for each wrapped module:
 
 - A ``.wrap.cxx`` file (the implementation of the bindings)
 - A ``.wrap.hxx`` file (a small header declaring which classes are wrapped in A)
@@ -42,7 +42,7 @@ Let's create the first module that wraps a class ``N::A``:
 
    #include "module_a.wrap.cxx"
 
-clair-c2py generates ``module_a.wrap.cxx``
+``clair-c2py`` generates ``module_a.wrap.cxx``
 and  ``module_a.wrap.hxx``.
 
 Module B

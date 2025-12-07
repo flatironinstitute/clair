@@ -3,27 +3,24 @@
 Enumerations
 ************
 
-**clair-c2py** automatically wraps C++ enumerations (both ``enum`` and ``enum class``) as Python string-based enumerations.
+``clair-c2py`` automatically wraps C++ enumerations 
+(both ``enum`` and ``enum class``) as Python strings, 
+subject to the same customization rules as classes and functions 
+(see :ref:`customize`).
 
-C++ Code
-========
-
-Define your enumerations in C++:
-
-**my_enums.cpp**:
+Let us show a simple example with two enumerations and functions that use them:
 
 .. literalinclude:: ../examples/my_enums.cpp
    :language: cpp
+   :caption: my_enums.cpp
+   :end-before: #include "my_enums.wrap.cxx"
 
-Python Usage
-============
+In Python, we get:
 
 .. testsetup::
 
    import sys, os
    sys.path.insert(0, os.path.abspath('examples'))
-
-In Python, enumeration values are represented as strings:
 
 .. doctest::
 

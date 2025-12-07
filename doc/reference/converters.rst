@@ -124,8 +124,8 @@ In order to define a custom converter, specialize the :code:`c2py::py_converter`
 
 .. _third_party_lib:
 
-Custom converters for third party libraries
--------------------------------------------
+Set up for third party libraries
+--------------------------------
 
 If you are developing a third-party C++ library and 
 want to provide specializations for some of the types defined by the library, 
@@ -152,9 +152,8 @@ will **automatically** include the converters when `c2py` is included.
 For a concrete example, cf e.g. the 
 `TRIQS nda <https://github.com/TRIQS/nda>`_ library.
 
-
 .. note::
 
-  The c2py library must be included **before** including any library header that defines custom converters.
-  clair-c2py will *reject* the code otherwise, in order to ensure that the C2PY_INCLUDED macros is properly 
-  defined when the library headers are included.
+  The c2py library must be included **first**, hence before any library header that defines custom converters.
+  ``clair-c2py`` will *reject* the code otherwise, in order to ensure that the C2PY_INCLUDED macros is properly 
+  defined before any custom library headers are included.

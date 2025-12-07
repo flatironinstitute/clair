@@ -48,7 +48,7 @@ since 2014. It is fully backward compatible.*
    cmake
    gallery/index
    compiling_examples
-   reference
+   reference/index
    notebook
    issues
    changelog

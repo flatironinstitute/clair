@@ -10,11 +10,9 @@ What is a Clang tool ?
 and generates Python bindings from the Abstract Syntax Tree (AST).
 
 | LLVM/Clang is a modular library used to build both the Clang compiler and tools like ``clang-tidy``, ``clang-format``, etc.
-| A Clang tool uses the same C++ parser as the compiler to build an AST,
-| but instead of generating binary code, it analyzes or transforms the source code.
+| A Clang tool uses the same C++ parser as the compiler to build an AST, but instead of generating binary code, it analyzes or transforms the source code.
 
-As a result, ``clair-c2py`` can handle the full C++ language, including the latest standards (C++20, C++23),
-and is robust with complex code bases, macros, and templates.    
+As a result, ``clair-c2py`` can parse the full C++ language, including the latest standards (C++20, C++23).
 
 .. figure:: ../_static/clang_tool.png
    :align: center

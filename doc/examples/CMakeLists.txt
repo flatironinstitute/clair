@@ -29,8 +29,12 @@ endmacro()
 # Build the Python C++ extension module
 add_subdirectory(gallery)
 add_subdirectory(getting_started)
+add_subdirectory(code_annotations)
 
 add_clair_module(fun1)
 add_clair_module(function_template)
 add_clair_module(my_enums)
+
+# kept for error message generation in the doc
+# add_clair_module(fail)
 

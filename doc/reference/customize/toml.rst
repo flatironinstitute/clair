@@ -84,7 +84,7 @@ The initial TOML file looks as follows:
 
 After generating the Python bindings and compiling, we obtain:
 
-.. code-block:: console
+.. code-block:: python
 
     >>> import my_module
     >>> dir(my_module)
@@ -108,7 +108,7 @@ Filtering by namespace
 
 Now only the names in the ``foo`` namespace are available in Python:
 
-.. code-block:: console
+.. code-block:: python
 
     >>> import my_module
     >>> dir(my_module)
@@ -135,7 +135,7 @@ Filtering by name
 
 Now only the functions ``f1`` and ``f2`` are available in Python:
 
-.. code-block:: console
+.. code-block:: python
 
     >>> import my_module
     >>> dir(my_module)
@@ -157,7 +157,7 @@ To only wrap the function ``f1``, we can for example reject ``foo::f2`` explicit
 
 This results in only ``f1`` being available in Python:
 
-.. code-block:: console
+.. code-block:: python
 
     >>> import my_module
     >>> dir(my_module)
@@ -179,7 +179,7 @@ To only wrap functions declared in files whose name contains ``foo``, we modify 
 
 We obtain:
 
-.. code-block:: console
+.. code-block:: python
 
     >>> import my_module
     >>> dir(my_module)
@@ -194,7 +194,7 @@ Wrap no argument methods as properties
 | For example, our class ``A`` defined in ``foo.hpp`` has the getter method ``A::x()`` with no argument.
 | By default, this method is wrapped as a normal method in Python:
 
-.. code-block:: console
+.. code-block:: python
 
     >>> import my_module
     >>> a = my_module.A()
@@ -215,7 +215,7 @@ To wrap it as a property instead, we modify the TOML file as follows:
 
 Now the method ``A::x()`` is wrapped as a read-only property in Python:
 
-.. code-block:: console
+.. code-block:: python
 
     >>> import my_module
     >>> a = my_module.A()

@@ -20,9 +20,8 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.viewcode',
               'sphinx.ext.autosummary',
               'sphinx.ext.githubpages',
-               'sphinx_copybutton',
+              'sphinx_copybutton',
               #'nbsphinx',
-#               'myst_parser',
               ]
 
 # Copy button options
@@ -34,7 +33,7 @@ doctest_default_flags = doctest.ELLIPSIS  # Allow ... to match anything, but che
 doctest_test_doctest_blocks = ''  # Test all doctest blocks
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'monokai'  # Set code highlighting style for Sphinx
 
 highlight_language = 'cpp'
 

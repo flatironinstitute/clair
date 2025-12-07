@@ -11,23 +11,29 @@ C++ code
 --------
 
 .. literalinclude:: ../../../examples/code_annotations/c2py_rename.cpp
-   :language: cpp
+    :language: cpp
+    :end-before: #include "c2py_rename.wrap.cxx"
+
 
 Usage in Python
 ---------------
 
 After generating the extension module, we can use it in Python:
 
-.. code-block:: console
+.. testsetup::
+
+   import sys, os
+   sys.path.insert(0, os.path.abspath('examples/code_annotations'))
+
+
+.. doctest::
 
     >>> from c2py_rename import *
     >>> g(5)
     10
     >>> f(5)
     Traceback (most recent call last):
-    File "<python-input-2>", line 1, in <module>
-        f(5)
-        ^
+    ...
     NameError: name 'f' is not defined
 
 The function ``f`` has been renamed to ``g`` as instructed.

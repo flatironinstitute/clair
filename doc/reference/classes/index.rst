@@ -10,10 +10,8 @@ seamless interoperability between C++ and Python code.
 .. toctree::
    :maxdepth: 1
 
-   classes/constructors
-   classes/methods
-   classes/operators
-   classes/iterable
-   classes/string_representation
-   classes/copy
-   classes/hdf5
+   constructors
+   methods
+   operators
+   iterable
+   string_representation

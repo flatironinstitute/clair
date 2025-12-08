@@ -22,7 +22,7 @@ namespace clu {
     if (t.isNull()) return ""; // abort
 
     // if the type is a built in, just get its name, resolving all aliases.
-    if (auto *bu = t->getAs<clang::BuiltinType>()) { return str_t{bu->getName(policy)}; }
+    if (auto *bu = t->getAs<clang::BuiltinType>()) { return str_t{bu->getName(policy)} + (t.isConstQualified() ? " const" : ""); }
 
     // If we have an alias or a using, just the name, do not introspect.
     if (t->getAs<clang::TypedefType>()) { return clang::TypeName::getFullyQualifiedName(t, ctx, policy); }

@@ -110,7 +110,7 @@ int main(int argc, const char **argv) try {
   // Use canonical for comparison (to handle symlinks), but absolute for storage (ClangTool doesn't follow symlinks).
   auto canonical_source0 = fs::canonical(source0).string();
   for (auto &cmd : all_compile_cmds) {
-    if (fs::canonical(cmd.Filename).string() == canonical_source0) {
+    if (fs::exists(cmd.Filename) && fs::canonical(cmd.Filename).string() == canonical_source0) {
       if (cmd.CommandLine.empty()) throw std::runtime_error("CompileCommand has empty CommandLine for " + source0);
       auto expected_compiler = clu::get_clang_compiler_path();
       if (cmd.CommandLine[0] != expected_compiler) {

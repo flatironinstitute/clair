@@ -196,13 +196,9 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
   // Check convertibility
   if (not worker->check_convertibility(f)) return;
 
-  // Insert in the module function list. Unicity will be taken care of later by worker.
-  str_t py_name = f->getNameAsString();
-  if (auto rename = clu::get_annotation_value(f, "c2py_rename")) py_name = *rename;
-
   // store the function in the module_info or as method of a class if c2py_wrap_as_method is set
   if (not clu::has_annotation(f, "c2py_wrap_as_method"))
-    M.functions[py_name].push_back(fnt_info_t{f});
+    M.functions[worker->get_python_name(f)].push_back(fnt_info_t{f});
   else {
     if (f->param_size() == 0) {
       clu::emit_error(f, "A function tagged c2py_wrap_as_method must take at least 1 argument (self)");
@@ -210,7 +206,7 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
     }
     auto first_arg_type = as_CXXRecordDecl(f->getParamDecl(0)->getType());
     if (auto it = M.classes_ptr_to_info.find(first_arg_type); it != M.classes_ptr_to_info.end())
-      M.classes[it->second].second.methods[py_name].push_back(fnt_info_t{.ptr = f, .rewrite = false});
+      M.classes[it->second].second.methods[worker->get_python_name(f)].push_back(fnt_info_t{.ptr = f, .rewrite = false});
     else
       clu::emit_error(f->getParamDecl(0), "You request to wrap this function as a method, but the first argument is not a class being wrapped.");
   }

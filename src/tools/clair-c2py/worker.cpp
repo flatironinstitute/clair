@@ -82,10 +82,17 @@ bool worker_t::check_convertibility(clang::FunctionDecl const *f, bool test_retu
 //--------------------------------------------------------
 
 str_t worker_t::get_python_name(clang::CXXRecordDecl const *cls) const {
-  if (auto rename = clu::get_annotation_value(cls, "c2py_rename")) return *rename;
-  else return util::camel_case(cls->getNameAsString());
+  if (auto rename = clu::get_annotation_value(cls, "c2py_rename"))
+    return *rename;
+  else
+    return util::camel_case(cls->getNameAsString());
 }
 
+str_t worker_t::get_python_name(clang::FunctionDecl const *f) const {
+  str_t py_name = f->getNameAsString();
+  if (auto rename = clu::get_annotation_value(f, "c2py_rename")) py_name = *rename;
+  return py_name;
+}
 //--------------------------------------------------------
 
 void worker_t::analyze_one_method(clang::FunctionDecl const *f, cls_info_t &cls_info, cls_ptr_t cls) {
@@ -134,7 +141,7 @@ void worker_t::analyze_one_method(clang::FunctionDecl const *f, cls_info_t &cls_
   }
 
   // generic case
-  if (check_convertibility(m)) cls_info.methods[m->getNameAsString()].push_back({m});
+  if (check_convertibility(m)) cls_info.methods[get_python_name(m)].push_back({m});
 }
 
 // ---------     MAKE UNIQUE functions--------------

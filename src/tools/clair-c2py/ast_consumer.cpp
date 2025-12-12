@@ -113,23 +113,27 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
     return functionDecl(std::move(x)..., excludes);
   };
 
-  // ------- Match the AST
-  MatchFinder mf;
-
+  // ------- Match the AST in two passes
+  // Pass 1: Match classes and enums first, so all classes are collected
+  // before we process functions (which may reference these classes)
+  MatchFinder mf_1;
   matcher<mtch::Cls> ma_cls{worker};
   matcher<mtch::Enum> ma_enum{worker};
-  matcher<mtch::Fnt> ma_f{worker};
   matcher<mtch::ModuleClsWrap> ma_using{worker};
 
-  mf.addMatcher(add_excludes(call_cls).bind("class"), &ma_cls);
-  mf.addMatcher(add_excludes(call_enum).bind("en"), &ma_enum);
-  mf.addMatcher(add_excludes(call_fun).bind("func"), &ma_f);
+  mf_1.addMatcher(add_excludes(call_cls).bind("class"), &ma_cls);
+  mf_1.addMatcher(add_excludes(call_enum).bind("en"), &ma_enum);
+  mf_1.addMatcher(namespaceDecl(isExpansionInMainFile(), hasName("c2py_module"), //
+                                forEach(typeAliasDecl().bind("decl"))),
+                  &ma_using);
+  mf_1.matchAST(ctx);
+  if (ctx.getDiagnostics().hasErrorOccurred()) return;
 
-  mf.addMatcher(namespaceDecl(isExpansionInMainFile(), hasName("c2py_module"), //
-                              forEach(typeAliasDecl().bind("decl"))),
-                &ma_using);
-
-  mf.matchAST(ctx);
+  // Pass 2: Match functions now that all classes are known
+  MatchFinder mf_2;
+  matcher<mtch::Fnt> ma_f{worker};
+  mf_2.addMatcher(add_excludes(call_fun).bind("func"), &ma_f);
+  mf_2.matchAST(ctx);
   if (ctx.getDiagnostics().hasErrorOccurred()) return;
 
   // -------- done ----------

@@ -123,7 +123,7 @@ void codegen_synth___dict_attribute(std::ostream &code, std::ostream &table, cls
 
 // ===================================================================
 
-void codegen_getter_setter(std::ostream &table, std::ostream &doc, str_t const &prop_name, cls_info_t::property const &prop) {
+void codegen_getter_setter(std::ostream &table, std::ostream &doc, str_t const &prop_name, cls_info_t::property const &prop, str_t const &cls_name) {
 
   static long counter = 0;
 
@@ -138,8 +138,19 @@ void codegen_getter_setter(std::ostream &table, std::ostream &doc, str_t const &
   // ---- getter ----
   str_t getter_entry;
   if (getter_method) {
+    // Check if the method is inherited from a base class
+    auto method_parent = clu::get_fully_qualified_name(getter_method->getParent());
+    bool is_inherited  = (method_parent != cls_name);
+
     auto cast_op = fmt::format("cast{}<>", getter_method->isStatic() ? "" : (getter_method->isConst() ? "mc" : "m"));
-    getter_entry = fmt::format("c2py::getter_from_method<c2py::{}(&{})>", cast_op, prop.getter.ptr->getQualifiedNameAsString());
+    if (is_inherited) {
+      // Use getter_from_method_B for inherited methods to handle member pointer type conversion
+      getter_entry =
+         fmt::format("c2py::getter_from_method_B<{0}, c2py::{1}(&{2}::{3})>", cls_name, cast_op, method_parent, getter_method->getNameAsString());
+    } else {
+      // Use regular getter_from_method for methods declared in this class
+      getter_entry = fmt::format("c2py::getter_from_method<c2py::{}(&{})>", cast_op, prop.getter.ptr->getQualifiedNameAsString());
+    }
   } else {
     getter_entry = fmt::format("c2py::getter_from_fun<&{}>", prop.getter.ptr->getQualifiedNameAsString());
   }
@@ -151,8 +162,8 @@ void codegen_getter_setter(std::ostream &table, std::ostream &doc, str_t const &
   if (has_setter) {
     auto setter_name    = prop.setters[0].ptr->getQualifiedNameAsString();
     auto *setter_method = prop.setters[0].as_method();
-    setter_entry  = fmt::format("(setter)c2py::{}<&{}>", setter_method ? "setter_from_method" : "setter_from_fun", setter_name);
-    closure_entry = fmt::format(R"RAW((void*)"Cannot delete the attribute {}")RAW", prop_name);
+    setter_entry        = fmt::format("(setter)c2py::{}<&{}>", setter_method ? "setter_from_method" : "setter_from_fun", setter_name);
+    closure_entry       = fmt::format(R"RAW((void*)"Cannot delete the attribute {}")RAW", prop_name);
   }
 
   table << fmt::format(R"RAW( {{"{}", {}, {}, prop_doc_{}, {}}},)RAW", prop_name, getter_entry, setter_entry, counter, closure_entry);
@@ -249,10 +260,12 @@ void codegen_operators(std::ostream &code, cls_info_t const &cls_info, str_t con
       pairs.push_back(fmt::format("std::pair<{}, {}>", clu::get_fully_qualified_name(sig[0], ctx), clu::get_fully_qualified_name(sig[1], ctx)));
     }
 
-    code << fmt::format("\ntemplate <> struct c2py::arithmetic<{0}, c2py::OpName::{1}> : std::tuple<{2}> {{}};\n", cls_alias, op_name, join(pairs, ", "));
+    code << fmt::format("\ntemplate <> struct c2py::arithmetic<{0}, c2py::OpName::{1}> : std::tuple<{2}> {{}};\n", cls_alias, op_name,
+                        join(pairs, ", "));
   }
 
-  if (count > 0) code << fmt::format("\ntemplate <> constexpr PyNumberMethods *c2py::tp_as_number<{0}> = &c2py::tp_as_number_impl<{0}>;\n", cls_alias);
+  if (count > 0)
+    code << fmt::format("\ntemplate <> constexpr PyNumberMethods *c2py::tp_as_number<{0}> = &c2py::tp_as_number_impl<{0}>;\n", cls_alias);
 }
 
 // ===================================================================
@@ -341,7 +354,8 @@ str_t codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const
                              name, cls_alias, type, member_counter);
     else
       // {{"{0}", c2py::get_member<&{1}::{0}>, c2py::set_member<&{1}::{0}>, _c2py_doc_member_{3}, nullptr}},
-      Members << fmt::format(R"RAW( c2py::getsetdef_from_member<&{1}::{0}, {1}>("{0}", _c2py_doc_member_{3}),)RAW", name, cls_alias, type, member_counter);
+      Members << fmt::format(R"RAW( c2py::getsetdef_from_member<&{1}::{0}, {1}>("{0}", _c2py_doc_member_{3}),)RAW", name, cls_alias, type,
+                             member_counter);
     ++member_counter;
   }
 
@@ -352,7 +366,7 @@ str_t codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const
   std::stringstream Properties, PropertiesDocs;
   for (auto const &[pyname, prop] : cls_info.properties) {
     logs.prop(fmt::format("{}", pyname));
-    codegen_getter_setter(Properties, PropertiesDocs, pyname, prop);
+    codegen_getter_setter(Properties, PropertiesDocs, pyname, prop, cls_full_name);
   }
 
   if (cls_info.synthetize_dict_attribute()) codegen_synth___dict_attribute(code, Properties, cls_info, cls_alias);

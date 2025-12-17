@@ -39,6 +39,11 @@ namespace clu {
 
     if (auto *spe = t->getAs<clang::TemplateSpecializationType>()) {
 
+      // if this is a type alias template (like get_value_t<...>), desugar it to the underlying type
+      if (auto *tmpl_decl = spe->getTemplateName().getAsTemplateDecl()) {
+        if (llvm::isa<clang::TypeAliasTemplateDecl>(tmpl_decl)) { return get_fully_qualified_name(t.getCanonicalType(), ctx); }
+      }
+
       auto treat_one_template_arg = [&ctx, &policy](clang::TemplateArgument const &targ) -> str_t {
         switch (targ.getKind()) {
           case clang::TemplateArgument::ArgKind::Type: return get_fully_qualified_name(targ.getAsType(), ctx);

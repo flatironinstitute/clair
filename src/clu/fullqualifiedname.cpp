@@ -5,6 +5,7 @@
 #include <clang/AST/QualTypeNames.h>
 #include <clang/AST/DeclTemplate.h>
 #include <clang/AST/Attr.h>
+#include <clang/AST/Expr.h>
 
 namespace clu {
 
@@ -49,8 +50,14 @@ namespace clu {
           case clang::TemplateArgument::ArgKind::Type: return get_fully_qualified_name(targ.getAsType(), ctx);
 
           case clang::TemplateArgument::ArgKind::Expression: {
+            auto *expr = targ.getAsExpr();
             clang::Expr::EvalResult result;
-            if (targ.getAsExpr()->EvaluateAsInt(result, ctx)) return std::to_string(result.Val.getInt().getExtValue());
+            if (expr->EvaluateAsInt(result, ctx)) {
+              auto val = result.Val.getInt().getExtValue();
+              if (expr->getType()->isCharType()) { return std::string("'") + static_cast<char>(val) + "'"; }
+              return std::to_string(val);
+            }
+            break;
           }
 
           case clang::TemplateArgument::ArgKind::Integral: return std::to_string(targ.getAsIntegral().getExtValue());
@@ -104,7 +111,7 @@ namespace clu {
 #if LLVM_VERSION_MAJOR >= 21
     policy.PrintAsCanonical = true;
 #else
-    policy.PrintCanonicalTypes    = true;
+    policy.PrintCanonicalTypes = true;
 #endif
 
     return clean_libc_mess(clang::TypeName::getFullyQualifiedName(t, ctx, policy));

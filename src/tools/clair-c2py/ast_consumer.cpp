@@ -116,7 +116,6 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
   // ------- Match the AST in two passes
   // Pass 1: Match classes and enums first, so all classes are collected
   // before we process functions (which may reference these classes)
-  // Pass 2: Match functions after that all classes are known
   MatchFinder mf1, mf2;
   matcher<mtch::Cls> ma_cls{worker};
   matcher<mtch::Enum> ma_enum{worker};
@@ -124,14 +123,15 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
 
   mf1.addMatcher(add_excludes(call_cls).bind("class"), &ma_cls);
   mf1.addMatcher(add_excludes(call_enum).bind("en"), &ma_enum);
-  mf2.addMatcher(add_excludes(call_fun).bind("func"), &ma_f);
   mf1.addMatcher(namespaceDecl(isExpansionInMainFile(), hasName("c2py_module"), //
                                 forEach(typeAliasDecl().bind("decl"))),
                   &ma_using);
   mf1.matchAST(ctx);
   if (ctx.getDiagnostics().hasErrorOccurred()) return;
 
+  // Pass 2: Match functions after that all classes are known
   matcher<mtch::Fnt> ma_f{worker};
+  mf2.addMatcher(add_excludes(call_fun).bind("func"), &ma_f);
   mf2.matchAST(ctx);
   if (ctx.getDiagnostics().hasErrorOccurred()) return;
 

@@ -51,6 +51,8 @@ str_t fnt_params_with_default(clang::FunctionDecl const *f) {
   auto extract_default_argument = [](clang::ParmVarDecl const *p) -> str_t {
     clang::Expr const *defarg = p->getDefaultArg();
     EXPECTS(defarg);
+    defarg = defarg->IgnoreParenImpCasts();
+
     //if (not defarg) return {};
     clang::ASTContext *ctx = &p->getASTContext();
 
@@ -60,9 +62,15 @@ str_t fnt_params_with_default(clang::FunctionDecl const *f) {
     // If a reference to a variable
     if (auto *decl = llvm::dyn_cast_or_null<clang::DeclRefExpr>(defarg)) { return decl->getFoundDecl()->getQualifiedNameAsString(); }
 
-    // default solution : just extract the source code.
-    //llvm::errs() << "DEFAULT =" << clu::get_source_range_as_string(p->getDefaultArgRange(), ctx) << "\n";
-    return clu::get_source_range_as_string(p->getDefaultArgRange(), ctx);
+    // default solution : just extract the source code and clean it a bit
+    auto s = clu::get_source_range_as_string(p->getDefaultArgRange(), ctx);
+    //  strip leading '='  and spaces
+    size_t i = 0;
+    while (i < s.size() && (isspace((unsigned char)s[i]) || (s[i] == '='))) ++i;
+    s = s.substr(i);
+    // if the default parameter is a braced init list, we need the full type name
+    if (!s.empty() && s[0] == '{') s = clu::get_fully_qualified_name(p->getType(), *ctx) + s;
+    return s;
   };
   // --------
 

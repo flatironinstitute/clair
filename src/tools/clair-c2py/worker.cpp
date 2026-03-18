@@ -6,6 +6,7 @@
 #include <filesystem>
 
 #include "llvm/ADT/DenseSet.h"
+#include <clang/AST/RecursiveASTVisitor.h>
 
 #include <itertools/itertools.hpp>
 #include "utility/macros.hpp"
@@ -13,11 +14,72 @@
 #include "utility/logger.hpp"
 #include "clu/misc.hpp"
 #include "clu/concept.hpp"
+#include "data.hpp"
 
 static const struct {
   util::logger error    = util::logger{&std::cout, "-- ", "\033[1;33mError:  \033[0m"};
   util::logger rejected = util::logger{&std::cout, "-- ", "\033[1;33mRejecting: \033[0m"};
 } logs;
+
+// ------------------------------------------------
+// Validates that every return statement in a reference-returning method
+// returns a direct (or inherited) member of `this`.
+//
+// The visitor traverses the full body and emits an error for any
+// return statement whose expression is not of that form.  This covers all
+// control-flow paths (if/else branches, early returns, etc.).
+//
+// Expected AST shape for a valid return:
+//   ReturnStmt
+//     ImplicitCastExpr*          (zero or more, e.g. lvalue-to-rvalue)
+//       MemberExpr
+//         ImplicitCastExpr*      (zero or more, e.g. derived-to-base cast)
+//           CXXThisExpr
+//
+// Caveat: RecursiveASTVisitor descends into ALL nested scopes, including
+// lambdas and local classes defined inside the method body.  A return
+// statement inside such a nested scope belongs to that inner function, not
+// to the method being checked, and would be incorrectly flagged here.
+// This is not a problem for the typical wrapped methods (no nested
+// functions), but should be fixed (e.g. by overriding TraverseLambdaExpr
+// to return true without descending) if such patterns are ever wrapped.
+// NB : audited and commented by AI.
+class check_return_visitor : public clang::RecursiveASTVisitor<check_return_visitor> {
+  fnt_ptr_t f;
+
+  public:
+  explicit check_return_visitor(fnt_ptr_t f) : f{f} {}
+
+  bool VisitReturnStmt(clang::ReturnStmt *ret) {
+    // Peel implicit casts on the returned expression (e.g. lvalue-to-rvalue).
+    clang::Expr const *ret_value = ret->getRetValue();
+    while (auto *ice = llvm::dyn_cast_or_null<clang::ImplicitCastExpr>(ret_value)) ret_value = ice->getSubExpr();
+
+    // The expression must be a member access …
+    auto *ex = llvm::dyn_cast_or_null<clang::MemberExpr>(ret_value);
+
+    // Take the base of the outermost MemberExpr (e.g. base of `.something` is `b`).
+    // If ex was null (no MemberExpr found at all), start with nullptr.
+    clang::Expr const *base = ex ? ex->getBase() : nullptr;
+    // Peel any ImplicitCastExpr wrappers (e.g. derived-to-base casts for inherited members).
+    // After this, base is either CXXThisExpr, another MemberExpr (chained access), or something else.
+    while (auto *ice = llvm::dyn_cast_or_null<clang::ImplicitCastExpr>(base)) base = ice->getSubExpr();
+
+    // Accept only `this->direct_member`.  Anything else is rejected: nullptr (no MemberExpr),
+    // another MemberExpr (chained access like `b.something` where b is a member), a DeclRefExpr
+    // (local variable or global), etc.
+    // Caveat: `this->member.submember` is also rejected even though it is safe, because the
+    // chain is not walked.
+    // Fix if needed: replace the ImplicitCastExpr loop above with a loop that also
+    // descends through MemberExpr nodes until the root base is reached.
+    if (not llvm::dyn_cast_or_null<clang::CXXThisExpr>(base)) {
+      clu::emit_error(f->getReturnTypeSourceRange().getBegin(), f->getASTContext(),
+                      "c2py: Can not be converted from C++ to Python. I can not check that this method returns a member of `this`.");
+      clu::emit_error(ret->getBeginLoc(), f->getASTContext(), "c2py: ... due to this return statement.");
+    }
+    return true;
+  }
+};
 
 //--------------------------------------------------------
 
@@ -73,8 +135,20 @@ bool worker_t::check_convertibility(clang::FunctionDecl const *f, bool test_retu
       ok = false;
     } else if ((not ty->isVoidType()) and (not clu::satisfy_concept(ty, this->IsConvertibleC2Py, this->ci))
                and (not this->module_info.is_wrapped(ty))) {
-      if (emit_error) clu::emit_error(f, "c2py: Can not convert this return type from C++ to python");
+      if (emit_error)
+        clu::emit_error(f, "c2py: Can not be converted from C++ to python");
       ok = false;
+    } else {
+      if (ty->isReferenceType()) { // further checks if we return a reference
+                                   // it must be a method, and we only return this->a_member;
+                                   // everything else is rejected
+        if (auto m = llvm::dyn_cast_or_null<clang::CXXMethodDecl>(f); !m) {
+          clu::emit_error(f, "c2py: Can not be converted from C++ to Python. Only methods can return a reference.");
+        } else {
+          auto visitor = check_return_visitor{f};
+          visitor.TraverseStmt(m->getBody());
+        }
+      }
     }
   }
   return ok;
@@ -273,6 +347,26 @@ void worker_t::separate_properties(cls_info_t &cls_info) {
     }
     return false; // default: do not remove
   });
+}
+
+// -----------------------------
+// Returns the guard parameter index P from a C2PY_GUARD(P) annotation on `d`,
+// or -1 if no such annotation is present.
+//
+// C2PY_GUARD(P) declares that the lifetime of the return value is tied to
+// parameter P (0-based index)
+// The macro expands to an annotation attribute whose string value is
+// "c2py_guard_<P>" (e.g. "c2py_guard_0").
+int get_guard_number(clang::Decl const *d) {
+  std::regex const re{R"RAW(c2py_guard_(\d+))RAW"};
+  for (auto &attr : d->getAttrs()) {
+    if (auto an = llvm::dyn_cast_or_null<clang::AnnotateAttr>(attr)) {
+      std::smatch m;
+      auto anno = std::string{an->getAnnotation()};
+      if (std::regex_match(anno, m, re) and m.size() == 2) return std::stoi(m[1].str());
+    }
+  }
+  return -1;
 }
 
 // -------------------

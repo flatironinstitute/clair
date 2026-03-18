@@ -147,7 +147,7 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
 
     if (f_info.rewrite) {
       if (m and parent_class and not m->isStatic())
-        return fmt::format(R"RAW( c2py::cmethod([]({0} {6} & self {1} {2}) {{ return self.{3}({4}); }}, "self" {1} {5}))RAW", //
+        return fmt::format(R"RAW( c2py::cmethod([]({0} {6} & self {1} {2}) -> decltype(auto) {{ return self.{3}({4}); }}, "self" {1} {5}))RAW", //
                            clu::get_fully_qualified_name(parent_class), comma_if(args),                                       //
                            fnt_param_with_types(f), f->getNameAsString(), fnt_params(f), args, (m->isConst() ? "const" : ""));
       else

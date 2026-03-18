@@ -20,6 +20,10 @@ namespace clu {
   * @return C<cls>
   */
   inline bool satisfy_concept(clang::CXXRecordDecl const *cls, clang::ConceptDecl const *cpt, clang::CompilerInstance *ci) {
+#if LLVM_VERSION_MAJOR >= 22
+    return satisfy_concept(clang::QualType(cls->getASTContext().getCanonicalTagType(cls)), cpt, ci);
+#else
     return satisfy_concept(clang::QualType{cls->getTypeForDecl(), 0}, cpt, ci);
+#endif
   }
 } // namespace clu

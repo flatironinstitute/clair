@@ -19,8 +19,10 @@ bool clu::satisfy_concept(clang::QualType const &ty, clang::ConceptDecl const *c
   // typedef
   if (auto *ty2 = llvm::dyn_cast_or_null<clang::TypedefType>(ty.getTypePtr())) { return satisfy_concept(ty2->desugar(), cpt, ci); }
 
-  // ElaboratedType
+  // ElaboratedType (removed in LLVM 22, absorbed into TagType)
+#if LLVM_VERSION_MAJOR < 22
   if (auto *ty2 = llvm::dyn_cast_or_null<clang::ElaboratedType>(ty.getTypePtr())) { return satisfy_concept(ty2->desugar(), cpt, ci); }
+#endif
 
   // TemplateSpecializationType
   if (auto *ty2 = llvm::dyn_cast_or_null<clang::TemplateSpecializationType>(ty.getTypePtr())) { return satisfy_concept(ty2->desugar(), cpt, ci); }

@@ -81,6 +81,13 @@ bool worker_t::check_convertibility(clang::FunctionDecl const *f, bool test_retu
 }
 //--------------------------------------------------------
 
+str_t worker_t::get_python_name(clang::CXXRecordDecl const *cls) const {
+  if (auto rename = clu::get_annotation_value(cls, "c2py_rename")) return *rename;
+  else return util::camel_case(cls->getNameAsString());
+}
+
+//--------------------------------------------------------
+
 void worker_t::analyze_one_method(clang::FunctionDecl const *f, cls_info_t &cls_info, cls_ptr_t cls) {
 
   if (f->isDeleted()) return;

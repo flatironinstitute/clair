@@ -114,8 +114,7 @@ void analyze_class(clang::CXXRecordDecl const *cls, worker_t *worker) {
   }
 
   // Insert in the module class list
-  str_t py_name = util::camel_case(cls->getNameAsString());
-  worker->module_info.add_class(py_name, cls);
+  worker->module_info.add_class(worker->get_python_name(cls), cls);
 
   // Finally analyze recursively the nested classes, as they can be pruned by the namespaces directive
   for (auto const *d : cls->decls()) {

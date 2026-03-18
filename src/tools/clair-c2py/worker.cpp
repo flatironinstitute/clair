@@ -102,19 +102,18 @@ bool worker_t::check_convertibility(clang::FunctionDecl const *f, bool test_retu
                and (not this->module_info.is_wrapped(ty))) {
       if (emit_error)
         clu::emit_error(f, "c2py: Can not be converted from C++ to python");
-      else {
-        if (ty->isReferenceType()) { // further checks if we return a reference
-                                     // it must be a method, and we only return this->a_member;
-                                     // everything else is rejected
-          if (auto m = llvm::dyn_cast_or_null<clang::CXXMethodDecl>(f); !m) {
-            clu::emit_error(f, "c2py: Can not be converted from C++ to Python. Only methods can return a reference.");
-          } else {
-            auto visitor = check_return_visitor{f};
-            visitor.TraverseStmt(m->getBody());
-          }
+      ok = false;
+    } else {
+      if (ty->isReferenceType()) { // further checks if we return a reference
+                                   // it must be a method, and we only return this->a_member;
+                                   // everything else is rejected
+        if (auto m = llvm::dyn_cast_or_null<clang::CXXMethodDecl>(f); !m) {
+          clu::emit_error(f, "c2py: Can not be converted from C++ to Python. Only methods can return a reference.");
+        } else {
+          auto visitor = check_return_visitor{f};
+          visitor.TraverseStmt(m->getBody());
         }
       }
-      ok = false;
     }
   }
   return ok;

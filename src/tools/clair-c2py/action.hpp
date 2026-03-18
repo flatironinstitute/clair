@@ -31,7 +31,7 @@ class custom_action : public clang::ASTFrontendAction {
   // --------------------------
   bool BeginInvocation(clang::CompilerInstance &CI) override {
     // Skip function bodies, it gains parsing time, and we do not need them.
-    CI.getInvocation().getFrontendOpts().SkipFunctionBodies = 1;
+    // CI.getInvocation().getFrontendOpts().SkipFunctionBodies = 1;
 
     // Force color diagnostics if requested via environment variables
     // This ensures colors work even when output is redirected to a pipe

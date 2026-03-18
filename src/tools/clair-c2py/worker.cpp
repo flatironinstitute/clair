@@ -6,6 +6,7 @@
 #include <filesystem>
 
 #include "llvm/ADT/DenseSet.h"
+#include <clang/AST/RecursiveASTVisitor.h>
 
 #include <itertools/itertools.hpp>
 #include "utility/macros.hpp"
@@ -13,11 +14,37 @@
 #include "utility/logger.hpp"
 #include "clu/misc.hpp"
 #include "clu/concept.hpp"
+#include "data.hpp"
 
 static const struct {
   util::logger error    = util::logger{&std::cout, "-- ", "\033[1;33mError:  \033[0m"};
   util::logger rejected = util::logger{&std::cout, "-- ", "\033[1;33mRejecting: \033[0m"};
 } logs;
+
+// ------------------------------------------------
+
+class check_return_visitor : public clang::RecursiveASTVisitor<check_return_visitor> {
+  fnt_ptr_t f;
+
+  public:
+  explicit check_return_visitor(fnt_ptr_t f) : f{f} {}
+
+  bool VisitStmt(clang::Stmt *s) {
+    // Check only the return Statement in the tree
+    if (auto *ret = llvm::dyn_cast_or_null<clang::ReturnStmt>(s); ret) {
+      auto *ret_value = ret->getRetValue();
+      // peel off the ImplicitCastExpr
+      while (auto *decl = llvm::dyn_cast_or_null<clang::ImplicitCastExpr>(ret_value)) { ret_value = decl->getSubExpr(); }
+      // do we return this->something ? [ in fact A-> something and A == this]. If not : error
+      if (auto *ex = llvm::dyn_cast_or_null<clang::MemberExpr>(ret_value); not(ex and llvm::dyn_cast_or_null<clang::CXXThisExpr>(ex->getBase()))) {
+        clu::emit_error(f->getReturnTypeSourceRange().getBegin(), f->getASTContext(),
+                        "c2py: Can not be converted from C++ to Python. I can not check that this method returns a member of `this`.");
+        clu::emit_error(ret->getBeginLoc(), f->getASTContext(), "c2py: ... due to this return statement.");
+      }
+    }
+    return true;
+  }
+};
 
 //--------------------------------------------------------
 
@@ -73,7 +100,20 @@ bool worker_t::check_convertibility(clang::FunctionDecl const *f, bool test_retu
       ok = false;
     } else if ((not ty->isVoidType()) and (not clu::satisfy_concept(ty, this->IsConvertibleC2Py, this->ci))
                and (not this->module_info.is_wrapped(ty))) {
-      if (emit_error) clu::emit_error(f, "c2py: Can not convert this return type from C++ to python");
+      if (emit_error)
+        clu::emit_error(f, "c2py: Can not be converted from C++ to python");
+      else {
+        if (ty->isReferenceType()) { // further checks if we return a reference
+                                     // it must be a method, and we only return this->a_member;
+                                     // everything else is rejected
+          if (auto m = llvm::dyn_cast_or_null<clang::CXXMethodDecl>(f); !m) {
+            clu::emit_error(f, "c2py: Can not be converted from C++ to Python. Only methods can return a reference.");
+          } else {
+            auto visitor = check_return_visitor{f};
+            visitor.TraverseStmt(m->getBody());
+          }
+        }
+      }
       ok = false;
     }
   }
@@ -273,6 +313,23 @@ void worker_t::separate_properties(cls_info_t &cls_info) {
     }
     return false; // default: do not remove
   });
+}
+
+// -----------------------------
+
+int get_guard_number(clang::Decl const *d) {
+  std::regex const re{R"RAW(c2py_guard_(.*))RAW"};
+  for (auto &attr : d->getAttrs()) {
+    if (auto an = llvm::dyn_cast_or_null<clang::AnnotateAttr>(attr)) {
+      std::smatch m;
+      auto anno = std::string{an->getAnnotation()};
+      if (std::regex_match(anno, m, re))
+        // The first sub_match is the whole string; the next
+        // sub_match is the first parenthesized expression.
+        if (m.size() == 2) { llvm::errs() << " GAUARD = " << m[1].str(); }
+    }
+  }
+  return 0;
 }
 
 // -------------------

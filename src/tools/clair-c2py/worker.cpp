@@ -81,9 +81,9 @@ bool worker_t::check_convertibility(clang::FunctionDecl const *f, bool test_retu
 }
 //--------------------------------------------------------
 
-str_t worker_t::get_python_name(clang::NamedDecl const *d) const {
+str_t worker_t::get_python_name(clang::FunctionDecl const *d) const {
   if (auto rename = clu::get_annotation_value(d, "c2py_rename")) return *rename;
-  else return util::camel_case(d->getNameAsString());
+  else return d->getNameAsString();
 }
 
 //--------------------------------------------------------

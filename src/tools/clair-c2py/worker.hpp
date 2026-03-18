@@ -45,8 +45,8 @@ struct worker_t {
   bool check_convertibility(clang::FunctionDecl const *f, bool test_return_type = true) const;
 
 
-  /// Get the Python name of a decl after taking into account possible renaming.
-  str_t get_python_name(clang::NamedDecl const *d) const;
+  /// Get the Python name of a FunctionDecl after taking into account possible renaming.
+  str_t get_python_name(clang::FunctionDecl const *d) const;
 
   private:
   void analyze_one_method(clang::FunctionDecl const *f, cls_info_t &cls_info, cls_ptr_t cls);

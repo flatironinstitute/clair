@@ -112,6 +112,10 @@ namespace clu {
   // ----------------------------------------------
 
   str_t get_fully_qualified_name(clang::TypeDecl const *t, bool canonical) {
+#if LLVM_VERSION_MAJOR >= 22
+    if (auto *td = llvm::dyn_cast<clang::TagDecl>(t))
+      return get_fully_qualified_name(t->getASTContext().getTagType(clang::ElaboratedTypeKeyword::None, std::nullopt, td, false), t->getASTContext(), canonical);
+#endif
     return get_fully_qualified_name(clang::QualType{t->getTypeForDecl(), 0}, t->getASTContext(), canonical);
   }
 

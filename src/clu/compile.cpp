@@ -40,7 +40,9 @@ void clu::compile(clang::CompilerInstance &ci, std::string const &code) {
   ciNew.setInvocation(cinvNew);
 #endif
   ciNew.setTarget(&Target);
-#if LLVM_VERSION_MAJOR >= 20
+#if LLVM_VERSION_MAJOR >= 22
+  ciNew.createDiagnostics(*llvm::vfs::getRealFileSystem(), ciNew.getDiagnosticOpts());
+#elif LLVM_VERSION_MAJOR >= 20
   ciNew.createDiagnostics(*llvm::vfs::getRealFileSystem());
 #else
   ciNew.createDiagnostics();

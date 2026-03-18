@@ -35,17 +35,18 @@ std::string format_toml_error(const toml::parse_error &err) {
   std::ostringstream oss;
   oss << "Failed to parse TOML file: " << err.description() << "\n";
 
-  const auto &source = err.source();
-  oss << "At " << source.path << ":" << source.begin.line << ":" << source.begin.column << "\n";
+  const auto &toml_src = err.source();
+  oss << "At " << toml_src.path << ":" << toml_src.begin.line << ":" << toml_src.begin.column << "\n";
 
   // Print a few lines around the error
-  std::ifstream file(*source.path.get());
+  std::ifstream file(*toml_src.path.get());
   if (file) {
     std::string line;
     for (long line_no = 1; std::getline(file, line); ++line_no) {
-      if (std::abs(line_no - long(source.begin.line)) > 2) continue;
-      oss << fmt::format("{}{}: {}\n", (line_no == source.begin.line ? ">> " : "   "), line_no, line);
-      if (line_no == source.begin.line) oss << "   " << std::string(source.begin.column - 1, ' ') << "^\n";
+      if (std::abs(line_no - long(toml_src.begin.line)) > 2) continue;
+      oss << fmt::format("{}{}: {}\n", (line_no == toml_src.begin.line ? ">> " : "   "), line_no, line);
+      if (line_no == toml_src.begin.line) oss << "   " << std::string(toml_src.begin.column - 1, ' ') << "^\n";
+      // ahah
     }
   }
 

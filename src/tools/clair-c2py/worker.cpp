@@ -180,6 +180,21 @@ void worker_t::analyze_one_method(clang::FunctionDecl const *f, cls_info_t &cls_
       ctr and ctr->isCopyOrMoveConstructor())
     return; // no move or copy constructor
 
+  // ---- explicit property annotations
+  if (auto prop_name = clu::get_annotation_value(m, "c2py_property_get")) {
+    if (m->getNumParams() != 0)
+      clu::emit_error(m, "c2py: C2PY_PROPERTY_GET method must take no parameters");
+    else if (m->getReturnType()->isVoidType())
+      clu::emit_error(m, "c2py: C2PY_PROPERTY_GET method must not return void");
+    else if (check_convertibility(m))
+      cls_info.properties[*prop_name].getter = {.ptr = m};
+    return;
+  }
+  if (auto prop_name = clu::get_annotation_value(m, "c2py_property_set")) {
+    if (check_convertibility(m)) cls_info.properties[*prop_name].setters.push_back({.ptr = m});
+    return;
+  }
+
   auto name = m->getNameAsString();
 
   // ---- constructors

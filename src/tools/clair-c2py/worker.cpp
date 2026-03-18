@@ -340,20 +340,23 @@ void worker_t::separate_properties(cls_info_t &cls_info) {
 }
 
 // -----------------------------
-
+// Returns the guard parameter index P from a C2PY_GUARD(P) annotation on `d`,
+// or -1 if no such annotation is present.
+//
+// C2PY_GUARD(P) declares that the lifetime of the return value is tied to
+// parameter P (0-based index)
+// The macro expands to an annotation attribute whose string value is
+// "c2py_guard_<P>" (e.g. "c2py_guard_0").
 int get_guard_number(clang::Decl const *d) {
-  std::regex const re{R"RAW(c2py_guard_(.*))RAW"};
+  std::regex const re{R"RAW(c2py_guard_(\d+))RAW"};
   for (auto &attr : d->getAttrs()) {
     if (auto an = llvm::dyn_cast_or_null<clang::AnnotateAttr>(attr)) {
       std::smatch m;
       auto anno = std::string{an->getAnnotation()};
-      if (std::regex_match(anno, m, re))
-        // The first sub_match is the whole string; the next
-        // sub_match is the first parenthesized expression.
-        if (m.size() == 2) { llvm::errs() << " GAUARD = " << m[1].str(); }
+      if (std::regex_match(anno, m, re) and m.size() == 2) return std::stoi(m[1].str());
     }
   }
-  return 0;
+  return -1;
 }
 
 // -------------------

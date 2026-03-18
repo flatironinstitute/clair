@@ -180,21 +180,6 @@ void worker_t::analyze_one_method(clang::FunctionDecl const *f, cls_info_t &cls_
       ctr and ctr->isCopyOrMoveConstructor())
     return; // no move or copy constructor
 
-  // ---- explicit property annotations
-  if (auto prop_name = clu::get_annotation_value(m, "c2py_property_get")) {
-    if (m->getNumParams() != 0)
-      clu::emit_error(m, "c2py: C2PY_PROPERTY_GET method must take no parameters");
-    else if (m->getReturnType()->isVoidType())
-      clu::emit_error(m, "c2py: C2PY_PROPERTY_GET method must not return void");
-    else if (check_convertibility(m))
-      cls_info.properties[*prop_name].getter = {.ptr = m};
-    return;
-  }
-  if (auto prop_name = clu::get_annotation_value(m, "c2py_property_set")) {
-    if (check_convertibility(m)) cls_info.properties[*prop_name].setters.push_back({.ptr = m});
-    return;
-  }
-
   auto name = m->getNameAsString();
 
   // ---- constructors
@@ -227,6 +212,27 @@ void worker_t::analyze_one_method(clang::FunctionDecl const *f, cls_info_t &cls_
   if (name == "begin" or name == "end" or name == "cend" or name == "cbegin") {
     cls_info.has_iterator = true;
     return; // do not wrap these methods
+  }
+
+  // ---- explicit property annotations
+  if (auto prop_name = clu::get_annotation_value(m, "c2py_property_get")) {
+    if (m->getNumParams() != 0)
+      clu::emit_error(m, "c2py: C2PY_PROPERTY_GET method must take no parameters");
+    else if (m->getReturnType()->isVoidType())
+      clu::emit_error(m, "c2py: C2PY_PROPERTY_GET method must not return void");
+    else if (check_convertibility(m))
+      cls_info.properties[*prop_name].getter = {.ptr = m};
+    return;
+  }
+  if (auto prop_name = clu::get_annotation_value(m, "c2py_property_set")) {
+    if (check_convertibility(m)) cls_info.properties[*prop_name].setters.push_back({.ptr = m});
+    return;
+  }
+
+  // wrap_no_arg_methods_as_properties: treat no-arg non-void methods as read-only properties.
+  if (config.wrap_no_arg_methods_as_properties and m->getNumParams() == 0 and not m->getReturnType()->isVoidType()) {
+    if (check_convertibility(m)) cls_info.properties[get_python_name(m)].getter = {.ptr = m};
+    return;
   }
 
   // generic case
@@ -348,22 +354,6 @@ void worker_t::scan_class_and_bases_elements(cls_info_t &cls_info) {
   }
 }
 
-// ------------------------------------------------
-void worker_t::separate_properties(cls_info_t &cls_info) {
-  // if the method has no argument and is not void (?)
-  // we remove it as method, and insert it in the property list
-  std::erase_if(cls_info.methods, [&cls_info](auto &&p) -> bool {
-    auto &[name, v] = p;
-    if ((v.size() == 1) and (v[0].ptr->getNumParams() == 0)) {
-      if (auto *m = v[0].as_method(); m and not m->getReturnType()->isVoidType()) {
-        cls_info.properties.insert({name, cls_info_t::property{v[0], {}}});
-        return true; // remove
-      }
-    }
-    return false; // default: do not remove
-  });
-}
-
 // -----------------------------
 // Returns the guard parameter index P from a C2PY_GUARD(P) annotation on `d`,
 // or -1 if no such annotation is present.
@@ -392,7 +382,6 @@ void worker_t::run() {
 
   for (auto &[_, cls_info] : this->module_info.classes) {
     this->scan_class_and_bases_elements(cls_info);
-    if (config.wrap_no_arg_methods_as_properties) this->separate_properties(cls_info);
 
     // Checks
     if (cls_info.constructors.empty() and not cls_info.synthetize_dict_attribute()

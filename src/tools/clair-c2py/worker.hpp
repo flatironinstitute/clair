@@ -53,5 +53,4 @@ struct worker_t {
   void analyze_one_method(clang::FunctionDecl const *f, cls_info_t &cls_info, cls_ptr_t cls);
   void scan_class_elements(cls_info_t &cls_info, cls_ptr_t cls);
   void scan_class_and_bases_elements(cls_info_t &cls_info);
-  void separate_properties(cls_info_t &cls_info);
 };

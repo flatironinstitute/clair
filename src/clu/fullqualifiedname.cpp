@@ -61,7 +61,11 @@ namespace clu {
             break;
           }
 
-          case clang::TemplateArgument::ArgKind::Integral: return std::to_string(targ.getAsIntegral().getExtValue());
+          case clang::TemplateArgument::ArgKind::Integral: {
+            auto val = targ.getAsIntegral().getExtValue();
+            if (targ.getIntegralType()->isCharType()) { return std::string("'") + static_cast<char>(val) + "'"; }
+            return std::to_string(val);
+          }
           default: break;
         }
         // default : use policy

@@ -126,63 +126,39 @@ void codegen_synth___dict_attribute(std::ostream &code, std::ostream &table, cls
 
 // ===================================================================
 
-void codegen_getter_setter(std::ostream &code, std::ostream &table, std::ostream &doc, str_t const &prop_name, cls_info_t::property const &prop) {
+void codegen_getter_setter(std::ostream &table, std::ostream &doc, str_t const &prop_name, cls_info_t::property const &prop) {
 
   static long counter = 0;
 
-  bool has_setter      = !prop.setters.empty();
-  auto *getter_method  = prop.getter.as_method(); // null when getter is a free function
-
-  // ---- setter ----
-  // FIXME : implement the LIST of setters.
-  if (has_setter) {
-    auto *setter_method      = prop.setters[0].as_method();
-    auto setter_name         = prop.setters[0].ptr->getQualifiedNameAsString();
-    // free function setter uses cmethod (first arg is self); method setter uses cfun
-    auto cfun_or_cmethod     = std::string{setter_method ? "cfun" : "cmethod"};
-    auto setter_arg_names    = std::string{setter_method ? R"("i")" : R"("self", "i")"};
-    code << fmt::format(R"RAW(
-      static int prop_set_{counter}(PyObject *self, PyObject *value, void *closure) {{
-         if (value == NULL) return (PyErr_SetString(PyExc_AttributeError, "Cannot delete the attribute {prop_name}"), -1);
-         static c2py::dispatcher_f_kw_t d = {{c2py::{cfun_or_cmethod}(&{setter}, {setter_arg_names})}};
-         d(self, c2py::pyref(PyTuple_Pack(1, value)), nullptr);
-        return 0;
-      }}
-
-)RAW",
-                        "counter"_a = counter, "prop_name"_a = prop_name, "setter"_a = setter_name,
-                        "cfun_or_cmethod"_a = cfun_or_cmethod, "setter_arg_names"_a = setter_arg_names);
-  }
-
-  // ---- free function getter: generate an explicit getter function ----
-  if (!getter_method) {
-    code << fmt::format(R"RAW(
-      static PyObject *prop_get_{counter}(PyObject *self, void *) {{
-        static c2py::dispatcher_f_kw_t ovs = {{c2py::cmethod(&{getter}, "self")}};
-        return ovs(self, nullptr, nullptr);
-      }}
-
-)RAW",
-                        "counter"_a = counter, "getter"_a = prop.getter.ptr->getQualifiedNameAsString());
-  }
+  bool has_setter     = !prop.setters.empty();
+  auto *getter_method = prop.getter.as_method(); // null when getter is a free function
 
   auto gsdoc   = clu::doc_string_t{prop.getter.ptr};
   auto doc_str = gsdoc.brief_str;
   doc_str += gsdoc.details_str.empty() ? "" : (doc_str.empty() ? gsdoc.details_str : fmt::format("\n\n{}", gsdoc.details_str));
   doc << fmt::format(R"RAW( static constexpr auto prop_doc_{0} = R"DOC({1})DOC"; )RAW", counter, doc_str);
 
-  // ---- table entry ----
-  auto setter_entry = (has_setter ? fmt::format("(setter)prop_set_{0}", counter) : str_t{"nullptr"});
+  // ---- getter ----
+  str_t getter_entry;
   if (getter_method) {
-    // method getter: use getter_from_method with appropriate cast operator
-    auto cast_op = fmt::format("cast{}<>", (getter_method->isStatic() ? "" : (getter_method->isConst() ? "mc" : "m")));
-    table << fmt::format(R"RAW( {{"{1}", c2py::getter_from_method<c2py::{3}(&{2})>, {4}, prop_doc_{0}, nullptr}},)RAW",
-                         counter, prop_name, prop.getter.ptr->getQualifiedNameAsString(), cast_op, setter_entry);
+    auto cast_op = fmt::format("cast{}<>", getter_method->isStatic() ? "" : (getter_method->isConst() ? "mc" : "m"));
+    getter_entry = fmt::format("c2py::getter_from_method<c2py::{}(&{})>", cast_op, prop.getter.ptr->getQualifiedNameAsString());
   } else {
-    // free function getter: use the explicitly generated prop_get_N
-    table << fmt::format(R"RAW( {{"{1}", prop_get_{0}, {2}, prop_doc_{0}, nullptr}},)RAW",
-                         counter, prop_name, setter_entry);
+    getter_entry = fmt::format("c2py::getter_from_fun<&{}>", prop.getter.ptr->getQualifiedNameAsString());
   }
+
+  // ---- setter ----
+  // FIXME: implement the LIST of setters.
+  str_t setter_entry  = "nullptr";
+  str_t closure_entry = "nullptr";
+  if (has_setter) {
+    auto setter_name    = prop.setters[0].ptr->getQualifiedNameAsString();
+    auto *setter_method = prop.setters[0].as_method();
+    setter_entry  = fmt::format("(setter)c2py::{}<&{}>", setter_method ? "setter_from_method" : "setter_from_fun", setter_name);
+    closure_entry = fmt::format(R"RAW((void*)"Cannot delete the attribute {}")RAW", prop_name);
+  }
+
+  table << fmt::format(R"RAW( {{"{}", {}, {}, prop_doc_{}, {}}},)RAW", prop_name, getter_entry, setter_entry, counter, closure_entry);
 
   counter++;
 }
@@ -336,15 +312,14 @@ void codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const 
 
   // ---------- Properties ------------
 
-  std::stringstream PropertiesDecls, Properties, PropertiesDocs;
+  std::stringstream Properties, PropertiesDocs;
   for (auto const &[pyname, prop] : cls_info.properties) {
     logs.prop(fmt::format("{}", pyname));
-    codegen_getter_setter(PropertiesDecls, Properties, PropertiesDocs, pyname, prop);
+    codegen_getter_setter(Properties, PropertiesDocs, pyname, prop);
   }
 
   if (cls_info.synthetize_dict_attribute()) codegen_synth___dict_attribute(code, Properties, cls_info);
 
-  code << PropertiesDecls.str();
   code << PropertiesDocs.str();
 
   // ---------- member & prop table

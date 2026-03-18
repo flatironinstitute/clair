@@ -22,7 +22,8 @@ namespace clu {
     if (t.isNull()) return ""; // abort
 
     // if the type is a built in, just get its name, resolving all aliases.
-    if (auto *bu = t->getAs<clang::BuiltinType>()) { return str_t{bu->getName(policy)}; }
+    // cv-qualifiers live on the QualType wrapper, not on BuiltinType itself, so prepend them explicitly.
+    if (auto *bu = t->getAs<clang::BuiltinType>()) { return (t.isConstQualified() ? "const " : "") + str_t{bu->getName(policy)}; }
 
     // If we have an alias or a using, just the name, do not introspect.
     if (t->getAs<clang::TypedefType>()) { return clang::TypeName::getFullyQualifiedName(t, ctx, policy); }

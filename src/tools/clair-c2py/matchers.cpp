@@ -192,6 +192,32 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
     M.module_init = f;
   }
 
+  // ---- property annotations on free functions
+  if (auto prop_name = clu::get_annotation_value(f, "c2py_property_get")) {
+    if (f->param_size() == 0) {
+      clu::emit_error(f, "A function tagged c2py_property_get must take at least 1 argument (self)");
+      return;
+    }
+    auto first_arg_type = as_CXXRecordDecl(f->getParamDecl(0)->getType());
+    if (auto it = M.classes_ptr_to_info.find(first_arg_type); it != M.classes_ptr_to_info.end())
+      M.classes[it->second].second.properties[*prop_name].getter = fnt_info_t{.ptr = f, .rewrite = false};
+    else
+      clu::emit_error(f->getParamDecl(0), "c2py_property_get: first argument is not a class being wrapped.");
+    return;
+  }
+  if (auto prop_name = clu::get_annotation_value(f, "c2py_property_set")) {
+    if (f->param_size() == 0) {
+      clu::emit_error(f, "A function tagged c2py_property_set must take at least 1 argument (self)");
+      return;
+    }
+    auto first_arg_type = as_CXXRecordDecl(f->getParamDecl(0)->getType());
+    if (auto it = M.classes_ptr_to_info.find(first_arg_type); it != M.classes_ptr_to_info.end())
+      M.classes[it->second].second.properties[*prop_name].setters.push_back(fnt_info_t{.ptr = f, .rewrite = false});
+    else
+      clu::emit_error(f->getParamDecl(0), "c2py_property_set: first argument is not a class being wrapped.");
+    return;
+  }
+
   // Check convertibility
   if (not worker->check_convertibility(f)) return;
 

@@ -22,25 +22,50 @@ static const struct {
 } logs;
 
 // ------------------------------------------------
-
+// Validates that every return statement in a reference-returning method
+// returns a direct (or inherited) member of `this`.
+//
+// The visitor traverses the full body and emits an error for any
+// return statement whose expression is not of that form.  This covers all
+// control-flow paths (if/else branches, early returns, etc.).
+//
+// Expected AST shape for a valid return:
+//   ReturnStmt
+//     ImplicitCastExpr*          (zero or more, e.g. lvalue-to-rvalue)
+//       MemberExpr
+//         ImplicitCastExpr*      (zero or more, e.g. derived-to-base cast)
+//           CXXThisExpr
+//
+// Caveat: RecursiveASTVisitor descends into ALL nested scopes, including
+// lambdas and local classes defined inside the method body.  A return
+// statement inside such a nested scope belongs to that inner function, not
+// to the method being checked, and would be incorrectly flagged here.
+// This is not a problem for the typical wrapped methods (no nested
+// functions), but should be fixed (e.g. by overriding TraverseLambdaExpr
+// to return true without descending) if such patterns are ever wrapped.
 class check_return_visitor : public clang::RecursiveASTVisitor<check_return_visitor> {
   fnt_ptr_t f;
 
   public:
   explicit check_return_visitor(fnt_ptr_t f) : f{f} {}
 
-  bool VisitStmt(clang::Stmt *s) {
-    // Check only the return Statement in the tree
-    if (auto *ret = llvm::dyn_cast_or_null<clang::ReturnStmt>(s); ret) {
-      auto *ret_value = ret->getRetValue();
-      // peel off the ImplicitCastExpr
-      while (auto *decl = llvm::dyn_cast_or_null<clang::ImplicitCastExpr>(ret_value)) { ret_value = decl->getSubExpr(); }
-      // do we return this->something ? [ in fact A-> something and A == this]. If not : error
-      if (auto *ex = llvm::dyn_cast_or_null<clang::MemberExpr>(ret_value); not(ex and llvm::dyn_cast_or_null<clang::CXXThisExpr>(ex->getBase()))) {
-        clu::emit_error(f->getReturnTypeSourceRange().getBegin(), f->getASTContext(),
-                        "c2py: Can not be converted from C++ to Python. I can not check that this method returns a member of `this`.");
-        clu::emit_error(ret->getBeginLoc(), f->getASTContext(), "c2py: ... due to this return statement.");
-      }
+  bool VisitReturnStmt(clang::ReturnStmt *ret) {
+    // Peel implicit casts on the returned expression (e.g. lvalue-to-rvalue).
+    clang::Expr const *ret_value = ret->getRetValue();
+    while (auto *ice = llvm::dyn_cast_or_null<clang::ImplicitCastExpr>(ret_value)) ret_value = ice->getSubExpr();
+
+    // The expression must be a member access …
+    auto *ex = llvm::dyn_cast_or_null<clang::MemberExpr>(ret_value);
+
+    // … whose base is `this`, possibly through a derived-to-base cast
+    // (needed for members inherited from a base class).
+    clang::Expr const *base = ex ? ex->getBase() : nullptr;
+    while (auto *ice = llvm::dyn_cast_or_null<clang::ImplicitCastExpr>(base)) base = ice->getSubExpr();
+
+    if (not llvm::dyn_cast_or_null<clang::CXXThisExpr>(base)) {
+      clu::emit_error(f->getReturnTypeSourceRange().getBegin(), f->getASTContext(),
+                      "c2py: Can not be converted from C++ to Python. I can not check that this method returns a member of `this`.");
+      clu::emit_error(ret->getBeginLoc(), f->getASTContext(), "c2py: ... due to this return statement.");
     }
     return true;
   }

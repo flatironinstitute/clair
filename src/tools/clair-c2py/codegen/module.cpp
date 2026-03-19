@@ -14,6 +14,7 @@ using namespace fmt::literals;
 using util::join;
 static const struct {
   util::logger mod = util::logger{&std::cout, "-- ", "\033[1;32mModule: \033[0m"};
+  util::logger enu = util::logger{&std::cout, "-- ", "\033[1;32mEnum: \033[0m"};
 } logs;
 
 // =========== module code template ==============
@@ -36,6 +37,7 @@ str_t codegen_module(module_info_t const &m) {
   std::stringstream EnumDecls;
   for (auto const &enu : m.enums) {
     auto qname = enu->getQualifiedNameAsString();
+    logs.enu(qname);
     EnumDecls << fmt::format(
        R"RAW( 
        template <> std::map<{0}, str_t> c2py::enum_to_string<{0}> = {{ {1} }};)RAW",

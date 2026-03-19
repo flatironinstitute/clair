@@ -49,6 +49,9 @@ struct worker_t {
   /// Get the Python name of a function or method after taking into account possible renaming.
   str_t get_python_name(clang::FunctionDecl const *f) const;
 
+  /// Analyze a binary operator (free function or method) and store its operand types
+  void analyze_operator(clang::FunctionDecl const *f);
+
   private:
   void analyze_one_method(clang::FunctionDecl const *f, cls_info_t &cls_info, cls_ptr_t cls);
   void scan_class_elements(cls_info_t &cls_info, cls_ptr_t cls);

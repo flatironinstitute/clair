@@ -10,6 +10,10 @@ using cls_ptr_t = clang::CXXRecordDecl const *;
 using fnt_ptr_t = clang::FunctionDecl const *;
 
 // -----------------------------------------------------------
+// Operator kind: arithmetic, comparison, and unary
+enum class OpKind { Add, Sub, Mul, Div, Eq, Ne, Lt, Gt, Le, Ge, Neg, Pos };
+
+// -----------------------------------------------------------
 
 struct fnt_info_t {
   fnt_ptr_t ptr = nullptr;
@@ -44,6 +48,10 @@ struct cls_info_t {
   };
   std::map<str_t, property> properties = {}; // pyname -> list of C++ overloads
 
+  // operators: op -> list of signatures (each signature = full argument type list)
+  // e.g. Add -> {{A, A}, {A, int}}, Neg -> {{A}}
+  std::map<OpKind, std::vector<std::vector<clang::QualType>>> operators = {};
+
   // Do we need to synthesize a constructor, as the class has only a {}
   // aggregate initialization
   bool synthetize_init_from_pydict() const { return (ptr->isAggregate() and (ptr->getNumBases() == 0)); }
@@ -62,8 +70,8 @@ struct module_info_t {
   str_t documentation;
   clang::FunctionDecl const *module_init = nullptr;
 
-  std::map<str_t, std::vector<fnt_info_t>> functions; // vector not unique
-  std::vector<clang::EnumDecl const *> enums;         // all enums (including in classes)
+  std::map<str_t, std::vector<fnt_info_t>> functions;     // vector not unique
+  std::vector<clang::EnumDecl const *> enums;             // all enums (including in classes)
 
   std::vector<std::pair<str_t, cls_info_t>> classes; // index of cls_table. Must keep order of insertion to have base first
   std::map<cls_ptr_t, long> classes_ptr_to_info;     // reverse search table
@@ -74,9 +82,16 @@ struct module_info_t {
     classes_ptr_to_info[cls] = long(classes.size() - 1); // index in classes
   }
 
-  bool is_wrapped(clang::QualType ty) const {
+  cls_ptr_t get_wrapped_cls(clang::QualType ty) const {
     clang::CXXRecordDecl const *cls = ty->getAsCXXRecordDecl();
     if (!cls) cls = ty->getPointeeCXXRecordDecl();
-    return cls and classes_ptr_to_info.contains(cls);
+    return (cls and classes_ptr_to_info.contains(cls)) ? cls : nullptr;
   }
+
+  cls_info_t *get_wrapped_cls_info(clang::QualType ty) {
+    auto cls = get_wrapped_cls(ty);
+    return cls ? &classes[classes_ptr_to_info.at(cls)].second : nullptr;
+  }
+
+  bool is_wrapped(clang::QualType ty) const { return get_wrapped_cls(ty) != nullptr; }
 };

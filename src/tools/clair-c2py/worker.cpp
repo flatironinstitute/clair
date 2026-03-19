@@ -22,6 +22,26 @@ static const struct {
 } logs;
 
 // ------------------------------------------------
+
+// Map operator name + arity to OpKind. Returns std::nullopt for unsupported operators.
+// Arity is the number of operands (1 = unary, 2 = binary).
+static std::optional<OpKind> operator_name_to_kind(std::string_view name, int arity) {
+  if (name == "operator+" and arity == 2) return OpKind::Add;
+  if (name == "operator-" and arity == 2) return OpKind::Sub;
+  if (name == "operator+" and arity == 1) return OpKind::Pos;
+  if (name == "operator-" and arity == 1) return OpKind::Neg;
+  if (name == "operator*") return OpKind::Mul;
+  if (name == "operator/") return OpKind::Div;
+  if (name == "operator==") return OpKind::Eq;
+  if (name == "operator!=") return OpKind::Ne;
+  if (name == "operator<") return OpKind::Lt;
+  if (name == "operator>") return OpKind::Gt;
+  if (name == "operator<=") return OpKind::Le;
+  if (name == "operator>=") return OpKind::Ge;
+  return std::nullopt;
+}
+
+// ------------------------------------------------
 // Validates that every return statement in a reference-returning method
 // returns a direct (or inherited) member of `this`.
 //
@@ -197,8 +217,9 @@ void worker_t::analyze_one_method(clang::FunctionDecl const *f, cls_info_t &cls_
       if (check_convertibility(m, m->isConst())) (m->isConst() ? cls_info.getitems : cls_info.setitems).push_back({m});
     } else if (name == "operator()") {
       if (check_convertibility(m)) cls_info.methods["__call__"].push_back({m});
+    } else {
+      analyze_operator(f);
     }
-    // all other operators are ignored
     return;
   }
 
@@ -285,6 +306,34 @@ std::vector<fnt_info_t> rm_const_overloads(std::vector<fnt_info_t> const &mlist)
   for (int i : idx) result.push_back(mlist[i]);
 
   return result;
+}
+
+// ------------------------------------------------
+
+void worker_t::analyze_operator(clang::FunctionDecl const *f) {
+
+  auto name    = f->getNameAsString();
+  auto *method = llvm::dyn_cast<clang::CXXMethodDecl>(f);
+
+  // Compute the operand arity (including implicit this for methods)
+  int arity = int(f->getNumParams()) + (method ? 1 : 0);
+  if (arity < 1 or arity > 2) return;
+
+  auto op = operator_name_to_kind(name, arity);
+  if (not op) return;
+
+  if (not check_convertibility(f)) return;
+
+  // Build the full argument type list
+  std::vector<clang::QualType> args;
+  if (method) args.push_back(method->getThisType()->getPointeeType().getUnqualifiedType());
+  for (unsigned i = 0; i < f->getNumParams(); ++i)
+    args.push_back(f->getParamDecl(i)->getType().getNonReferenceType().getUnqualifiedType());
+
+  // Associate with the class of the first argument; fall back to second if first is not wrapped
+  auto *cli = module_info.get_wrapped_cls_info(args[0]);
+  if (not cli and args.size() > 1) cli = module_info.get_wrapped_cls_info(args[1]);
+  if (cli) cli->operators[*op].push_back(std::move(args));
 }
 
 // ------------------------------------------------

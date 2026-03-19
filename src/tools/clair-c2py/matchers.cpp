@@ -171,12 +171,15 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
     std::abort();
   }
 
-  // Discard some special function
-  if (f->getNameAsString().starts_with("operator")) return;
-
   // apply c2py_ignore and the reject_name regex
   auto &M = worker->module_info;
   if (worker->is_rejected(f, &logs.rejected)) return;
+
+  // Special treatment for operator
+  if (f->getNameAsString().starts_with("operator")) {
+    worker->analyze_operator(f);
+    return;
+  }
 
   // ---- module_init tag
   // At most one function can be tagged as module_init
@@ -191,6 +194,9 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
     if (not f->getReturnType()->isVoidType()) clu::emit_error(f, "A function tagged c2py_module_init must return void");
     M.module_init = f;
   }
+
+  // ----- Check convertibility
+  if (not worker->check_convertibility(f)) return;
 
   // ---- property annotations on free functions
   if (auto prop_name = clu::get_annotation_value(f, "c2py_property_get")) {
@@ -217,9 +223,6 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
       clu::emit_error(f->getParamDecl(0), "c2py_property_set: first argument is not a class being wrapped.");
     return;
   }
-
-  // Check convertibility
-  if (not worker->check_convertibility(f)) return;
 
   // store the function in the module_info or as method of a class if c2py_wrap_as_method is set
   if (not clu::has_annotation(f, "c2py_wrap_as_method"))

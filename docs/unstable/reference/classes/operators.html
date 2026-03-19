@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Operators &mdash; clair - Automatic Python/C++ bindings  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b20cc3f5" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=417d15d8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=8f9e6779" />
+
+  
+  
+        <script src="../../_static/jquery.js?v=8dae8fb0"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=66b4909c"></script>
+        <script src="../../_static/copybutton.js?v=71494f10"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Iterable Objects" href="iterable.html" />
+    <link rel="prev" title="Methods" href="methods.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7E588A" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            clair - Automatic Python/C++ bindings
+          </a>
+              <div class="version">
+                0.3.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../install_src.html">Compiling from source</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../install_src.html#clair">clair</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../install_src.html#c2py">c2py</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../install_src.html#cmake-options">CMake options</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../install_src.html#set-environment-variables">Set environment variables</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started/index.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started/index.html#c-code">C++ Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started/index.html#generate-python-bindings-and-compile-the-module">Generate Python Bindings and Compile the Module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/use_clair_c2py_manually.html">Use clair-c2py manually</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../getting_started/use_clair_c2py_manually.html#generate-python-bindings">Generate Python Bindings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../getting_started/use_clair_c2py_manually.html#compile-the-module">Compile the Module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/use_cmake_integration.html">Use CMake integration [Recommended]</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../getting_started/use_cmake_integration.html#generate-python-bindings-and-compile-the-module">Generate Python Bindings and Compile the Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../getting_started/use_cmake_integration.html#cmake-configuration">CMake Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../getting_started/use_cmake_integration.html#general-workflow">General Workflow</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started/index.html#use-the-python-module">Use the Python Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started/index.html#what-is-a-clang-tool">What is a Clang tool?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../gallery/index.html">Gallery</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../gallery/functions.html">Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../gallery/class1.html">Classes</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Reference documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../basic_notions.html">Basic notions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../basic_notions.html#type-conversion">Type conversion</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../basic_notions.html#principle">Principle</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../basic_notions.html#convertible-types">Convertible types</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../basic_notions.html#dynamical-dispatch">Dynamical dispatch</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../customize.html">Customization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../customize/code_annotations.html">Using annotations in the C++ sources</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../customize/toml.html">Using a TOML configuration file</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../customize/toml.html#generating-a-template-toml-file">Generating a template TOML file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../customize/toml.html#toml-configuration-options">TOML Configuration Options</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../customize/toml.html#example">Example</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../customize/toml.html#filtering-by-namespace">Filtering by namespace</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../customize/toml.html#filtering-by-name">Filtering by name</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../customize/toml.html#filter-by-file-name">Filter by file name</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../customize/toml.html#wrap-no-argument-methods-as-properties">Wrap no argument methods as properties</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../functions.html">Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../functions.html#default-behavior-customization">Default Behavior &amp; Customization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../functions.html#template-functions">Template Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../functions.html#coroutines-generators">Coroutines, generators</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Classes</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="index.html#default-behavior-customization">Default Behavior &amp; Customization</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="constructors.html">Constructors</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="constructors.html#user-defined-constructors">User-defined constructors</a></li>
+<li class="toctree-l5"><a class="reference internal" href="constructors.html#synthesized-aggregate-constructor">Synthesized aggregate constructor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="methods.html">Methods</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="methods.html#instance-methods">Instance Methods</a></li>
+<li class="toctree-l5"><a class="reference internal" href="methods.html#const-methods">Const Methods</a></li>
+<li class="toctree-l5"><a class="reference internal" href="methods.html#static-methods">Static Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Operators</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#operator">Operator()</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#id1">Operator[]</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#arithmetic-operators">Arithmetic Operators</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#comparison-operators">Comparison Operators</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="iterable.html">Iterable Objects</a></li>
+<li class="toctree-l4"><a class="reference internal" href="string_representation.html">String Representation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../enums.html">Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multiple.html">Across multiple modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../multiple.html#example-two-communicating-modules">Example: Two communicating modules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../multiple.html#module-a-defining-a-class">Module A: Defining a class</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../multiple.html#module-b">Module B</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../multiple.html#cmake-configuration">CMake configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../multiple.html#usage-in-python">Usage in Python</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../converters.html">Converters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../converters.html#default-converters">Default converters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../converters.html#custom-converters-for-user-defined-types">Custom converters for user-defined types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../converters.html#set-up-for-third-party-libraries">Set up for third party libraries</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../c2py.html">c2py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../hdf5.html">HDF5 (TRIQS/h5 Integration)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../nda.html">TRIQS/nda</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebook.html">Notebook integration</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../issues.html">Reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Change Logs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about.html">About clair/c2py</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7E588A" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">clair - Automatic Python/C++ bindings</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Reference documentation</a></li>
+          <li class="breadcrumb-item"><a href="index.html">Classes</a></li>
+      <li class="breadcrumb-item active">Operators</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/reference/classes/operators.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="operators">
+<span id="class-operators"></span><h1>Operators<a class="headerlink" href="#operators" title="Link to this heading"></a></h1>
+<section id="operator">
+<h2>Operator()<a class="headerlink" href="#operator" title="Link to this heading"></a></h2>
+<p>The function call operator allows objects to be called like functions in Python.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// operator() wrapping</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span>
+
+<span class="k">namespace</span><span class="w"> </span><span class="nn">mylib</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">  </span><span class="k">class</span><span class="w"> </span><span class="nc">multiplier</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">factor_</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="n">multiplier</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">factor</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">factor_</span><span class="p">(</span><span class="n">factor</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+
+<span class="w">    </span><span class="c1">// Function call operator</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="k">operator</span><span class="p">()(</span><span class="kt">int</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">factor_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">value</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="p">};</span>
+
+<span class="p">}</span><span class="w"> </span><span class="c1">// namespace mylib</span>
+</pre></div>
+</div>
+<p>The Python usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mymodule</span> <span class="kn">import</span> <span class="n">Multiplier</span>
+<span class="n">mult</span> <span class="o">=</span> <span class="n">Multiplier</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">mult</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>  <span class="c1"># Calls operator()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>  <span class="c1"># 50</span>
+</pre></div>
+</div>
+</section>
+<section id="id1">
+<h2>Operator[]<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<p>The subscript operator enables indexing and item access in Python.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// operator[] wrapping</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span>
+
+<span class="k">namespace</span><span class="w"> </span><span class="nn">mylib</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">  </span><span class="k">class</span><span class="w"> </span><span class="nc">container</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">data_</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="n">container</span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">size</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">data_</span><span class="p">(</span><span class="n">size</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+
+<span class="w">    </span><span class="c1">// Subscript operator for reading</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="k">operator</span><span class="p">[](</span><span class="kt">size_t</span><span class="w"> </span><span class="n">index</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">data_</span><span class="p">[</span><span class="n">index</span><span class="p">];</span><span class="w"> </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Subscript operator for writing</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="o">&amp;</span><span class="k">operator</span><span class="p">[](</span><span class="kt">size_t</span><span class="w"> </span><span class="n">index</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">data_</span><span class="p">[</span><span class="n">index</span><span class="p">];</span><span class="w"> </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kt">size_t</span><span class="w"> </span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">data_</span><span class="p">.</span><span class="n">size</span><span class="p">();</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="p">};</span>
+
+<span class="p">}</span><span class="w"> </span><span class="c1">// namespace mylib</span>
+</pre></div>
+</div>
+<p>The Python usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mymodule</span> <span class="kn">import</span> <span class="n">Container</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">Container</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">42</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># 42</span>
+</pre></div>
+</div>
+</section>
+<section id="arithmetic-operators">
+<h2>Arithmetic Operators<a class="headerlink" href="#arithmetic-operators" title="Link to this heading"></a></h2>
+<p>Arithmetic operators (+, -, <a href="#id2"><span class="problematic" id="id3">*</span></a>, /, etc.) are automatically wrapped.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Arithmetic operators</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span>
+
+<span class="k">namespace</span><span class="w"> </span><span class="nn">mylib</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">  </span><span class="k">class</span><span class="w"> </span><span class="nc">vector</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">vector</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="n">y</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+
+<span class="w">    </span><span class="c1">// Arithmetic operators</span>
+<span class="w">    </span><span class="n">vector</span><span class="w"> </span><span class="k">operator</span><span class="o">+</span><span class="p">(</span><span class="n">vector</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">&amp;</span><span class="n">other</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">vector</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">other</span><span class="p">.</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">other</span><span class="p">.</span><span class="n">y</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">vector</span><span class="w"> </span><span class="k">operator</span><span class="o">-</span><span class="p">(</span><span class="n">vector</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">&amp;</span><span class="n">other</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">vector</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">other</span><span class="p">.</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">other</span><span class="p">.</span><span class="n">y</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">vector</span><span class="w"> </span><span class="k">operator</span><span class="o">*</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">scalar</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">vector</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">scalar</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">scalar</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">vector</span><span class="w"> </span><span class="o">&amp;</span><span class="k">operator</span><span class="o">+=</span><span class="p">(</span><span class="n">vector</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">&amp;</span><span class="n">other</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">x</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">other</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
+<span class="w">      </span><span class="n">y</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">other</span><span class="p">.</span><span class="n">y</span><span class="p">;</span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="o">*</span><span class="k">this</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">};</span>
+
+<span class="p">}</span><span class="w"> </span><span class="c1">// namespace mylib</span>
+</pre></div>
+</div>
+<p>The Python usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mymodule</span> <span class="kn">import</span> <span class="n">Vector</span>
+<span class="n">v1</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+<span class="n">v2</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">)</span>
+<span class="n">v3</span> <span class="o">=</span> <span class="n">v1</span> <span class="o">+</span> <span class="n">v2</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">v3</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">v3</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>  <span class="c1"># 4.0, 6.0</span>
+</pre></div>
+</div>
+</section>
+<section id="comparison-operators">
+<h2>Comparison Operators<a class="headerlink" href="#comparison-operators" title="Link to this heading"></a></h2>
+<p>Comparison operators (==, !=, &lt;, &gt;, &lt;=, &gt;=) are wrapped when defined.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Comparison operators</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;tuple&gt;</span>
+
+<span class="k">namespace</span><span class="w"> </span><span class="nn">mylib</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">  </span><span class="k">class</span><span class="w"> </span><span class="nc">version</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">major_</span><span class="p">,</span><span class="w"> </span><span class="n">minor_</span><span class="p">,</span><span class="w"> </span><span class="n">patch_</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="n">version</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">major</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">minor</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">patch</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">major_</span><span class="p">(</span><span class="n">major</span><span class="p">),</span><span class="w"> </span><span class="n">minor_</span><span class="p">(</span><span class="n">minor</span><span class="p">),</span><span class="w"> </span><span class="n">patch_</span><span class="p">(</span><span class="n">patch</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+
+<span class="w">    </span><span class="c1">// C++20 spaceship operator</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="k">operator</span><span class="o">&lt;=&gt;</span><span class="p">(</span><span class="n">version</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">&amp;</span><span class="n">other</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">tie</span><span class="p">(</span><span class="n">major_</span><span class="p">,</span><span class="w"> </span><span class="n">minor_</span><span class="p">,</span><span class="w"> </span><span class="n">patch_</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;=&gt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">tie</span><span class="p">(</span><span class="n">other</span><span class="p">.</span><span class="n">major_</span><span class="p">,</span><span class="w"> </span><span class="n">other</span><span class="p">.</span><span class="n">minor_</span><span class="p">,</span><span class="w"> </span><span class="n">other</span><span class="p">.</span><span class="n">patch_</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kt">bool</span><span class="w"> </span><span class="k">operator</span><span class="o">==</span><span class="p">(</span><span class="n">version</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">&amp;</span><span class="n">other</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">major_</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">other</span><span class="p">.</span><span class="n">major_</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">minor_</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">other</span><span class="p">.</span><span class="n">minor_</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">patch_</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">other</span><span class="p">.</span><span class="n">patch_</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="p">};</span>
+
+<span class="p">}</span><span class="w"> </span><span class="c1">// namespace mylib</span>
+</pre></div>
+</div>
+<p>The Python usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mymodule</span> <span class="kn">import</span> <span class="n">Version</span>
+<span class="n">v1</span> <span class="o">=</span> <span class="n">Version</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">v2</span> <span class="o">=</span> <span class="n">Version</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">v1</span> <span class="o">&lt;</span> <span class="n">v2</span><span class="p">)</span>   <span class="c1"># True</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">v1</span> <span class="o">==</span> <span class="n">v2</span><span class="p">)</span>  <span class="c1"># False</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="methods.html" class="btn btn-neutral float-left" title="Methods" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="iterable.html" class="btn btn-neutral float-right" title="Iterable Objects" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, The Simons Foundation, author: O. Parcollet.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

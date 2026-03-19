@@ -5,8 +5,8 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Customization &mdash; clair - Automatic Python/C++ bindings  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=f7f783a0" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b20cc3f5" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=417d15d8" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=8f9e6779" />
 
   
@@ -22,8 +22,8 @@
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Templates" href="templates.html" />
-    <link rel="prev" title="Reference documentation" href="../reference.html" /> 
+    <link rel="next" title="Using annotations in the C++ sources" href="customize/code_annotations.html" />
+    <link rel="prev" title="Basic notions" href="basic_notions.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -61,85 +61,114 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted.html">Getting started</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../gettingstarted.html#starting-example">Starting example</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../gettingstarted.html#python-c-bindings-generation">Python C++ Bindings Generation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../gettingstarted.html#compilation">Compilation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../gettingstarted.html#documentation">Documentation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../gettingstarted.html#what-is-a-binding-code-exactly">What is a binding code exactly ?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/index.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started/index.html#c-code">C++ Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started/index.html#generate-python-bindings-and-compile-the-module">Generate Python Bindings and Compile the Module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started/use_clair_c2py_manually.html">Use clair-c2py manually</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../getting_started/use_clair_c2py_manually.html#generate-python-bindings">Generate Python Bindings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../getting_started/use_clair_c2py_manually.html#compile-the-module">Compile the Module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started/use_cmake_integration.html">Use CMake integration [Recommended]</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../getting_started/use_cmake_integration.html#generate-python-bindings-and-compile-the-module">Generate Python Bindings and Compile the Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../getting_started/use_cmake_integration.html#cmake-configuration">CMake Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../getting_started/use_cmake_integration.html#general-workflow">General Workflow</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../cmake.html">CMake Integration</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../cmake.html#cmake-configuration">CMake configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../cmake.html#compiling">Compiling</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../cmake.html#workflow">Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started/index.html#use-the-python-module">Use the Python Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started/index.html#what-is-a-clang-tool">What is a Clang tool?</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../examples/functions/functions.html">Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../examples/classes/classes.html">Classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../examples/code_annotations/code_annotations.html">Code annotations</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../examples/code_annotations/code_annotations.html#c2py-ignore">C2PY_IGNORE</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../examples/code_annotations/code_annotations.html#c2py-rename">C2PY_RENAME</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../examples/code_annotations/code_annotations.html#c2py-module-init">C2PY_MODULE_INIT</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../examples/code_annotations/code_annotations.html#c2py-wrap-as-method">C2PY_WRAP_AS_METHOD</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../examples/code_annotations/code_annotations.html#compiling-the-examples">Compiling the examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gallery/index.html">Gallery</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../gallery/functions.html">Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gallery/class1.html">Classes</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../examples/toml/toml.html">TOML input file</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../examples/toml/toml.html#basic-setup">Basic setup</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../examples/toml/toml.html#filters">Filters</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../examples/toml/toml.html#filtering-by-namespace">Filtering by namespace</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../examples/toml/toml.html#filtering-by-name">Filtering by name</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../examples/toml/toml.html#filter-by-file-name">Filter by file name</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Reference documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="basic_notions.html">Basic notions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="basic_notions.html#type-conversion">Type conversion</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="basic_notions.html#principle">Principle</a></li>
+<li class="toctree-l4"><a class="reference internal" href="basic_notions.html#convertible-types">Convertible types</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../examples/toml/toml.html#wrap-no-argument-methods-as-properties">Wrap no argument methods as properties</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../examples/toml/toml.html#exclude-system-headers">Exclude system headers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="basic_notions.html#dynamical-dispatch">Dynamical dispatch</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../examples/function_templates/function_templates.html">Function templates</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../examples/class_templates/class_templates.html">Class templates</a></li>
-</ul>
-</li>
-<li class="toctree-l1 current"><a class="reference internal" href="../reference.html">Reference documentation</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Customization</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#code-annotations">Code annotations</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#toml-input-file">TOML input file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="customize/code_annotations.html">Using annotations in the C++ sources</a></li>
+<li class="toctree-l3"><a class="reference internal" href="customize/toml.html">Using a TOML configuration file</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="customize/toml.html#generating-a-template-toml-file">Generating a template TOML file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="customize/toml.html#toml-configuration-options">TOML Configuration Options</a></li>
+<li class="toctree-l4"><a class="reference internal" href="customize/toml.html#example">Example</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="customize/toml.html#filtering-by-namespace">Filtering by namespace</a></li>
+<li class="toctree-l5"><a class="reference internal" href="customize/toml.html#filtering-by-name">Filtering by name</a></li>
+<li class="toctree-l5"><a class="reference internal" href="customize/toml.html#filter-by-file-name">Filter by file name</a></li>
+<li class="toctree-l5"><a class="reference internal" href="customize/toml.html#wrap-no-argument-methods-as-properties">Wrap no argument methods as properties</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="templates.html">Templates</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fnt_basic.html">Function</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="fnt_basic.html#type-conversion">Type conversion</a></li>
-<li class="toctree-l3"><a class="reference internal" href="fnt_basic.html#dynamical-dispatch">Dynamical dispatch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="fnt_basic.html#template-functions">Template functions</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="classes.html">Classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="classes.html#constructors">Constructors</a></li>
-<li class="toctree-l3"><a class="reference internal" href="classes.html#methods">Methods</a></li>
-<li class="toctree-l3"><a class="reference internal" href="classes.html#static-methods">Static Methods</a></li>
-<li class="toctree-l3"><a class="reference internal" href="classes.html#operator">Operator()</a></li>
-<li class="toctree-l3"><a class="reference internal" href="classes.html#id1">Operator[]</a></li>
-<li class="toctree-l3"><a class="reference internal" href="classes.html#iterable-object">Iterable object</a></li>
-<li class="toctree-l3"><a class="reference internal" href="classes.html#str-and-repr">str and repr</a></li>
-<li class="toctree-l3"><a class="reference internal" href="classes.html#copy">Copy</a></li>
-<li class="toctree-l3"><a class="reference internal" href="classes.html#operators">Operators</a></li>
-<li class="toctree-l3"><a class="reference internal" href="classes.html#hdf5">hdf5</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html">Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="functions.html#default-behavior-customization">Default Behavior &amp; Customization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="functions.html#template-functions">Template Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="functions.html#coroutines-generators">Coroutines, generators</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="classes/index.html">Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="classes/index.html#default-behavior-customization">Default Behavior &amp; Customization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="classes/constructors.html">Constructors</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="classes/constructors.html#user-defined-constructors">User-defined constructors</a></li>
+<li class="toctree-l5"><a class="reference internal" href="classes/constructors.html#synthesized-aggregate-constructor">Synthesized aggregate constructor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="classes/methods.html">Methods</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="classes/methods.html#instance-methods">Instance Methods</a></li>
+<li class="toctree-l5"><a class="reference internal" href="classes/methods.html#const-methods">Const Methods</a></li>
+<li class="toctree-l5"><a class="reference internal" href="classes/methods.html#static-methods">Static Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="classes/operators.html">Operators</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="classes/operators.html#operator">Operator()</a></li>
+<li class="toctree-l5"><a class="reference internal" href="classes/operators.html#id1">Operator[]</a></li>
+<li class="toctree-l5"><a class="reference internal" href="classes/operators.html#arithmetic-operators">Arithmetic Operators</a></li>
+<li class="toctree-l5"><a class="reference internal" href="classes/operators.html#comparison-operators">Comparison Operators</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="classes/iterable.html">Iterable Objects</a></li>
+<li class="toctree-l4"><a class="reference internal" href="classes/string_representation.html">String Representation</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="enums.html">Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple.html">Across multiple modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="multiple.html#example-two-communicating-modules">Example: Two communicating modules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="multiple.html#module-a-defining-a-class">Module A: Defining a class</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multiple.html#module-b">Module B</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multiple.html#cmake-configuration">CMake configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multiple.html#usage-in-python">Usage in Python</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="converters.html">Converters</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="converters.html#default-converters">Default converters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="converters.html#py-converter">py_converter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="converters.html#third-party-library-developer-corner">Third party library [developer corner]</a></li>
+<li class="toctree-l3"><a class="reference internal" href="converters.html#custom-converters-for-user-defined-types">Custom converters for user-defined types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="converters.html#set-up-for-third-party-libraries">Set up for third party libraries</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="c2py.html">c2py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hdf5.html">HDF5 (TRIQS/h5 Integration)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nda.html">TRIQS/nda</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../notebook.html">Notebook integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebook.html">Notebook integration</a><ul class="simple">
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../issues.html">Reporting issues</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Change Logs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../about.html">About clair/c2py</a></li>
@@ -159,7 +188,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../reference.html">Reference documentation</a></li>
+          <li class="breadcrumb-item"><a href="index.html">Reference documentation</a></li>
       <li class="breadcrumb-item active">Customization</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/reference/customize.rst.txt" rel="nofollow"> View page source</a>
@@ -172,74 +201,30 @@
              
   <section id="customization">
 <span id="customize"></span><h1>Customization<a class="headerlink" href="#customization" title="Link to this heading"></a></h1>
-<p>Many customization options of the bindings generation are available,
-e.g. wrap only some functions and classes, choose template instantiation, and so on.
-This can be done</p>
-<ul class="simple">
-<li><p>with code annotations or</p></li>
-<li><p>with a TOML input file.</p></li>
+<p><code class="docutils literal notranslate"><span class="pre">clair-c2py</span></code> is an automatic tool.
+It wraps functions, classes and enums that it discovers
+in the C++ source files, except those declared in system headers i.e. the standard library and more generally
+anything the compiler includes via <code class="docutils literal notranslate"><span class="pre">-isystem</span></code> options.</p>
+<p>This default behavior of the bindings generation can be <strong>customized</strong> in two ways:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="customize/code_annotations.html">Using annotations in the C++ sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="customize/toml.html">Using a TOML configuration file</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="customize/toml.html#generating-a-template-toml-file">Generating a template TOML file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="customize/toml.html#toml-configuration-options">TOML Configuration Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="customize/toml.html#example">Example</a></li>
 </ul>
-<p>The choice between the two approaches depends on the project and needs.</p>
-<section id="code-annotations">
-<h2>Code annotations<a class="headerlink" href="#code-annotations" title="Link to this heading"></a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">clair</span></code>’s behaviour can be modified by simple annotations in the code.</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">C2PY_IGNORE</span></code>: Placed before a function or a class, <code class="docutils literal notranslate"><span class="pre">clair</span></code> ignores it.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">C2PY_WRAP_AS_METHOD</span></code>: Placed before a function, <code class="docutils literal notranslate"><span class="pre">clair</span></code> adds the function as a method to the first argument’s class object.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">C2PY_MODULE_INIT</span></code>: Placed before a function, <code class="docutils literal notranslate"><span class="pre">clair</span></code> uses this function as the module initialization function.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">C2PY_RENAME(new_name)</span></code>: Placed before a function or a class, <code class="docutils literal notranslate"><span class="pre">clair</span></code> uses <code class="docutils literal notranslate"><span class="pre">new_name</span></code> as the name in Python.</p></li>
+</li>
 </ul>
-<p>These annotations overrule any filter options in the TOML file.</p>
-<p>See <a class="reference internal" href="../examples/code_annotations/code_annotations.html#code-annotations"><span class="std std-ref">Code annotations</span></a> for examples.</p>
-</section>
-<section id="toml-input-file">
-<h2>TOML input file<a class="headerlink" href="#toml-input-file" title="Link to this heading"></a></h2>
-<p>The TOML file is required to have the same name as the C++ source file, except for the <code class="docutils literal notranslate"><span class="pre">.cpp</span></code> extension.
-For example, if the C++ source file given to <code class="docutils literal notranslate"><span class="pre">clair-c2py</span></code> is <code class="docutils literal notranslate"><span class="pre">my_module.cpp</span></code>, the TOML file should be called <code class="docutils literal notranslate"><span class="pre">my_module.toml</span></code>.</p>
-<p>Here is an example TOML file showing and explaining the available options:</p>
-<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Name of the package [optional].</span>
-<span class="c1"># Name of the module will be package_name.module_filename</span>
-<span class="n">package_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my_package&quot;</span>
-
-<span class="c1"># The documentation string of the module. </span>
-<span class="n">documentation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;This is an awesome module generated by c2py/clair.&quot;</span>
-
-<span class="c1"># List of namespaces as a space separated string e.g. &quot;A A::B&quot;</span>
-<span class="c1"># If non-empty, only the elements declared in EXACTLY these namespaces are wrapped.</span>
-<span class="c1"># NB e.g. in previous example A::detail will be ignored, whatever match_names.</span>
-<span class="n">namespaces</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;foo bar&quot;</span>
-
-<span class="c1"># Match/reject elements according to a regex (LLVM regex)</span>
-<span class="c1"># If match_names/match_names are both set, the algorithm is </span>
-<span class="c1">#  for X of fully qualified name qname</span>
-<span class="c1">#    if match_names and match_names does not match Qname : skip X</span>
-<span class="c1">#    if reject_names and reject_names matches Qname : skip X</span>
-<span class="c1">#    else keep X.</span>
-<span class="c1">#</span>
-<span class="n">match_names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-<span class="n">reject_names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-
-<span class="c1"># Only keep elements declared in files matching the pattern</span>
-<span class="n">match_files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="c1"># String must be a regex</span>
-
-<span class="c1"># If true, transform methods with no arguments into a read only property</span>
-<span class="n">wrap_no_arg_methods_as_properties</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
-
-<span class="c1"># [Advanced] If yes (default), all elements (class/enum/functions)</span>
-<span class="c1"># declared in headers included with -isystem are ignored for better performance.</span>
-<span class="n">exclude_system_headers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
-</pre></div>
 </div>
-<p>See <a class="reference internal" href="../examples/toml/toml.html#toml"><span class="std std-ref">TOML input file</span></a> for how these options affect the generated bindings.</p>
-</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../reference.html" class="btn btn-neutral float-left" title="Reference documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="templates.html" class="btn btn-neutral float-right" title="Templates" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="basic_notions.html" class="btn btn-neutral float-left" title="Basic notions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="customize/code_annotations.html" class="btn btn-neutral float-right" title="Using annotations in the C++ sources" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

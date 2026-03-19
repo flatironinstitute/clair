@@ -3,3 +3,11 @@
 .wy-nav-content {
     max-width: 70em;
 }
+
+.highlight .hll {
+    font-weight: bold;
+}
+
+.highlight .hll * {
+    color: red !important;
+}

@@ -227,6 +227,43 @@ void codegen_getsetitem(std::ostream &code, cls_info_t const &cls_info) {
 
 // ===================================================================
 
+void codegen_operators(std::ostream &code, cls_info_t const &cls_info) {
+
+  // Map binary arithmetic OpKinds to c2py::OpName strings; returns nullptr for non-arithmetic ops
+  auto to_arith_name = [](OpKind k) -> const char * {
+    switch (k) {
+      case OpKind::Add: return "Add";
+      case OpKind::Sub: return "Sub";
+      case OpKind::Mul: return "Mul";
+      case OpKind::Div: return "Div";
+      default: return nullptr;
+    }
+  };
+
+  auto const *cls = cls_info.ptr;
+  auto cls_name   = clu::get_fully_qualified_name(cls);
+  auto &ctx       = cls->getASTContext();
+
+  int count = 0;
+  for (auto const &[kind, sigs] : cls_info.operators) {
+    auto *op_name = to_arith_name(kind);
+    if (not op_name or sigs.empty()) continue;
+    ++count;
+
+    std::vector<str_t> pairs;
+    for (auto const &sig : sigs) {
+      EXPECTS(sig.size() == 2);
+      pairs.push_back(fmt::format("std::pair<{}, {}>", clu::get_fully_qualified_name(sig[0], ctx), clu::get_fully_qualified_name(sig[1], ctx)));
+    }
+
+    code << fmt::format("\ntemplate <> struct c2py::arithmetic<{0}, c2py::OpName::{1}> : std::tuple<{2}> {{}};\n", cls_name, op_name, join(pairs, ", "));
+  }
+
+  if (count > 0) code << fmt::format("\ntemplate <> constexpr PyNumberMethods *c2py::tp_as_number<{0}> = &c2py::tp_as_number_impl<{0}>;\n", cls_name);
+}
+
+// ===================================================================
+
 void codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const &cls_info, str_t const &full_module_name) {
 
   logs.cls(fmt::format("{1} [Python: {0}]", cls_py_name, cls_info.ptr->getQualifiedNameAsString()));
@@ -340,6 +377,10 @@ void codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const 
   // ---------- operator [] & size as len
 
   codegen_getsetitem(code, cls_info);
+
+  // ---------- arithmetic operators
+
+  codegen_operators(code, cls_info);
 
   // ----------- import other modules
 

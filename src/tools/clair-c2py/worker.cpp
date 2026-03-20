@@ -138,25 +138,23 @@ bool worker_t::is_rejected(clang::Decl const *decl, util::logger const *log) {
 
 // check if function parameter and return type are convertible.
 bool worker_t::check_convertibility(clang::FunctionDecl const *f, bool test_return_type) const {
-  bool emit_error = true; // TODO: make it depends on options and regex
-  bool ok         = true;
+  bool ok = true;
   for (auto i : itertools::range(f->getNumParams())) {
     auto *p = f->getParamDecl(i);
     auto ty = p->getType();
     if ((not ty->isVoidType()) and (not clu::satisfy_concept(ty, this->IsConvertiblePy2C, this->ci)) and (not this->module_info.is_wrapped(ty))) {
-      if (emit_error) clu::emit_error(p, "c2py: Can not convert this argument from python to C++");
+      clu::emit_error(p, "c2py: Can not convert this argument from python to C++");
       ok = false;
     }
   }
   if (test_return_type) {
     auto ty = f->getReturnType();
     if (ty->isPointerType() and (ty->getPointeeType().getAsString() != "PyObject")) {
-      if (emit_error) clu::emit_error(f, "c2py: Can not convert a raw C++ pointer to python");
+      clu::emit_error(f, "c2py: Can not convert a raw C++ pointer to python");
       ok = false;
     } else if ((not ty->isVoidType()) and (not clu::satisfy_concept(ty, this->IsConvertibleC2Py, this->ci))
                and (not this->module_info.is_wrapped(ty))) {
-      if (emit_error)
-        clu::emit_error(f, "c2py: Can not be converted from C++ to python");
+      clu::emit_error(f, "c2py: Can not be converted from C++ to python");
       ok = false;
     } else {
       if (ty->isReferenceType()) { // further checks if we return a reference

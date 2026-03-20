@@ -127,6 +127,20 @@ static clang::CXXRecordDecl *as_CXXRecordDecl(clang::QualType qtype) {
     if (auto *cxxrec = llvm::dyn_cast<clang::CXXRecordDecl>(rtype->getDecl())) return cxxrec;
   return nullptr; // Not a class/struct type
 }
+
+// Validate that f has at least one parameter whose type is a wrapped class.
+// Returns the corresponding cls_info_t, or nullptr after emitting an error.
+static cls_info_t *find_wrapped_cls_for_first_arg(clang::FunctionDecl const *f, module_info_t &M) {
+  if (f->param_size() == 0) {
+    clu::emit_error(f, "c2py: This annotated function must take at least 1 argument (self)");
+    return nullptr;
+  }
+  auto *first_arg_type = as_CXXRecordDecl(f->getParamDecl(0)->getType());
+  if (auto it = M.classes_ptr_to_info.find(first_arg_type); it != M.classes_ptr_to_info.end())
+    return &M.classes[it->second].second;
+  clu::emit_error(f->getParamDecl(0), "c2py: First argument is not a class being wrapped");
+  return nullptr;
+}
 // -------------------------------------------------
 template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
 
@@ -190,44 +204,25 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
 
   // ---- property annotations on free functions
   if (auto prop_name = clu::get_annotation_value(f, "c2py_property_get")) {
-    if (f->param_size() == 0) {
-      clu::emit_error(f, "A function tagged c2py_property_get must take at least 1 argument (self)");
-      return;
-    }
-    auto first_arg_type = as_CXXRecordDecl(f->getParamDecl(0)->getType());
-    if (auto it = M.classes_ptr_to_info.find(first_arg_type); it != M.classes_ptr_to_info.end())
-      M.classes[it->second].second.properties[*prop_name].getter = fnt_info_t{.ptr = f, .rewrite = false};
-    else
-      clu::emit_error(f->getParamDecl(0), "c2py_property_get: first argument is not a class being wrapped.");
+    if (auto *cli = find_wrapped_cls_for_first_arg(f, M))
+      cli->properties[*prop_name].getter = fnt_info_t{.ptr = f, .rewrite = false};
     return;
   }
   if (auto prop_name = clu::get_annotation_value(f, "c2py_property_set")) {
-    if (f->param_size() == 0) {
-      clu::emit_error(f, "A function tagged c2py_property_set must take at least 1 argument (self)");
-      return;
-    }
-    auto first_arg_type = as_CXXRecordDecl(f->getParamDecl(0)->getType());
-    if (auto it = M.classes_ptr_to_info.find(first_arg_type); it != M.classes_ptr_to_info.end())
-      M.classes[it->second].second.properties[*prop_name].setters.push_back(fnt_info_t{.ptr = f, .rewrite = false});
-    else
-      clu::emit_error(f->getParamDecl(0), "c2py_property_set: first argument is not a class being wrapped.");
+    if (auto *cli = find_wrapped_cls_for_first_arg(f, M))
+      cli->properties[*prop_name].setters.push_back(fnt_info_t{.ptr = f, .rewrite = false});
     return;
   }
 
-  // store the function in the module_info or as method of a class if c2py_wrap_as_method is set
-  if (not clu::has_annotation(f, "c2py_wrap_as_method"))
-    M.functions[worker->get_python_name(f)].push_back(fnt_info_t{f});
-  else {
-    if (f->param_size() == 0) {
-      clu::emit_error(f, "A function tagged c2py_wrap_as_method must take at least 1 argument (self)");
-      return;
-    }
-    auto first_arg_type = as_CXXRecordDecl(f->getParamDecl(0)->getType());
-    if (auto it = M.classes_ptr_to_info.find(first_arg_type); it != M.classes_ptr_to_info.end())
-      M.classes[it->second].second.methods[worker->get_python_name(f)].push_back(fnt_info_t{.ptr = f, .rewrite = false});
-    else
-      clu::emit_error(f->getParamDecl(0), "You request to wrap this function as a method, but the first argument is not a class being wrapped.");
+  // ---- wrap as method of the class of the first argument
+  if (clu::has_annotation(f, "c2py_wrap_as_method")) {
+    if (auto *cli = find_wrapped_cls_for_first_arg(f, M))
+      cli->methods[worker->get_python_name(f)].push_back(fnt_info_t{.ptr = f, .rewrite = false});
+    return;
   }
+
+  // ---- generic free function
+  M.functions[worker->get_python_name(f)].push_back(fnt_info_t{f});
 }
 
 // -------------------------------------------------

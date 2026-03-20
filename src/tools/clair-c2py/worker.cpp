@@ -136,7 +136,7 @@ bool worker_t::check_convertibility(clang::FunctionDecl const *f, bool test_retu
   for (auto i : itertools::range(f->getNumParams())) {
     auto *p = f->getParamDecl(i);
     auto ty = p->getType();
-    if ((not ty->isVoidType()) and (not clu::satisfy_concept(ty, this->IsConvertiblePy2C, this->ci)) and (not this->module_info.is_wrapped(ty))) {
+    if ((not ty->isVoidType()) and (not clu::satisfy_concept(ty, this->concepts.IsConvertiblePy2C, this->ci)) and (not this->module_info.is_wrapped(ty))) {
       clu::emit_error(p, "c2py: Can not convert this argument from python to C++");
       ok = false;
     }
@@ -146,7 +146,7 @@ bool worker_t::check_convertibility(clang::FunctionDecl const *f, bool test_retu
     if (ty->isPointerType() and (ty->getPointeeType().getAsString() != "PyObject")) {
       clu::emit_error(f, "c2py: Can not convert a raw C++ pointer to python");
       ok = false;
-    } else if ((not ty->isVoidType()) and (not clu::satisfy_concept(ty, this->IsConvertibleC2Py, this->ci))
+    } else if ((not ty->isVoidType()) and (not clu::satisfy_concept(ty, this->concepts.IsConvertibleC2Py, this->ci))
                and (not this->module_info.is_wrapped(ty))) {
       clu::emit_error(f, "c2py: Can not be converted from C++ to python");
       ok = false;
@@ -369,8 +369,8 @@ void worker_t::scan_class_elements(cls_info_t &cls_info, cls_ptr_t cls) {
     else if (auto *f = llvm::dyn_cast<clang::FieldDecl>(decl)) {
       auto ty = f->getType();
       if (not this->module_info.is_wrapped(ty)) {
-        if (not clu::satisfy_concept(ty, this->IsConvertiblePy2C, this->ci)) clu::emit_error(f, "c2py: Can not be converted from python to C++");
-        if (not clu::satisfy_concept(ty, this->IsConvertibleC2Py, this->ci)) clu::emit_error(f, "c2py: Can not be converted from C++ to python");
+        if (not clu::satisfy_concept(ty, this->concepts.IsConvertiblePy2C, this->ci)) clu::emit_error(f, "c2py: Can not be converted from python to C++");
+        if (not clu::satisfy_concept(ty, this->concepts.IsConvertibleC2Py, this->ci)) clu::emit_error(f, "c2py: Can not be converted from C++ to python");
       }
       cls_info.fields.push_back(f);
     }
@@ -382,10 +382,10 @@ void worker_t::scan_class_elements(cls_info_t &cls_info, cls_ptr_t cls) {
 void worker_t::scan_class_and_bases_elements(cls_info_t &cls_info) {
 
   // h5
-  cls_info.has_hdf5 = HasHdf5 and clu::satisfy_concept(cls_info.ptr, HasHdf5, this->ci);
+  cls_info.has_hdf5 = concepts.HasHdf5 and clu::satisfy_concept(cls_info.ptr, concepts.HasHdf5, this->ci);
 
   // Serialization
-  if (clu::satisfy_concept(cls_info.ptr, this->HasSerializeLikeBoost, this->ci))
+  if (clu::satisfy_concept(cls_info.ptr, this->concepts.HasSerializeLikeBoost, this->ci))
     cls_info.serialization = Serialization::Tuple;
   else if (cls_info.has_hdf5)
     cls_info.serialization = Serialization::H5;
@@ -424,7 +424,7 @@ void worker_t::run() {
 
     // Checks
     if (cls_info.constructors.empty() and not cls_info.synthetize_dict_attribute()
-        and not clu::satisfy_concept(cls_info.ptr, this->HasNonDeletedDefaultConstructor, this->ci))
+        and not clu::satisfy_concept(cls_info.ptr, this->concepts.HasNonDeletedDefaultConstructor, this->ci))
       clu::emit_error(cls_info.ptr, "This class has no wrapped constructor and is not default constructible.");
   }
 }

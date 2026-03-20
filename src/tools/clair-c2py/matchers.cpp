@@ -24,15 +24,15 @@ template <> void matcher<mtch::Concept>::run(const MatchResult &Result) {
     auto cname = cpt->getName().str();
 
     if (cname == "IsConvertiblePy2C")
-      worker->IsConvertiblePy2C = cpt;
+      worker->concepts.IsConvertiblePy2C = cpt;
     else if (cname == "IsConvertibleC2Py")
-      worker->IsConvertibleC2Py = cpt;
+      worker->concepts.IsConvertibleC2Py = cpt;
     else if (cname == "HasSerializeLikeBoost")
-      worker->HasSerializeLikeBoost = cpt;
+      worker->concepts.HasSerializeLikeBoost = cpt;
     else if (cname == "HasNonDeletedDefaultConstructor")
-      worker->HasNonDeletedDefaultConstructor = cpt;
+      worker->concepts.HasNonDeletedDefaultConstructor = cpt;
     else if (cname == "Storable")
-      worker->HasHdf5 = cpt;
+      worker->concepts.HasHdf5 = cpt;
     // else ignore the others concepts
   }
 }
@@ -98,7 +98,7 @@ void analyze_class(clang::CXXRecordDecl const *cls, worker_t *worker) {
 
   // reject a class which already HAS a converter Py2C
   // otherwise the wrapping would take precedence
-  if (clu::satisfy_concept(cls, worker->IsConvertiblePy2C, worker->ci)) {
+  if (clu::satisfy_concept(cls, worker->concepts.IsConvertiblePy2C, worker->ci)) {
     logs.rejected(fmt::format(R"RAW({0} [{1}])RAW", cls->getQualifiedNameAsString(), "Already has a converter"));
     return;
   }

@@ -32,12 +32,12 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
     mf.addMatcher(namedDecl(namedDecl().bind("conceptDecl"), hasName("h5::Storable")), &ma);
     mf.matchAST(ctx);
   }
-  if (worker->IsConvertiblePy2C == nullptr) {
+  if (worker->concepts.IsConvertiblePy2C == nullptr) {
     llvm::errs() << "Can not find the c2py concepts. Internal error. It should never happen. Aborting.";
     return;
   }
 
-  if (worker->HasHdf5) logs.note("Found Flatiron/h5 Storable concept. Will generate h5 code for all wrapped classes satisfying this concept.");
+  if (worker->concepts.HasHdf5) logs.note("Found Flatiron/h5 Storable concept. Will generate h5 code for all wrapped classes satisfying this concept.");
 
   // ------- Build the matcher to restrict the match to the namespaces
   auto make_ns_matcher = [&]() -> DeclarationMatcher {

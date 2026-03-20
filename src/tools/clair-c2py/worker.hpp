@@ -10,14 +10,15 @@ struct worker_t {
 
   std::optional<llvm::Regex> reject_names; // only regex, the other ones are used directly in the ASTMatcher
 
-  // Concept matched from c2py, and h5 library (if present)
-  // They are used with the Sema (clu::concept_check) to introspect types.
-  // They are Matched in the ASTConsumer, and set to nullptr if not found.
-  clang::ConceptDecl const *IsConvertiblePy2C               = nullptr;
-  clang::ConceptDecl const *IsConvertibleC2Py               = nullptr;
-  clang::ConceptDecl const *HasSerializeLikeBoost           = nullptr;
-  clang::ConceptDecl const *HasHdf5                         = nullptr;
-  clang::ConceptDecl const *HasNonDeletedDefaultConstructor = nullptr;
+  // Concepts matched from c2py and h5 library (if present).
+  // Resolved by the ASTConsumer; nullptr if not found.
+  struct {
+    clang::ConceptDecl const *IsConvertiblePy2C               = nullptr;
+    clang::ConceptDecl const *IsConvertibleC2Py               = nullptr;
+    clang::ConceptDecl const *HasSerializeLikeBoost           = nullptr;
+    clang::ConceptDecl const *HasHdf5                         = nullptr;
+    clang::ConceptDecl const *HasNonDeletedDefaultConstructor = nullptr;
+  } concepts;
 
   // Preprocessor will detect if the input has included the generated cxx file
   // and store the result in this variable.

@@ -1,8 +1,6 @@
 #include "./worker.hpp"
 
-#include <algorithm>
 #include <iostream>
-#include <numeric>
 #include <filesystem>
 
 #include "llvm/ADT/DenseSet.h"
@@ -17,7 +15,6 @@
 #include "data.hpp"
 
 static const struct {
-  util::logger error    = util::logger{&std::cout, "-- ", "\033[1;33mError:  \033[0m"};
   util::logger rejected = util::logger{&std::cout, "-- ", "\033[1;33mRejecting: \033[0m"};
 } logs;
 
@@ -176,8 +173,7 @@ bool worker_t::check_convertibility(clang::FunctionDecl const *f, bool test_retu
 str_t worker_t::get_python_name(clang::CXXRecordDecl const *cls) const {
   if (auto rename = clu::get_annotation_value(cls, "c2py_rename"))
     return *rename;
-  else
-    return util::camel_case(cls->getNameAsString());
+  return util::camel_case(cls->getNameAsString());
 }
 
 str_t worker_t::get_python_name(clang::FunctionDecl const *f) const {
@@ -209,7 +205,6 @@ void worker_t::analyze_one_method(clang::FunctionDecl const *f, cls_info_t &cls_
   // ---- operators : keep only [] and ()
   if (name.starts_with("operator")) {
     if (name == "operator[]") {
-      ASSERT(m);
       // Do not check the return type, only the parameters for the setitem, it is coded differently
       // than other functions
       if (check_convertibility(m, m->isConst())) (m->isConst() ? cls_info.getitems : cls_info.setitems).push_back({m});
@@ -402,7 +397,7 @@ void worker_t::scan_class_and_bases_elements(cls_info_t &cls_info) {
   scan_class_elements(cls_info, cls_info.ptr);
 
   // We loop on base classes which are not wrapped
-  // an authorize 1 base class to be wrapped (Python C API limitation)
+  // and authorize 1 base class to be wrapped (Python C API limitation)
   for (auto b : cls_info.ptr->bases()) {
     if (b.getAccessSpecifier() != clang::AccessSpecifier::AS_public) continue; // only public bases
     auto *c = b.getType()->getAsCXXRecordDecl();

@@ -11,7 +11,6 @@
 
 static const struct {
   util::logger rejected = util::logger{&std::cout, "-- ", "\033[1;33mRejecting: \033[0m"};
-  util::logger note     = util::logger{&std::cout, "-- ", "\033[1;32mNote:  \033[0m"};
   util::logger error    = util::logger{&std::cout, "-- ", "\033[1;31mError:  \033[0m"};
 } logs;
 
@@ -46,25 +45,20 @@ template <> void matcher<mtch::ModuleClsWrap>::run(const MatchResult &Result) {
   auto *d = Result.Nodes.getNodeAs<clang::TypeAliasDecl>("decl");
   assert(d);
   if (auto *cls = d->getUnderlyingType()->getAsCXXRecordDecl()) {
-    if (llvm::dyn_cast<clang::ClassTemplateSpecializationDecl>(cls)) { // is template specialization
-      if (not cls->hasDefinition()) {
-        // We have an alias e.g. A<int>, but it was not instantiated in the code
-        // clang is lazy with aliases, it does not instantiate them
-        // We use the Sema to instantiate the class ourselves
-        if (auto *ctsd = llvm::dyn_cast<clang::ClassTemplateSpecializationDecl>(cls); not ctsd->isCompleteDefinition()) {
-          clang::CXXRecordDecl *Pattern = ctsd->getSpecializedTemplate()->getTemplatedDecl();
-          auto &SemaRef                 = worker->ci->getSema();
+    if (auto *ctsd = llvm::dyn_cast<clang::ClassTemplateSpecializationDecl>(cls)) {
+      if (not cls->hasDefinition() and not ctsd->isCompleteDefinition()) {
+        // The alias (e.g. A<int>) was not instantiated in the code.
+        // Clang is lazy with aliases, so we use Sema to instantiate it ourselves.
+        clang::CXXRecordDecl *Pattern = ctsd->getSpecializedTemplate()->getTemplatedDecl();
+        auto &SemaRef                 = worker->ci->getSema();
 
-          SemaRef.InstantiateClass(ctsd->getLocation(),                        // PointOfInstantiation
-                                   ctsd,                                       // Instantiation
-                                   Pattern,                                    // Pattern
-                                   SemaRef.getTemplateInstantiationArgs(ctsd), // TemplateArgs
-                                   clang::TSK_ExplicitInstantiationDefinition,
-                                   /*Complain=*/true);
-          if (ctsd->isInvalidDecl()) clu::emit_error(d, "c2py: Error in instantiating the class on the right hand side of the alias");
-        }
-        // Default previous behaviour: request that the user explicitely instantiate the class.
-        //clu::emit_error(d, "c2py: Please instantiate the class explicitely");
+        SemaRef.InstantiateClass(ctsd->getLocation(),                        // PointOfInstantiation
+                                 ctsd,                                       // Instantiation
+                                 Pattern,                                    // Pattern
+                                 SemaRef.getTemplateInstantiationArgs(ctsd), // TemplateArgs
+                                 clang::TSK_ExplicitInstantiationDefinition,
+                                 /*Complain=*/true);
+        if (ctsd->isInvalidDecl()) clu::emit_error(d, "c2py: Error in instantiating the class on the right hand side of the alias");
       }
     }
     worker->module_info.add_class(d->getName().str(), cls);
@@ -88,18 +82,14 @@ void analyze_class(clang::CXXRecordDecl const *cls, worker_t *worker) {
     return; // remove protected/private classes
 
   // only struct and class
-  if (not((cls->getTagKind() == clang::TagTypeKind::Struct) or (cls->getTagKind() == clang::TagTypeKind::Class))) return; // just struct and class
+  if (not((cls->getTagKind() == clang::TagTypeKind::Struct) or (cls->getTagKind() == clang::TagTypeKind::Class))) return;
 
   // Reject the declaration of a class template (not an instantiation)
   if (cls->getDescribedClassTemplate()) return;
 
-  // Template specialization: accept only EXPLICIT instantiation
-  // if (auto *s = llvm::dyn_cast_or_null<clang::ClassTemplateSpecializationDecl>(cls)) {
-  //   if (!s->isExplicitInstantiationOrSpecialization()) return;
-  // }
-
-  // Reject template specialization
-  if (llvm::dyn_cast_or_null<clang::ClassTemplateSpecializationDecl>(cls)) return;
+  // Reject template specialization (even explicit ones — they are handled
+  // via the ModuleClsWrap matcher through using-declarations instead).
+  if (llvm::isa<clang::ClassTemplateSpecializationDecl>(cls)) return;
 
   // ---- Apply the filters
 
@@ -131,7 +121,7 @@ template <> void matcher<mtch::Cls>::run(const clang::ast_matchers::MatchFinder:
 
 // -------------------------------------------------
 
-clang::CXXRecordDecl *as_CXXRecordDecl(clang::QualType qtype) {
+static clang::CXXRecordDecl *as_CXXRecordDecl(clang::QualType qtype) {
   qtype = qtype.getNonReferenceType().getCanonicalType();
   if (auto *rtype = qtype->getAs<clang::RecordType>())
     if (auto *cxxrec = llvm::dyn_cast<clang::CXXRecordDecl>(rtype->getDecl())) return cxxrec;
@@ -155,7 +145,7 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
   if (f->getNameAsString().starts_with("__builtin_coro_")) return;
 
   // skip the deduction guides (CTAD)
-  if (llvm::dyn_cast_or_null<clang::CXXDeductionGuideDecl>(f)) return;
+  if (llvm::isa<clang::CXXDeductionGuideDecl>(f)) return;
 
   // Instantiation: accept only EXPLICIT instantiation
   if (const auto *info = f->getTemplateSpecializationInfo(); info and not info->isExplicitInstantiationOrSpecialization()) return;
@@ -164,7 +154,7 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
   if (f->getDescribedFunctionTemplate()) return;
 
   // method should not be here
-  EXPECTS(not llvm::dyn_cast_or_null<clang::CXXMethodDecl>(f));
+  EXPECTS(not llvm::isa<clang::CXXMethodDecl>(f));
 
   if (f->getQualifiedNameAsString().starts_with("c2py::")) {
     logs.error("FATAL ERROR: incorrect configuration or includes. It requests wrapping c2py functions which makes no sense.");

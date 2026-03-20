@@ -295,35 +295,36 @@ std::vector<fnt_info_t> make_unique(std::vector<fnt_info_t> const &flist) {
 }
 
 // -----------------------
-// Takes a list of methods, and return a list without const/non const method duplication
-// Choose the non-const version if there is both.
+// Takes a list of methods, and return a list without const/non const method duplication.
+// When both a const and non-const method share the same parameter types, keep only the non-const version.
+// Preserves original order.
 std::vector<fnt_info_t> rm_const_overloads(std::vector<fnt_info_t> const &mlist) {
 
-  // Extract parameter types and constness
-  auto extract_signature = [](fnt_info_t const &fi) {
+  auto get_param_types = [](fnt_info_t const &fi) {
     llvm::SmallVector<clang::QualType> params;
     params.reserve(fi.ptr->getNumParams());
-    for (auto const &p : fi.ptr->parameters()) params.push_back(p->getType());
-    auto *method = llvm::dyn_cast_or_null<clang::CXXMethodDecl>(fi.ptr);
-    return std::pair{std::move(params), method && method->isConst() ? 0 : 1};
+    for (auto const *p : fi.ptr->parameters()) params.push_back(p->getType());
+    return params;
   };
 
-  // Create signatures for all methods
-  std::vector<std::pair<llvm::SmallVector<clang::QualType>, int>> signatures;
-  std::transform(mlist.begin(), mlist.end(), std::back_inserter(signatures), extract_signature);
+  // For each param signature, record the index of the preferred overload (non-const wins).
+  std::map<llvm::SmallVector<clang::QualType>, size_t> best;
+  for (size_t i = 0; i < mlist.size(); ++i) {
+    auto params   = get_param_types(mlist[i]);
+    auto *method  = llvm::dyn_cast_or_null<clang::CXXMethodDecl>(mlist[i].ptr);
+    bool is_const = method && method->isConst();
+    auto [it, inserted] = best.try_emplace(std::move(params), i);
+    if (!inserted && !is_const) it->second = i; // non-const wins
+  }
 
-  // Remove duplicates based on parameter types
-  std::vector<int> idx(signatures.size());
-  std::iota(idx.begin(), idx.end(), 0);
-  std::sort(idx.begin(), idx.end(), [&signatures](int i, int j) { return signatures[i] < signatures[j]; });
-  idx.erase(std::unique(idx.begin(), idx.end(), [&signatures](int i, int j) { return signatures[i].first == signatures[j].first; }), idx.end());
-  std::sort(idx.begin(), idx.end());
+  // Collect winners in original order.
+  llvm::DenseSet<size_t> winner_indices;
+  for (auto const &[_, idx] : best) winner_indices.insert(idx);
 
-  // replace with ranges when widely supported
   std::vector<fnt_info_t> result;
-  result.reserve(idx.size());
-  for (int i : idx) result.push_back(mlist[i]);
-
+  result.reserve(winner_indices.size());
+  for (size_t i = 0; i < mlist.size(); ++i)
+    if (winner_indices.contains(i)) result.push_back(mlist[i]);
   return result;
 }
 

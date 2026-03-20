@@ -53,19 +53,16 @@ static std::optional<OpKind> operator_name_to_kind(std::string_view name, int ar
 //         ImplicitCastExpr*      (zero or more, e.g. derived-to-base cast)
 //           CXXThisExpr
 //
-// Caveat: RecursiveASTVisitor descends into ALL nested scopes, including
-// lambdas and local classes defined inside the method body.  A return
-// statement inside such a nested scope belongs to that inner function, not
-// to the method being checked, and would be incorrectly flagged here.
-// This is not a problem for the typical wrapped methods (no nested
-// functions), but should be fixed (e.g. by overriding TraverseLambdaExpr
-// to return true without descending) if such patterns are ever wrapped.
-// NB : audited and commented by AI.
 class check_return_visitor : public clang::RecursiveASTVisitor<check_return_visitor> {
   fnt_ptr_t f;
 
   public:
   explicit check_return_visitor(fnt_ptr_t f) : f{f} {}
+
+  // Do not descend into nested scopes (lambdas, local classes) whose
+  // return statements belong to the inner function, not to the method.
+  bool TraverseLambdaExpr(clang::LambdaExpr *) { return true; }
+  bool TraverseCXXRecordDecl(clang::CXXRecordDecl *) { return true; }
 
   bool VisitReturnStmt(clang::ReturnStmt *ret) {
     // Peel implicit casts on the returned expression (e.g. lvalue-to-rvalue).

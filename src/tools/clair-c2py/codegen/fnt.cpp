@@ -34,15 +34,8 @@ str_t fnt_params(fnt_ptr_t f) {
 
 str_t fnt_params_with_default(clang::FunctionDecl const *f) {
 
-  // Find the only declaration which will have default argument if any
-  for (auto *redecl : f->redecls()) {
-    if (auto *f2 = llvm::dyn_cast_or_null<clang::FunctionDecl>(redecl); //
-        f2 and llvm::any_of(f2->parameters(), [](auto *p) { return p->hasDefaultArg(); })) {
-      f = redecl;
-      break; // only one decl with default argument is permitted
-    }
-  }
-
+  // best_redecl() in worker.cpp already picks the declaration with defaults/names,
+  // but for template specializations we need the original template declaration.
   // if f is a template specialization, we take the original declaration (template)
   if (auto *info = f->getTemplateSpecializationInfo(); info and info->isExplicitInstantiationOrSpecialization())
     f = info->getTemplate()->getTemplatedDecl();

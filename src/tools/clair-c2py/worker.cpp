@@ -261,7 +261,23 @@ void worker_t::analyze_one_method(clang::FunctionDecl const *f, cls_info_t &cls_
 }
 
 // ---------     MAKE UNIQUE functions--------------
-// Make a list of function unique, keeping the order
+// Among all redeclarations of f, pick the best one:
+// 1. Prefer a redecl with default arguments (at most one exists per C++ rules)
+// 2. Otherwise prefer a redecl where all parameters are named
+// 3. Fall back to the most recent redecl
+const clang::FunctionDecl *best_redecl(const clang::FunctionDecl *f) {
+  const clang::FunctionDecl *with_names = nullptr;
+  for (auto *redecl : f->redecls()) {
+    auto *r = llvm::dyn_cast<clang::FunctionDecl>(redecl);
+    if (not r) continue;
+    if (llvm::any_of(r->parameters(), [](auto *p) { return p->hasDefaultArg(); })) return r;
+    if (not with_names and llvm::all_of(r->parameters(), [](auto *p) { return !p->getName().empty(); })) with_names = r;
+  }
+  return with_names ? with_names : f->getMostRecentDecl();
+}
+
+// Make a list of function unique, keeping the order.
+// For each group of redeclarations, pick the best one (with defaults or named params).
 std::vector<fnt_info_t> make_unique(std::vector<fnt_info_t> const &flist) {
   llvm::DenseSet<const clang::FunctionDecl *> seen; // LLVM recommended replacement of std::set
   std::vector<fnt_info_t> res;
@@ -269,9 +285,12 @@ std::vector<fnt_info_t> make_unique(std::vector<fnt_info_t> const &flist) {
   res.reserve(flist.size());
 
   for (const auto &f : flist) {
-    if (seen.insert(f.ptr->getMostRecentDecl()).second) // first time we see this decl
-      res.push_back(f);
+    if (seen.insert(f.ptr->getMostRecentDecl()).second) {
+      auto *best = best_redecl(f.ptr);
+      res.push_back({.ptr = best, .rewrite = f.rewrite, .parent_class = f.parent_class});
+    }
   }
+
   return res;
 }
 

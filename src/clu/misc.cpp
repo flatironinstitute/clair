@@ -10,10 +10,20 @@ namespace stdr = std::ranges;
 namespace clu {
 
   str_t get_name_of_TemplateArgument(clang::TemplateArgument const &a, clang::ASTContext const *ctx) {
+    // For pack arguments, expand elements directly to avoid the <> wrapping
+    // that TemplateArgument::print adds around packs.
+    if (a.getKind() == clang::TemplateArgument::Pack) {
+      str_t result;
+      for (auto const &elem : a.pack_elements()) {
+        if (!result.empty()) result += ", ";
+        result += get_name_of_TemplateArgument(elem, ctx);
+      }
+      return result;
+    }
     const clang::PrintingPolicy policy(ctx->getLangOpts());
     str_t s;
     llvm::raw_string_ostream out(s);
-    a.print(policy, out, true);
+    a.print(policy, out, false);
     return out.str();
   }
 

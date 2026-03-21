@@ -23,11 +23,20 @@ void printCustomVersion(llvm::raw_ostream &OS) {
   OS.flush();
 }
 static const cl::extrahelp OurHelp(R"HELPDOC(
-  clang-c2py generates Python binding for C++.
-  Usage: 
-   clair-c2py module_source_file.cpp -- all compiler options   # pass options on the command line, after the `--` separator
-   clair-c2py module_source_file.cpp                           # uses compile_commands.json in the current directory
-   clair-c2py module_source_file.cpp -p DIR                    # uses compile_commands.json from a specified directory DIR
+  clair-c2py generates Python bindings for C++.
+
+  Usage:
+   clair-c2py module.cpp -- [compiler options]    Pass compiler options after the -- separator
+   clair-c2py module.cpp                          Use compile_commands.json in the current directory
+   clair-c2py module.cpp -p DIR                   Use compile_commands.json from directory DIR
+
+  Configuration:
+   clair-c2py --gen-default-config module.cpp     Generate a default module.toml configuration file
+   clair-c2py --update-config module.cpp          Update an existing module.toml with new defaults
+
+  Other options:
+   -v                                             Verbose output
+   --generate-depfile=FILE                        Generate a CMake dependency file
 )HELPDOC");
 static cl::OptionCategory c2py_opt_category(""); //NOLINT
 static const cl::opt<bool> opt_verbose("v", cl::desc("Verbose"), cl::cat(c2py_opt_category));

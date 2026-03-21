@@ -123,9 +123,10 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
 
   mf1.addMatcher(add_excludes(call_cls).bind("class"), &ma_cls);
   mf1.addMatcher(add_excludes(call_enum).bind("en"), &ma_enum);
-  mf1.addMatcher(namespaceDecl(isExpansionInMainFile(), hasName("c2py_module"), //
-                                forEach(typeAliasDecl().bind("decl"))),
-                  &ma_using);
+  // Match using declarations in c2py_module namespace.
+  // No file restriction: c2py_module is specific enough, and the declarations
+  // may live in an #include'd file
+  mf1.addMatcher(namespaceDecl(hasName("c2py_module"), forEach(typeAliasDecl().bind("decl"))), &ma_using);
   mf1.matchAST(ctx);
   if (ctx.getDiagnostics().hasErrorOccurred()) return;
 

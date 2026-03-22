@@ -52,17 +52,16 @@ str_t codegen_module(module_info_t const &m) {
 
   // classes wrapped
   for (auto const &[cls_py_name, cls_info] : m.classes) {
-    codegen_cls(ClassesDecls, cls_py_name, cls_info, full_module_name);
+    auto cls_alias = codegen_cls(ClassesDecls, cls_py_name, cls_info, full_module_name);
 
-    auto cls_name = clu::get_fully_qualified_name(cls_info.ptr);
     if (cls_info.base != nullptr)
-      PyTypeReadyDecls << fmt::format(R"RAW(   c2py::wrap_pytype<{0}>.tp_base = &c2py::wrap_pytype<{1}>; )RAW", cls_name,
+      PyTypeReadyDecls << fmt::format(R"RAW(   c2py::wrap_pytype<{0}>.tp_base = &c2py::wrap_pytype<{1}>; )RAW", cls_alias,
                                       clu::get_fully_qualified_name(cls_info.base));
-    PyTypeReadyDecls << fmt::format(R"RAW( if (PyType_Ready(&c2py::wrap_pytype<{}>) < 0) return NULL;)RAW", cls_name);
+    PyTypeReadyDecls << fmt::format(R"RAW( if (PyType_Ready(&c2py::wrap_pytype<{}>) < 0) return NULL;)RAW", cls_alias);
 
-    AddTypeObjectDecls << fmt::format(R"RAW(c2py::add_type_object_to_main<{0}>("{1}",m, conv_table); )RAW", cls_name, cls_py_name);
+    AddTypeObjectDecls << fmt::format(R"RAW(c2py::add_type_object_to_main<{0}>("{1}",m, conv_table); )RAW", cls_alias, cls_py_name);
 
-    if (cls_info.has_hdf5) Hdf5Registration << fmt::format(R"RAW( register_h5_type<{0}>(register_class); )RAW", cls_name);
+    if (cls_info.has_hdf5) Hdf5Registration << fmt::format(R"RAW( register_h5_type<{0}>(register_class); )RAW", cls_alias);
   }
 
   //
@@ -95,7 +94,6 @@ str_t codegen_module(module_info_t const &m) {
                     "FunctionDecls"_a        = FunctionDecls.str(),        //
                     "FunctionDocs"_a         = FunctionDocs.str(),         //
                     "FunctionTable"_a        = FunctionTable.str(),        //
-                    "WrapInfo"_a             = codegen_wrap_info(m),       //
                     "PyTypeReadyDecls"_a     = PyTypeReadyDecls.str(),     //
                     "AddTypeObjectDecls"_a   = AddTypeObjectDecls.str(),   //
                     "Hdf5C2pyIncluder"_a     = Hdf5C2pyIncluder.str(),     //
@@ -109,15 +107,13 @@ str_t codegen_module(module_info_t const &m) {
 
 // =========== wrp info generation ==============
 
-str_t codegen_wrap_info(module_info_t const &m, bool write_header) {
+str_t codegen_wrap_info(module_info_t const &m) {
   std::stringstream wrap_info;
   auto full_module_name = m.package_name.empty() ? m.module_name : m.package_name + '.' + m.module_name;
   for (auto const &[cls_py_name, cls_info] : m.classes) {
-    wrap_info << fmt::format(R"RAW( template <> constexpr bool c2py::is_wrapped<{0}>   = true;)RAW", clu::get_fully_qualified_name(cls_info.ptr));
-    if (write_header) {
-      wrap_info << fmt::format(R"RAW(template <> inline constexpr auto c2py::tp_name<{0}> = "{1}.{2}";)RAW",
-                               clu::get_fully_qualified_name(cls_info.ptr), full_module_name, cls_py_name);
-    }
+    auto cls_name = clu::get_fully_qualified_name(cls_info.ptr);
+    wrap_info << fmt::format(R"RAW( template <> constexpr bool c2py::is_wrapped<{0}> = true;)RAW", cls_name);
+    wrap_info << fmt::format(R"RAW(template <> inline constexpr auto c2py::tp_name<{0}> = "{1}.{2}";)RAW", cls_name, full_module_name, cls_py_name);
   }
   return wrap_info.str();
 }
@@ -132,7 +128,7 @@ str_t codegen_hxx(module_info_t const &m) {
     #define C2PY_HXX_DECLARATION_{0}_GUARDS
     )RAW",
                      m.module_name);
-  hxx << codegen_wrap_info(m, true);
+  hxx << codegen_wrap_info(m);
   hxx << "\n#endif";
 
   return hxx.str();

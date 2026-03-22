@@ -26,8 +26,14 @@ static const struct {
 
 // ---------------------------------------------------------------
 
+// Returns the parameter name, generating a synthetic _p_N if unnamed.
+static str_t param_name(clang::ParmVarDecl const *p, int i) {
+  auto n = p->getNameAsString();
+  return n.empty() ? fmt::format("_p_{}", i) : n;
+}
+
 str_t fnt_params(fnt_ptr_t f) {
-  return join(itertools::range(f->getNumParams()), [f](int i) { return f->getParamDecl(i)->getNameAsString(); }, ',');
+  return join(itertools::range(f->getNumParams()), [f](int i) { return param_name(f->getParamDecl(i), i); }, ',');
 }
 
 // ---------------------------------------------------------------
@@ -95,7 +101,7 @@ str_t fnt_paramtypes(fnt_ptr_t f) {
 // ---------------------------------------------------------------
 
 str_t fnt_param_with_types(fnt_ptr_t f) {
-  return join(itertools::range(f->getNumParams()), [f](int i) { return fnt_param_type(f, i) + ' ' + f->getParamDecl(i)->getNameAsString(); }, ',');
+  return join(itertools::range(f->getNumParams()), [f](int i) { return fnt_param_type(f, i) + ' ' + param_name(f->getParamDecl(i), i); }, ',');
 }
 
 // ---------------------------------------------------------------
@@ -109,7 +115,8 @@ str_t fnt_tparams(fnt_ptr_t f) {
 // ===================================================================
 
 void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostream &doc, std::string const &pyname,
-                             std::vector<fnt_info_t> const &flist, clang::CXXRecordDecl const *parent_class, bool enforce_method) {
+                             std::vector<fnt_info_t> const &flist, clang::CXXRecordDecl const *parent_class, bool enforce_method,
+                             std::string const &cls_alias) {
 
   static long fun_counter = 0;
   // no // if (flist.empty()) return; // can happen, some function are moved to properties
@@ -123,20 +130,26 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
 
   code << '\n'
        << fmt::format(R"RAW( // {}
-                             static auto const fun_{} = c2py::dispatcher_f_kw_t{{ )RAW",
+                             static auto const _c2py_fun_{} = c2py::dispatcher_f_kw_t{{ )RAW",
                       pyname, fun_counter);
 
-  auto l = [&enforce_method, parent_class](fnt_info_t const &f_info) {
+  // Use cls_alias if provided, otherwise fall back to computing the FQN of parent_class.
+  auto parent_cls_name = (not cls_alias.empty()) ? cls_alias
+                                                 : (parent_class ? clu::get_fully_qualified_name(parent_class) : str_t{});
+
+  auto l = [&enforce_method, parent_class, &parent_cls_name](fnt_info_t const &f_info) {
     auto *f    = f_info.ptr;
     auto *m    = llvm::dyn_cast_or_null<clang::CXXMethodDecl>(f);
     auto args  = fnt_params_with_default(f);
-    auto fname = (m and parent_class ? clu::get_fully_qualified_name(parent_class) + "::" + f->getNameAsString() : f->getQualifiedNameAsString());
+    auto fname = (m and parent_class ? parent_cls_name + "::" + f->getNameAsString() : f->getQualifiedNameAsString());
+    auto fname_log = (m and parent_class ? clu::get_fully_qualified_name(parent_class) + "::" + f->getNameAsString() : f->getQualifiedNameAsString());
+
     auto cfun_or_cmethod = std::string{enforce_method and (not m) ? "cmethod" : "cfun"};
     if (m and parent_class and m->getParent() != parent_class) // it is a inherited method
-      cfun_or_cmethod += "_B<" + clu::get_fully_qualified_name(parent_class) + '>';
+      cfun_or_cmethod += "_B<" + parent_cls_name + '>';
     // if m is inherited, we add the <Cls> explicitly to pass Cls to the dispatcher properly
 
-    logs.fun_c(fmt::format("{0}({1})", fname, fnt_param_with_types(f)));
+    logs.fun_c(fmt::format("{0}({1})", fname_log, fnt_param_with_types(f)));
 
     if (f_info.rewrite) {
       auto targs     = f->getTemplateSpecializationArgs() ? "<" + fnt_tparams(f) + ">" : "";
@@ -146,7 +159,7 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
 
       if (m and parent_class and not m->isStatic())
         return fmt::format(R"RAW( c2py::cmethod([]({0} {6} & self {1} {2}) -> decltype(auto) {{ return {3}({4}); }}, "self" {1} {5}))RAW", //
-                           clu::get_fully_qualified_name(parent_class), comma_if(args),                                       //
+                           parent_cls_name, comma_if(args),                                                                                //
                            fnt_param_with_types(f), call_name, fnt_params(f), args, (m->isConst() ? "const" : ""));
       else
         return fmt::format(R"RAW( c2py::cfun([]({}) {{ return {}({}); }} {} {}))RAW", //
@@ -167,7 +180,7 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
 
   // ---- write the doc  ----
   auto [fdoc, param_types, return_types] = pydoc(flist);
-  doc << '\n' << fmt::format(R"RAW( static const auto doc_d_{0} = fun_{0}.doc(R"DOC({1})DOC")RAW", fun_counter, fdoc);
+  doc << '\n' << fmt::format(R"RAW( static const auto _c2py_doc_{0} = _c2py_fun_{0}.doc(R"DOC({1})DOC")RAW", fun_counter, fdoc);
   if (not param_types.empty() or not return_types.empty()) {
     auto join_f = [](auto const &vec) { return fmt::format("{{{}}}", codegen::cpp_to_py_types(vec)); };
     doc << (param_types.empty() ? ", {}" : fmt::format(", {{{}}}", util::join(param_types, join_f, ", ")))
@@ -179,8 +192,8 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
   // the call function are special
   if (pyname == "__call__")
     code << '\n'
-         << fmt::format(R"RAW(  template <> inline constexpr ternaryfunc c2py::tp_call<{0}> = c2py::pyfkw<fun_{1}>;  )RAW",
-                        clu::get_fully_qualified_name(parent_class), fun_counter)
+         << fmt::format(R"RAW(  template <> inline constexpr ternaryfunc c2py::tp_call<{0}> = c2py::pyfkw<_c2py_fun_{1}>;  )RAW",
+                        parent_cls_name, fun_counter)
          << '\n';
   else { // generic case
     // is one of the methods static ?
@@ -190,7 +203,7 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
     });
 
     // add in the table
-    table << fmt::format(R"RAW( {{"{}", (PyCFunction)c2py::pyfkw<fun_{}>, METH_VARARGS | METH_KEYWORDS {}, doc_d_{}.c_str()}}, )RAW", //
+    table << fmt::format(R"RAW( {{"{}", (PyCFunction)c2py::pyfkw<_c2py_fun_{}>, METH_VARARGS | METH_KEYWORDS {}, _c2py_doc_{}.c_str()}}, )RAW", //
                          pyname, fun_counter, (is_static ? "| METH_STATIC" : ""), fun_counter);
   }
 
@@ -198,18 +211,19 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
 }
 // ===================================================================
 
-void codegen::write_dispatch_constructors(std::ostream &code, std::string const &cls_cpp_name, std::vector<fnt_info_t> const &flist) {
+void codegen::write_dispatch_constructors(std::ostream &code, std::string const &cls_cpp_name, std::string const &cls_log_name,
+                                          std::vector<fnt_info_t> const &flist) {
 
   static long counter = 0;
-  code << fmt::format(R"RAW( static auto init_{} = c2py::dispatcher_c_kw_t {{ )RAW", counter) << '\n';
+  code << fmt::format(R"RAW( static auto _c2py_init_{} = c2py::dispatcher_c_kw_t {{ )RAW", counter) << '\n';
 
   logs.meth("__init__");
 
-  auto l = [&cls_cpp_name](auto &f_info) {
+  auto l = [&cls_cpp_name, &cls_log_name](auto &f_info) {
     auto *f    = f_info.ptr;
     auto args  = fnt_params_with_default(f);
     auto targs = fnt_paramtypes(f);
-    logs.fun_c(fmt::format("{0}({1})", cls_cpp_name, fnt_param_with_types(f)));
+    logs.fun_c(fmt::format("{0}({1})", cls_log_name, fnt_param_with_types(f)));
 
     if (llvm::dyn_cast_or_null<clang::CXXConstructorDecl>(f))
       return fmt::format(R"RAW( c2py::c_constructor<{}{}{}>({}))RAW", cls_cpp_name, comma_if(targs), targs, args);
@@ -226,18 +240,18 @@ void codegen::write_dispatch_constructors(std::ostream &code, std::string const 
   if (flist.empty()) {
     // no constructor : use default
     code << fmt::format(R"RAW(c2py::c_constructor<{}>())RAW", cls_cpp_name);
-    logs.fun_c(fmt::format("{0}() [default]", cls_cpp_name));
+    logs.fun_c(fmt::format("{0}() [default]", cls_log_name));
   } else
     code << join(flist, l, ',');
 
   code << "};\n";
 
-  code << fmt::format(R"RAW( template <> constexpr initproc c2py::tp_init<{}> = c2py::pyfkw_constructor<init_{}>;)RAW", //
+  code << fmt::format(R"RAW( template <> constexpr initproc c2py::tp_init<{}> = c2py::pyfkw_constructor<_c2py_init_{}>;)RAW", //
                       cls_cpp_name, counter);
 
   // doc string for dispatched constructors
   auto [doc, param_types, return_types] = pydoc(flist);
-  code << '\n' << fmt::format(R"RAW(template <> const std::string c2py::tp_ctor_doc<{0}> = init_{1}.doc(R"DOC({2})DOC")RAW", cls_cpp_name, counter, doc);
+  code << '\n' << fmt::format(R"RAW(template <> const std::string c2py::tp_ctor_doc<{0}> = _c2py_init_{1}.doc(R"DOC({2})DOC")RAW", cls_cpp_name, counter, doc);
   if (not param_types.empty()) {
     auto join_f = [](auto const &vec) { return fmt::format("{{{}}}", codegen::cpp_to_py_types(vec)); };
     code << fmt::format(", {{{}}}", util::join(param_types, join_f, ", "));

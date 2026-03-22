@@ -37,12 +37,10 @@ clang::Expr const *get_field_initializer(clang::FieldDecl const *f) {
 
 // ===================================================================
 
-void codegen_synth_constructor(std::ostream &code, cls_info_t const &cls_info) {
-  auto const *cls = cls_info.ptr;
-  auto cls_name   = clu::get_fully_qualified_name(cls); //cls->getQualifiedNameAsString();
+void codegen_synth_constructor(std::ostream &code, cls_info_t const &cls_info, str_t const &cls_alias, str_t const &cls_full_name) {
   EXPECTS(!cls_info.fields.empty());
 
-  logs.cls_details(fmt::format("Synthesize constructor from pydict", cls_name));
+  logs.cls_details("Synthesize constructor from pydict");
   static long counter = 0;
 
   std::vector<std::string> non_default_const_params;
@@ -64,18 +62,18 @@ void codegen_synth_constructor(std::ostream &code, cls_info_t const &cls_info) {
        << fmt::format(R"RAW(
       static int synth_constructor_{1}(PyObject *self, PyObject *args, PyObject *kwargs) {{
        if (args and PyTuple_Check(args) and (PyTuple_Size(args)>0)) {{
-        PyErr_SetString(PyExc_RuntimeError, ("Error in constructing {0}.\nNo positional arguments allowed. Use keywords arguments"));
+        PyErr_SetString(PyExc_RuntimeError, ("Error in constructing {2}.\nNo positional arguments allowed. Use keywords arguments"));
         return -1;
        }}
       c2py::pydict_extractor de{{kwargs}};
-      try {{ ((c2py::wrap<{0}> *)self)->_c = new {0}{{ {2}  }}; }}
+      try {{ ((c2py::wrap<{0}> *)self)->_c = new {0}{{ {3}  }}; }}
       catch (std::exception const &e) {{
-        PyErr_SetString(PyExc_RuntimeError, ("Error in constructing {0} from a Python dict.\n   "s + e.what()).c_str());
+        PyErr_SetString(PyExc_RuntimeError, ("Error in constructing {2} from a Python dict.\n   "s + e.what()).c_str());
         return -1;
       }}
       auto & self_c = *(((c2py::wrap<{0}> *)self)->_c);
  )RAW",
-                      clu::get_fully_qualified_name(cls), counter, join(non_default_const_params, ','));
+                      cls_alias, counter, cls_full_name, join(non_default_const_params, ','));
 
   for (auto *f : simple_fields)
     code << fmt::format(R"RAW( de("{0}", self_c.{0}, {1}); )RAW", f->getNameAsString(), (get_field_initializer(f) != nullptr));
@@ -86,12 +84,12 @@ void codegen_synth_constructor(std::ostream &code, cls_info_t const &cls_info) {
 
      template <> constexpr initproc c2py::tp_init<{}> = synth_constructor_{};
    )RAW",
-                      clu::get_fully_qualified_name(cls), counter);
+                      cls_alias, counter);
 
   // doc string for synthesized constructor
   auto [doc, field_types] = pydoc_of_synthetized_constructor(cls_info);
   code << '\n'
-       << fmt::format(R"RAW(template <> const std::string c2py::tp_ctor_doc<{0}> = c2py::replace_tags()RAW", cls_name)
+       << fmt::format(R"RAW(template <> const std::string c2py::tp_ctor_doc<{0}> = c2py::replace_tags()RAW", cls_alias)
        << fmt::format(R"RAW(R"DOC({0})DOC", "par", {{{1}}});)RAW", doc, codegen::cpp_to_py_types(field_types));
 
   ++counter;
@@ -99,17 +97,16 @@ void codegen_synth_constructor(std::ostream &code, cls_info_t const &cls_info) {
 
 // ===================================================================
 
-void codegen_synth___dict_attribute(std::ostream &code, std::ostream &table, cls_info_t const &cls_info) {
+void codegen_synth___dict_attribute(std::ostream &code, std::ostream &table, cls_info_t const &cls_info, str_t const &cls_alias) {
 
   static long counter = 0;
-  auto const *cls     = cls_info.ptr;
   if (cls_info.fields.empty()) return; // Nothing to return
 
   code << '\n'
        << fmt::format(R"RAW( static PyObject *prop_get_dict_{0}(PyObject *self, void *) {{
                               auto & self_c = *(((c2py::wrap<{1}> *)self)->_c);
                               c2py::pydict dic; )RAW",
-                      counter, clu::get_fully_qualified_name(cls));
+                      counter, cls_alias);
 
   for (auto *f : cls_info.fields) {
     //if (f->getAccess() != clang::AS_public) continue; // SHOULD BE USELESS
@@ -165,26 +162,23 @@ void codegen_getter_setter(std::ostream &table, std::ostream &doc, str_t const &
 
 // ===================================================================
 
-void codegen_getsetitem(std::ostream &code, cls_info_t const &cls_info) {
+void codegen_getsetitem(std::ostream &code, cls_info_t const &cls_info, str_t const &cls_alias) {
 
   static long counter = 0;
 
   if ((not cls_info.has_size_method) and cls_info.getitems.empty()) return;
 
-  auto const *cls = cls_info.ptr;
-  auto cls_name   = clu::get_fully_qualified_name(cls);
-
-  auto get_ovs = [&cls_name](auto &f_info) {
+  auto get_ovs = [&cls_alias](auto &f_info) {
     auto *m = llvm::dyn_cast_or_null<clang::CXXMethodDecl>(f_info.ptr);
-    return fmt::format(R"RAW( c2py::cfun2(c2py::getitem<{0}, {1}>))RAW", cls_name, fnt_paramtypes(m));
+    return fmt::format(R"RAW( c2py::cfun2(c2py::getitem<{0}, {1}>))RAW", cls_alias, fnt_paramtypes(m));
   };
 
-  auto set_ovs = [&cls_name](auto &f_info) {
+  auto set_ovs = [&cls_alias](auto &f_info) {
     auto *m = llvm::dyn_cast_or_null<clang::CXXMethodDecl>(f_info.ptr);
-    return fmt::format(R"RAW( c2py::cfun2(c2py::setitem<{0}, {1}>))RAW", cls_name, fnt_paramtypes(m));
+    return fmt::format(R"RAW( c2py::cfun2(c2py::setitem<{0}, {1}>))RAW", cls_alias, fnt_paramtypes(m));
   };
 
-  str_t size_code    = (cls_info.has_size_method ? fmt::format("c2py::tpxx_size<{}>", cls_name) : "nullptr");
+  str_t size_code    = (cls_info.has_size_method ? fmt::format("c2py::tpxx_size<{}>", cls_alias) : "nullptr");
   str_t getitem_code = "nullptr";
   str_t setitem_code = "nullptr";
 
@@ -220,14 +214,14 @@ void codegen_getsetitem(std::ostream &code, cls_info_t const &cls_info) {
   code << fmt::format(R"RAW(
            template <> PyMappingMethods c2py::tp_as_mapping<{0}> = {{ {1}, {2}, {3} }};
           )RAW",
-                      cls_name, size_code, getitem_code, setitem_code);
+                      cls_alias, size_code, getitem_code, setitem_code);
 
   counter++;
 }
 
 // ===================================================================
 
-void codegen_operators(std::ostream &code, cls_info_t const &cls_info) {
+void codegen_operators(std::ostream &code, cls_info_t const &cls_info, str_t const &cls_alias) {
 
   // Map binary arithmetic OpKinds to c2py::OpName strings; returns nullptr for non-arithmetic ops
   auto to_arith_name = [](OpKind k) -> const char * {
@@ -241,7 +235,6 @@ void codegen_operators(std::ostream &code, cls_info_t const &cls_info) {
   };
 
   auto const *cls = cls_info.ptr;
-  auto cls_name   = clu::get_fully_qualified_name(cls);
   auto &ctx       = cls->getASTContext();
 
   int count = 0;
@@ -256,23 +249,30 @@ void codegen_operators(std::ostream &code, cls_info_t const &cls_info) {
       pairs.push_back(fmt::format("std::pair<{}, {}>", clu::get_fully_qualified_name(sig[0], ctx), clu::get_fully_qualified_name(sig[1], ctx)));
     }
 
-    code << fmt::format("\ntemplate <> struct c2py::arithmetic<{0}, c2py::OpName::{1}> : std::tuple<{2}> {{}};\n", cls_name, op_name, join(pairs, ", "));
+    code << fmt::format("\ntemplate <> struct c2py::arithmetic<{0}, c2py::OpName::{1}> : std::tuple<{2}> {{}};\n", cls_alias, op_name, join(pairs, ", "));
   }
 
-  if (count > 0) code << fmt::format("\ntemplate <> constexpr PyNumberMethods *c2py::tp_as_number<{0}> = &c2py::tp_as_number_impl<{0}>;\n", cls_name);
+  if (count > 0) code << fmt::format("\ntemplate <> constexpr PyNumberMethods *c2py::tp_as_number<{0}> = &c2py::tp_as_number_impl<{0}>;\n", cls_alias);
 }
 
 // ===================================================================
 
-void codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const &cls_info, str_t const &full_module_name) {
+str_t codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const &cls_info, str_t const &full_module_name) {
 
-  logs.cls(fmt::format("{1} [Python: {0}]", cls_py_name, cls_info.ptr->getQualifiedNameAsString()));
+  auto *cls          = cls_info.ptr;
+  auto cls_full_name = clu::get_fully_qualified_name(cls);
 
-  auto *cls     = cls_info.ptr;
-  auto cls_name = clu::get_fully_qualified_name(cls); //cls->getQualifiedNameAsString();
+  logs.cls(fmt::format("{1} [Python: {0}]", cls_py_name, cls_full_name));
+
+  // -- emit using alias for this class
+  static int cls_counter = 0;
+  auto cls_alias         = fmt::format("_c2py_cls_{}", cls_counter++);
+  code << '\n' << fmt::format("// --------- class {} -----------", cls_alias);
+  code << '\n' << fmt::format("using {} = {};", cls_alias, cls_full_name);
+  code << '\n' << fmt::format("template <> constexpr bool c2py::is_wrapped<{}> = true;", cls_alias);
 
   // -- tp_name
-  code << '\n' << fmt::format(R"RAW(template <> inline constexpr auto c2py::tp_name<{0}> = "{1}.{2}";)RAW", cls_name, full_module_name, cls_py_name);
+  code << '\n' << fmt::format(R"RAW(template <> inline constexpr auto c2py::tp_name<{0}> = "{1}.{2}";)RAW", cls_alias, full_module_name, cls_py_name);
 
   // ---------- Methods ------------
   {
@@ -280,24 +280,24 @@ void codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const 
 
     // ---- constructor
     if (cls_info.synthetize_init_from_pydict() and not(cls_info.fields.empty())) {
-      codegen_synth_constructor(MethodDecls, cls_info);
+      codegen_synth_constructor(MethodDecls, cls_info, cls_alias, cls_full_name);
     } else
-      codegen::write_dispatch_constructors(MethodDecls, cls_name, cls_info.constructors);
+      codegen::write_dispatch_constructors(MethodDecls, cls_alias, cls_full_name, cls_info.constructors);
 
     // ---- methods
     for (auto const &[fpyname, overloads] : cls_info.methods)
-      codegen::write_dispatch(MethodDecls, MethodTable, MethodDocs, fpyname, overloads, cls, true);
+      codegen::write_dispatch(MethodDecls, MethodTable, MethodDocs, fpyname, overloads, cls, true, cls_alias);
 
     // ----- hdf5 : __write_hdf5__
-    if (cls_info.has_hdf5) MethodTable << fmt::format(R"RAW( {{"__write_hdf5__", c2py::tpxx_write_h5<{0}>, METH_VARARGS, "  "}}, )RAW", cls_name);
+    if (cls_info.has_hdf5) MethodTable << fmt::format(R"RAW( {{"__write_hdf5__", c2py::tpxx_write_h5<{0}>, METH_VARARGS, "  "}}, )RAW", cls_alias);
 
     // ----- Serialization
 
     if (cls_info.serialization != Serialization::None) {
       static auto ser_opt_vec = std::vector<str_t>{"", "tuple", "h5", "repr"};
       auto set_opt            = ser_opt_vec[int(cls_info.serialization)];
-      MethodTable << fmt::format(R"RAW({{"__getstate__", c2py::getstate_{0}<{1}>, METH_NOARGS, ""}},)RAW", set_opt, cls_name);
-      MethodTable << fmt::format(R"RAW({{"__setstate__", c2py::setstate_{0}<{1}>, METH_O, ""}},)RAW", set_opt, cls_name);
+      MethodTable << fmt::format(R"RAW({{"__getstate__", c2py::getstate_{0}<{1}>, METH_NOARGS, ""}},)RAW", set_opt, cls_alias);
+      MethodTable << fmt::format(R"RAW({{"__setstate__", c2py::setstate_{0}<{1}>, METH_O, ""}},)RAW", set_opt, cls_alias);
     }
     // ----- assemble the code
 
@@ -313,7 +313,7 @@ void codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const 
       }};
 
      )RAW",
-                        cls_name, MethodTable.str());
+                        cls_alias, MethodTable.str());
   }
 
   // ---------- Members ------------
@@ -332,16 +332,16 @@ void codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const 
     auto fdoc_str = fdoc.brief_str;
     fdoc_str += fdoc.details_str.empty() ? "" : (fdoc_str.empty() ? fdoc.details_str : fmt::format("\n\n{}", fdoc.details_str));
 
-    MembersDoc << fmt::format(R"RAW( constexpr auto doc_member_{0} = R"DOC({1})DOC"; )RAW", member_counter, fdoc_str);
+    MembersDoc << fmt::format(R"RAW( constexpr auto _c2py_doc_member_{0} = R"DOC({1})DOC"; )RAW", member_counter, fdoc_str);
 
     if (is_const)
       Members << fmt::format(R"RAW(
-                         {{"{0}", c2py::get_member<&{1}::{0}, {1}>, nullptr, doc_member_{3}, nullptr}},
+                         {{"{0}", c2py::get_member<&{1}::{0}, {1}>, nullptr, _c2py_doc_member_{3}, nullptr}},
                           )RAW",
-                             name, cls_name, type, member_counter);
+                             name, cls_alias, type, member_counter);
     else
-      // {{"{0}", c2py::get_member<&{1}::{0}>, c2py::set_member<&{1}::{0}>, doc_member_{3}, nullptr}},
-      Members << fmt::format(R"RAW( c2py::getsetdef_from_member<&{1}::{0}, {1}>("{0}", doc_member_{3}),)RAW", name, cls_name, type, member_counter);
+      // {{"{0}", c2py::get_member<&{1}::{0}>, c2py::set_member<&{1}::{0}>, _c2py_doc_member_{3}, nullptr}},
+      Members << fmt::format(R"RAW( c2py::getsetdef_from_member<&{1}::{0}, {1}>("{0}", _c2py_doc_member_{3}),)RAW", name, cls_alias, type, member_counter);
     ++member_counter;
   }
 
@@ -355,15 +355,15 @@ void codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const 
     codegen_getter_setter(Properties, PropertiesDocs, pyname, prop);
   }
 
-  if (cls_info.synthetize_dict_attribute()) codegen_synth___dict_attribute(code, Properties, cls_info);
+  if (cls_info.synthetize_dict_attribute()) codegen_synth___dict_attribute(code, Properties, cls_info, cls_alias);
 
   code << PropertiesDocs.str();
 
   // ---------- member & prop table
+  if (not cls_info.fields.empty() or not cls_info.properties.empty())
+    code << fmt::format(R"RAW(
 
-  code << fmt::format(R"RAW(
-
-      // ----- Method table ----
+      // ----- Member and property table ----
 
       template <> constinit PyGetSetDef c2py::tp_getset<{0}>[] = {{
          {1}
@@ -372,21 +372,23 @@ void codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const 
       }};
 
       )RAW",
-                      cls_name, Members.str(), Properties.str());
+                        cls_alias, Members.str(), Properties.str());
 
   // ---------- operator [] & size as len
 
-  codegen_getsetitem(code, cls_info);
+  codegen_getsetitem(code, cls_info, cls_alias);
 
   // ---------- arithmetic operators
 
-  codegen_operators(code, cls_info);
+  codegen_operators(code, cls_info, cls_alias);
 
   // ----------- import other modules
 
   // -- tp_doc
   auto cls_doc = pydoc(cls_info);
   code << '\n'
-       << fmt::format(R"RAW(template <> const std::string c2py::tp_doc<{0}> = R"DOC({1})DOC" + )RAW", cls_name, cls_doc)
-       << (cls_doc.empty() ? "" : R"RAW( std::string{"\n\n----------\n\n"}  + )RAW") << fmt::format(R"RAW(c2py::tp_ctor_doc<{0}>;)RAW", cls_name);
+       << fmt::format(R"RAW(template <> const std::string c2py::tp_doc<{0}> = R"DOC({1})DOC" + )RAW", cls_alias, cls_doc)
+       << (cls_doc.empty() ? "" : R"RAW( std::string{"\n\n----------\n\n"}  + )RAW") << fmt::format(R"RAW(c2py::tp_ctor_doc<{0}>;)RAW", cls_alias);
+
+  return cls_alias;
 }

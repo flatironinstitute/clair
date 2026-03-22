@@ -82,6 +82,12 @@ class custom_action : public clang::ASTFrontendAction {
     auto outfilename     = worker->module_info.sourcefile_full_stem + ".wrap.cxx";
     auto outfilename_hxx = worker->module_info.sourcefile_full_stem + ".wrap.hxx";
 
+    log(fmt::format("\033[1;34m[Success] \033[0m"));
+    log(fmt::format("   Generated Python bindings: {} [included in {}]", outfilename, worker->module_info.sourcefile));
+    log(fmt::format("             headers        : {} [to be used with other modules, cf doc]", outfilename_hxx));
+
+#if 0
+log("Running clang-format ...");
     auto clang_format_style = clang::format::getStyle("file",                         // StyleName: look for .clang-format file
                                                       worker->module_info.sourcefile, // FileName: directory to start search from
                                                       "LLVM"                          // Fallback style if no config found
@@ -90,11 +96,10 @@ class custom_action : public clang::ASTFrontendAction {
 
     code     = clu::clang_format(code, clang_format_style);
     code_hxx = clu::clang_format(code_hxx, clang_format_style);
+#endif
     std::ofstream(outfilename) << code;
     std::ofstream(outfilename_hxx) << code_hxx;
-    log(fmt::format("\033[1;34m[Success] \033[0m"));
-    log(fmt::format("   Generated Python bindings: {} [included in {}]", outfilename, worker->module_info.sourcefile));
-    log(fmt::format("             headers        : {} [to be used with other modules, cf doc]", outfilename_hxx));
+    log("Done.");
 
     // Examine if the preprocessor has found the include of the generated file in the module.
     if (not worker->input_has_included_generated_cxx) {

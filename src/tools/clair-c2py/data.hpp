@@ -5,6 +5,8 @@
 #include "utility/string_tools.hpp"
 #include "utility/logger.hpp"
 #include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclTemplate.h"
+#include "llvm/ADT/STLExtras.h"
 
 using cls_ptr_t = clang::CXXRecordDecl const *;
 using fnt_ptr_t = clang::FunctionDecl const *;
@@ -15,13 +17,22 @@ enum class OpKind { Add, Sub, Mul, Div, Eq, Ne, Lt, Gt, Le, Ge, Neg, Pos };
 
 // -----------------------------------------------------------
 
+// Template specializations can use a function pointer (&f<targs>) unless
+// the template has a parameter pack, which c2py's dispatcher can't handle.
+inline bool fnt_needs_rewrite(fnt_ptr_t f) {
+  if (!f) return true;
+  auto *info = f->getTemplateSpecializationInfo();
+  if (!info) return true; // non-template: rewrite
+  // Check if the template declaration has a parameter pack
+  for (auto *p : info->getTemplate()->getTemplateParameters()->asArray())
+    if (p->isParameterPack()) return true;
+  return false;
+}
+
 struct fnt_info_t {
   fnt_ptr_t ptr = nullptr;
-  bool rewrite  = true;
-  // If true, we rewrite the function into a lambda instead of using its pointer.
-  // Must be true in general due to a few corner cases discovered after v0.1.
+  bool rewrite       = fnt_needs_rewrite(ptr);
   cls_ptr_t parent_class = nullptr;
-  //bool no_gil                              = clu::has_annotation(ptr, "c2py_nogil");
   [[nodiscard]] clang::CXXMethodDecl const *as_method() const { return llvm::dyn_cast_or_null<clang::CXXMethodDecl>(ptr); }
 };
 

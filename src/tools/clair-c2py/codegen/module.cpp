@@ -59,7 +59,7 @@ str_t codegen_module(module_info_t const &m) {
                                       clu::get_fully_qualified_name(cls_info.base));
     PyTypeReadyDecls << fmt::format(R"RAW( if (PyType_Ready(&c2py::wrap_pytype<{}>) < 0) return NULL;)RAW", cls_alias);
 
-    AddTypeObjectDecls << fmt::format(R"RAW(c2py::add_type_object_to_main<{0}>("{1}",m, conv_table); )RAW", cls_alias, cls_py_name);
+    AddTypeObjectDecls << fmt::format(R"RAW(_add_type({0}, "{1}"); )RAW", cls_alias, cls_py_name);
 
     if (cls_info.has_hdf5) Hdf5Registration << fmt::format(R"RAW( register_h5_type<{0}>(register_class); )RAW", cls_alias);
   }

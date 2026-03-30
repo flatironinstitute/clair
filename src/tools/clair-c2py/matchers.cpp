@@ -189,6 +189,13 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
   // method should not be here
   EXPECTS(not llvm::isa<clang::CXXMethodDecl>(f));
 
+  // Deduplicate friend declarations vs out-of-class definitions.
+  // If this is a friend declaration (not a definition) and the definition
+  // exists in this TU, skip — the definition will be matched separately.
+  // If no definition is visible (defined in another .cpp), keep the declaration.
+  if (f->getFriendObjectKind() != clang::Decl::FOK_None and not f->isThisDeclarationADefinition())
+    if (f->getDefinition()) return;
+
   if (f->getQualifiedNameAsString().starts_with("c2py::")) {
     logs.error("FATAL ERROR: incorrect configuration or includes. It requests wrapping c2py functions which makes no sense.");
     std::abort();

@@ -40,18 +40,29 @@ static std::optional<OpKind> operator_name_to_kind(std::string_view name, int ar
 
 // ------------------------------------------------
 // Validates that every return statement in a reference-returning method
-// returns a direct (or inherited) member of `this`.
+// returns a member of `this` (at any depth).
 //
 // The visitor traverses the full body and emits an error for any
 // return statement whose expression is not of that form.  This covers all
 // control-flow paths (if/else branches, early returns, etc.).
 //
-// Expected AST shape for a valid return:
+// In Clang's AST, MemberExpr represents a field access `obj.field`.
+// It has two parts: the member (the field) and the base (the expression
+// to the left of the dot, via getBase()). For a chain `this->a.b`, the
+// outermost MemberExpr (.b) has a base that is another MemberExpr (.a),
+// whose base is CXXThisExpr.
+//
+// Valid AST shapes (direct member or member-of-member, any depth):
 //   ReturnStmt
-//     ImplicitCastExpr*          (zero or more, e.g. lvalue-to-rvalue)
-//       MemberExpr
-//         ImplicitCastExpr*      (zero or more, e.g. derived-to-base cast)
-//           CXXThisExpr
+//     ImplicitCastExpr*                    (zero or more, e.g. lvalue-to-rvalue)
+//       MemberExpr (.field)
+//         [ MemberExpr (.submember) ]*     (zero or more intermediate members)
+//           [ ImplicitCastExpr* ]          (e.g. derived-to-base cast)
+//             CXXThisExpr
+//
+// The loop walks getBase() through ImplicitCastExprs and MemberExprs until
+// it reaches the root. If that root is CXXThisExpr the return is safe.
+// Anything else (local variable, global, function call result) is rejected.
 //
 class check_return_visitor : public clang::RecursiveASTVisitor<check_return_visitor> {
   fnt_ptr_t f;
@@ -75,17 +86,19 @@ class check_return_visitor : public clang::RecursiveASTVisitor<check_return_visi
     // Take the base of the outermost MemberExpr (e.g. base of `.something` is `b`).
     // If ex was null (no MemberExpr found at all), start with nullptr.
     clang::Expr const *base = ex ? ex->getBase() : nullptr;
-    // Peel any ImplicitCastExpr wrappers (e.g. derived-to-base casts for inherited members).
-    // After this, base is either CXXThisExpr, another MemberExpr (chained access), or something else.
-    while (auto *ice = llvm::dyn_cast_or_null<clang::ImplicitCastExpr>(base)) base = ice->getSubExpr();
+    // Walk the access chain: peel ImplicitCastExprs and MemberExprs until we reach the root base.
+    // This accepts both `this->member` and `this->member.submember` (any depth).
+    while (base) {
+      if (auto *ice = llvm::dyn_cast<clang::ImplicitCastExpr>(base))
+        base = ice->getSubExpr();
+      else if (auto *me = llvm::dyn_cast<clang::MemberExpr>(base))
+        base = me->getBase();
+      else
+        break;
+    }
 
-    // Accept only `this->direct_member`.  Anything else is rejected: nullptr (no MemberExpr),
-    // another MemberExpr (chained access like `b.something` where b is a member), a DeclRefExpr
-    // (local variable or global), etc.
-    // Caveat: `this->member.submember` is also rejected even though it is safe, because the
-    // chain is not walked.
-    // Fix if needed: replace the ImplicitCastExpr loop above with a loop that also
-    // descends through MemberExpr nodes until the root base is reached.
+    // Accept `this->member` or `this->member.submember` (any depth).
+    // Reject: nullptr (no MemberExpr), DeclRefExpr (local/global variable), etc.
     if (not llvm::dyn_cast_or_null<clang::CXXThisExpr>(base)) {
       clu::emit_error(f->getReturnTypeSourceRange().getBegin(), f->getASTContext(),
                       "c2py: Can not be converted from C++ to Python. I can not check that this method returns a member of `this`.");

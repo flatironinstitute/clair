@@ -52,17 +52,22 @@ static std::optional<OpKind> operator_name_to_kind(std::string_view name, int ar
 // outermost MemberExpr (.b) has a base that is another MemberExpr (.a),
 // whose base is CXXThisExpr.
 //
-// Valid AST shapes (direct member or member-of-member, any depth):
+// Valid AST shapes (direct member, member-of-member, or method delegation):
 //   ReturnStmt
 //     ImplicitCastExpr*                    (zero or more, e.g. lvalue-to-rvalue)
 //       MemberExpr (.field)
 //         [ MemberExpr (.submember) ]*     (zero or more intermediate members)
 //           [ ImplicitCastExpr* ]          (e.g. derived-to-base cast)
 //             CXXThisExpr
+//   ReturnStmt
+//     CXXMemberCallExpr (this->method())
+//       MemberExpr (.method)
+//         [ MemberExpr* ]
+//           CXXThisExpr
 //
-// The loop walks getBase() through ImplicitCastExprs and MemberExprs until
-// it reaches the root. If that root is CXXThisExpr the return is safe.
-// Anything else (local variable, global, function call result) is rejected.
+// The loop walks getBase()/getImplicitObjectArgument() through ImplicitCastExprs
+// and MemberExprs until it reaches the root. If that root is CXXThisExpr the
+// return is safe. Anything else (local variable, global) is rejected.
 //
 class check_return_visitor : public clang::RecursiveASTVisitor<check_return_visitor> {
   fnt_ptr_t f;
@@ -80,12 +85,12 @@ class check_return_visitor : public clang::RecursiveASTVisitor<check_return_visi
     clang::Expr const *ret_value = ret->getRetValue();
     while (auto *ice = llvm::dyn_cast_or_null<clang::ImplicitCastExpr>(ret_value)) ret_value = ice->getSubExpr();
 
-    // The expression must be a member access …
-    auto *ex = llvm::dyn_cast_or_null<clang::MemberExpr>(ret_value);
-
-    // Take the base of the outermost MemberExpr (e.g. base of `.something` is `b`).
-    // If ex was null (no MemberExpr found at all), start with nullptr.
-    clang::Expr const *base = ex ? ex->getBase() : nullptr;
+    // The expression must be a member access or a method call on this.
+    clang::Expr const *base = nullptr;
+    if (auto *ex = llvm::dyn_cast_or_null<clang::MemberExpr>(ret_value))
+      base = ex->getBase();
+    else if (auto *call = llvm::dyn_cast_or_null<clang::CXXMemberCallExpr>(ret_value))
+      base = call->getImplicitObjectArgument();
     // Walk the access chain: peel ImplicitCastExprs and MemberExprs until we reach the root base.
     // This accepts both `this->member` and `this->member.submember` (any depth).
     while (base) {
@@ -97,8 +102,8 @@ class check_return_visitor : public clang::RecursiveASTVisitor<check_return_visi
         break;
     }
 
-    // Accept `this->member` or `this->member.submember` (any depth).
-    // Reject: nullptr (no MemberExpr), DeclRefExpr (local/global variable), etc.
+    // Accept `this->member`, `this->member.submember`, or `this->method()`.
+    // Reject: nullptr, DeclRefExpr (local/global variable), etc.
     if (not llvm::dyn_cast_or_null<clang::CXXThisExpr>(base)) {
       clu::emit_error(f->getReturnTypeSourceRange().getBegin(), f->getASTContext(),
                       "c2py: Can not be converted from C++ to Python. I can not check that this method returns a member of `this`.");

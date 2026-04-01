@@ -86,20 +86,21 @@ class custom_action : public clang::ASTFrontendAction {
     log(fmt::format("   Generated Python bindings: {} [included in {}]", outfilename, worker->module_info.sourcefile));
     log(fmt::format("             headers        : {} [to be used with other modules, cf doc]", outfilename_hxx));
 
-#if 0
-log("Running clang-format ...");
-    auto clang_format_style = clang::format::getStyle("file",                         // StyleName: look for .clang-format file
-                                                      worker->module_info.sourcefile, // FileName: directory to start search from
-                                                      "LLVM"                          // Fallback style if no config found
-                                                      )
-                                 .get(); // because of FallBack the get is always valid
+    if (not std::getenv("CLAIR_SKIP_CLANG_FORMAT")) {
+      log("Running clang-format ...");
+      auto clang_format_style = clang::format::getStyle("file",                         // StyleName: look for .clang-format file
+                                                        worker->module_info.sourcefile, // FileName: directory to start search from
+                                                        "LLVM"                          // Fallback style if no config found
+                                                        )
+                                   .get(); // because of FallBack the get is always valid
 
-    code     = clu::clang_format(code, clang_format_style);
-    code_hxx = clu::clang_format(code_hxx, clang_format_style);
-#endif
+      code     = clu::clang_format(code, clang_format_style);
+      code_hxx = clu::clang_format(code_hxx, clang_format_style);
+      log("Done.");
+    }
+
     std::ofstream(outfilename) << code;
     std::ofstream(outfilename_hxx) << code_hxx;
-    log("Done.");
 
     // Examine if the preprocessor has found the include of the generated file in the module.
     if (not worker->input_has_included_generated_cxx) {

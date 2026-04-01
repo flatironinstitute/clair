@@ -114,6 +114,26 @@ str_t fnt_tparams(fnt_ptr_t f) {
 
 // ===================================================================
 
+// Collect C2PY_DEPRECATED_PARAMETER_NAME annotations from all overloads
+// and emit .with_deprecated_params({...}) if any are found.
+static void emit_deprecated_params(std::ostream &code, std::vector<fnt_info_t> const &flist) {
+  std::map<str_t, str_t> deprecated_params;
+  for (auto const &f_info : flist) {
+    if (auto annot = clu::get_annotation_value(f_info.ptr, "c2py_deprecated_params")) {
+      for (auto &pair_str : util::split(*annot, ',')) {
+        auto parts = util::split(pair_str, ':');
+        if (parts.size() == 2) deprecated_params[util::trim(parts[0])] = util::trim(parts[1]);
+      }
+    }
+  }
+  if (not deprecated_params.empty()) {
+    code << ".with_deprecated_params({"
+         << join(deprecated_params, [](auto const &p) { return fmt::format(R"RAW({{"{}", "{}"}})RAW", p.first, p.second); }, ", ") << "})";
+  }
+}
+
+// ===================================================================
+
 void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostream &doc, std::string const &pyname,
                              std::vector<fnt_info_t> const &flist, clang::CXXRecordDecl const *parent_class, bool enforce_method,
                              std::string const &cls_alias) {
@@ -176,7 +196,9 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
     }
   };
 
-  code << join(flist, l, ',') << " };\n";
+  code << join(flist, l, ',') << " }";
+  emit_deprecated_params(code, flist);
+  code << ";\n";
 
   // ---- write the doc  ----
   auto [fdoc, param_types, return_types] = pydoc(flist);
@@ -244,7 +266,9 @@ void codegen::write_dispatch_constructors(std::ostream &code, std::string const 
   } else
     code << join(flist, l, ',');
 
-  code << "};\n";
+  code << "}";
+  emit_deprecated_params(code, flist);
+  code << ";\n";
 
   code << fmt::format(R"RAW( template <> constexpr initproc c2py::tp_init<{}> = c2py::pyfkw_constructor<_c2py_init_{}>;)RAW", //
                       cls_cpp_name, counter);

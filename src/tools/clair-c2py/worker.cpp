@@ -52,7 +52,7 @@ static std::optional<OpKind> operator_name_to_kind(std::string_view name, int ar
 // outermost MemberExpr (.b) has a base that is another MemberExpr (.a),
 // whose base is CXXThisExpr.
 //
-// Valid AST shapes (direct member, member-of-member, or method delegation):
+// Valid AST shapes (direct member, member-of-member, smart-ptr member, or method delegation):
 //   ReturnStmt
 //     ImplicitCastExpr*                    (zero or more, e.g. lvalue-to-rvalue)
 //       MemberExpr (.field)
@@ -60,14 +60,20 @@ static std::optional<OpKind> operator_name_to_kind(std::string_view name, int ar
 //           [ ImplicitCastExpr* ]          (e.g. derived-to-base cast)
 //             CXXThisExpr
 //   ReturnStmt
+//     MemberExpr (.field)                  (e.g. this->ptr->field)
+//       CXXOperatorCallExpr (operator->)
+//         MemberExpr (.ptr)
+//           CXXThisExpr
+//   ReturnStmt
 //     CXXMemberCallExpr (this->method())
 //       MemberExpr (.method)
 //         [ MemberExpr* ]
 //           CXXThisExpr
 //
-// The loop walks getBase()/getImplicitObjectArgument() through ImplicitCastExprs
-// and MemberExprs until it reaches the root. If that root is CXXThisExpr the
-// return is safe. Anything else (local variable, global) is rejected.
+// The loop walks getBase()/getImplicitObjectArgument()/getArg(0) through
+// ImplicitCastExprs, MemberExprs, and CXXOperatorCallExprs (overloaded operator->)
+// until it reaches the root. If that root is CXXThisExpr the return is safe.
+// Anything else (local variable, global) is rejected.
 //
 class check_return_visitor : public clang::RecursiveASTVisitor<check_return_visitor> {
   fnt_ptr_t f;
@@ -91,14 +97,20 @@ class check_return_visitor : public clang::RecursiveASTVisitor<check_return_visi
       base = ex->getBase();
     else if (auto *call = llvm::dyn_cast_or_null<clang::CXXMemberCallExpr>(ret_value))
       base = call->getImplicitObjectArgument();
-    // Walk the access chain: peel ImplicitCastExprs and MemberExprs until we reach the root base.
-    // This accepts both `this->member` and `this->member.submember` (any depth).
+    // Walk the access chain: peel ImplicitCastExprs, MemberExprs, and CXXOperatorCallExprs
+    // until we reach the root base. This accepts `this->member`, `this->member.submember`,
+    // and `this->smart_ptr->member` (overloaded operator->) at any depth.
     while (base) {
       if (auto *ice = llvm::dyn_cast<clang::ImplicitCastExpr>(base))
         base = ice->getSubExpr();
       else if (auto *me = llvm::dyn_cast<clang::MemberExpr>(base))
         base = me->getBase();
-      else
+      else if (auto *op = llvm::dyn_cast<clang::CXXOperatorCallExpr>(base)) {
+        if (op->getOperator() == clang::OO_Arrow)
+          base = op->getArg(0); // first arg of overloaded operator is the object (e.g. smart_ptr)
+        else
+          break; // other operators (e.g. operator*) are not allowed in the access chain
+      } else
         break;
     }
 

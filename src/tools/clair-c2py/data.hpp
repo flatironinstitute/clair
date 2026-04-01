@@ -17,21 +17,21 @@ enum class OpKind { Add, Sub, Mul, Div, Eq, Ne, Lt, Gt, Le, Ge, Neg, Pos };
 
 // -----------------------------------------------------------
 
-// Template specializations can use a function pointer (&f<targs>) unless
-// the template has a parameter pack, which c2py's dispatcher can't handle.
-inline bool fnt_needs_rewrite(fnt_ptr_t f) {
-  if (!f) return true;
-  auto *info = f->getTemplateSpecializationInfo();
-  if (!info) return true; // non-template: rewrite
-  // Check if the template declaration has a parameter pack
-  for (auto *p : info->getTemplate()->getTemplateParameters()->asArray())
-    if (p->isParameterPack()) return true;
-  return false;
-}
+// // Template specializations can use a function pointer (&f<targs>) unless
+// // the template has a parameter pack, which c2py's dispatcher can't handle.
+// inline bool fnt_needs_rewrite(fnt_ptr_t f) {
+//   if (!f) return true;
+//   auto *info = f->getTemplateSpecializationInfo();
+//   if (!info) return true; // non-template: rewrite
+//   // Check if the template declaration has a parameter pack
+//   for (auto *p : info->getTemplate()->getTemplateParameters()->asArray())
+//     if (p->isParameterPack()) return true;
+//   return false;
+// }
 
 struct fnt_info_t {
   fnt_ptr_t ptr = nullptr;
-  bool rewrite       = fnt_needs_rewrite(ptr);
+  bool rewrite           = true; // fnt_needs_rewrite(ptr);
   cls_ptr_t parent_class = nullptr;
   [[nodiscard]] clang::CXXMethodDecl const *as_method() const { return llvm::dyn_cast_or_null<clang::CXXMethodDecl>(ptr); }
 };

@@ -67,8 +67,11 @@ str_t fnt_params_with_default(clang::FunctionDecl const *f) {
     size_t i = 0;
     while (i < s.size() && (isspace((unsigned char)s[i]) || (s[i] == '='))) ++i;
     s = s.substr(i);
-    // if the default parameter is a braced init list, we need the full type name
-    if (!s.empty() && s[0] == '{') s = clu::get_fully_qualified_name(p->getType(), *ctx) + s;
+    // If the default contains a braced init (bare '{...}' or 'Type{...}'),
+    // replace everything before '{' with the fully qualified type name.
+    // This handles both bare braced-init-lists and Type{args} where the type may contain
+    // unqualified namespace-scoped aliases (e.g. myint_t instead of ns::myint_t).
+    if (auto pos = s.find('{'); pos != str_t::npos) s = clu::get_fully_qualified_name(p->getType(), *ctx) + s.substr(pos);
     return s;
   };
   // --------

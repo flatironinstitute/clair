@@ -136,20 +136,27 @@ void codegen_getter_setter(std::ostream &table, std::ostream &doc, str_t const &
   doc_str += gsdoc.details_str.empty() ? "" : (doc_str.empty() ? gsdoc.details_str : fmt::format("\n\n{}", gsdoc.details_str));
   doc << fmt::format(R"RAW( static constexpr auto prop_doc_{0} = R"DOC({1})DOC"; )RAW", counter, doc_str);
 
+  // Returns {parent_fqn, is_inherited} for a method, where is_inherited is true iff
+  // the method belongs to a strict base class of cls_info.ptr. Throws if unrelated.
+  auto method_origin = [&](clang::CXXMethodDecl const *m) -> std::pair<str_t, bool> {
+    auto *base        = m->getParent()->getCanonicalDecl();
+    auto *derived     = cls_info.ptr->getCanonicalDecl();
+    bool is_inherited = derived->isDerivedFrom(base);
+    if (!is_inherited and base != derived)
+      throw std::runtime_error(fmt::format("Error in property '{}': the method '{}' is not declared in the class '{}' nor inherited from it.",
+                                           prop_name, m->getQualifiedNameAsString(), clu::get_fully_qualified_name(cls_info.ptr)));
+    return {clu::get_fully_qualified_name(m->getParent()), is_inherited};
+  };
+
   // ---- getter ----
   str_t getter_entry;
   if (getter_method) {
-    // Check if the method is inherited from a base class
-    auto method_parent = clu::get_fully_qualified_name(getter_method->getParent());
-    bool is_inherited  = getter_method->getParent()->getCanonicalDecl() != cls_info.ptr->getCanonicalDecl();
-
-    auto cast_op = fmt::format("cast{}<>", getter_method->isStatic() ? "" : (getter_method->isConst() ? "mc" : "m"));
+    auto [method_parent, is_inherited] = method_origin(getter_method);
+    auto cast_op                       = fmt::format("cast{}<>", getter_method->isStatic() ? "" : (getter_method->isConst() ? "mc" : "m"));
     if (is_inherited) {
-      // Use getter_from_method_B for inherited methods to handle member pointer type conversion
       getter_entry = fmt::format("c2py::getter_from_method_B<{0}, c2py::{1}(&{2}::{3})>", clu::get_fully_qualified_name(cls_info.ptr), cast_op,
                                  method_parent, getter_method->getNameAsString());
     } else {
-      // Use regular getter_from_method for methods declared in this class
       getter_entry = fmt::format("c2py::getter_from_method<c2py::{}(&{})>", cast_op, prop.getter.ptr->getQualifiedNameAsString());
     }
   } else {
@@ -161,10 +168,19 @@ void codegen_getter_setter(std::ostream &table, std::ostream &doc, str_t const &
   str_t setter_entry  = "nullptr";
   str_t closure_entry = "nullptr";
   if (has_setter) {
-    auto setter_name    = prop.setters[0].ptr->getQualifiedNameAsString();
     auto *setter_method = prop.setters[0].as_method();
-    setter_entry        = fmt::format("(setter)c2py::{}<&{}>", setter_method ? "setter_from_method" : "setter_from_fun", setter_name);
-    closure_entry       = fmt::format(R"RAW((void*)"Cannot delete the attribute {}")RAW", prop_name);
+    if (setter_method) {
+      auto [setter_parent, is_inherited] = method_origin(setter_method);
+      if (is_inherited) {
+        setter_entry = fmt::format("(setter)c2py::setter_from_method_B<{0}, &{1}::{2}>", clu::get_fully_qualified_name(cls_info.ptr), setter_parent,
+                                   setter_method->getNameAsString());
+      } else {
+        setter_entry = fmt::format("(setter)c2py::setter_from_method<&{}>", prop.setters[0].ptr->getQualifiedNameAsString());
+      }
+    } else {
+      setter_entry = fmt::format("(setter)c2py::setter_from_fun<&{}>", prop.setters[0].ptr->getQualifiedNameAsString());
+    }
+    closure_entry = fmt::format(R"RAW((void*)"Cannot delete the attribute {}")RAW", prop_name);
   }
 
   table << fmt::format(R"RAW( {{"{}", {}, {}, prop_doc_{}, {}}},)RAW", prop_name, getter_entry, setter_entry, counter, closure_entry);

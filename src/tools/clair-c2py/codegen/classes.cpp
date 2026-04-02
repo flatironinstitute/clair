@@ -123,7 +123,8 @@ void codegen_synth___dict_attribute(std::ostream &code, std::ostream &table, cls
 
 // ===================================================================
 
-void codegen_getter_setter(std::ostream &table, std::ostream &doc, str_t const &prop_name, cls_info_t::property const &prop, str_t const &cls_name) {
+void codegen_getter_setter(std::ostream &table, std::ostream &doc, str_t const &prop_name, cls_info_t::property const &prop,
+                           cls_info_t const &cls_info) {
 
   static long counter = 0;
 
@@ -140,13 +141,13 @@ void codegen_getter_setter(std::ostream &table, std::ostream &doc, str_t const &
   if (getter_method) {
     // Check if the method is inherited from a base class
     auto method_parent = clu::get_fully_qualified_name(getter_method->getParent());
-    bool is_inherited  = (method_parent != cls_name);
+    bool is_inherited  = getter_method->getParent()->getCanonicalDecl() != cls_info.ptr->getCanonicalDecl();
 
     auto cast_op = fmt::format("cast{}<>", getter_method->isStatic() ? "" : (getter_method->isConst() ? "mc" : "m"));
     if (is_inherited) {
       // Use getter_from_method_B for inherited methods to handle member pointer type conversion
-      getter_entry =
-         fmt::format("c2py::getter_from_method_B<{0}, c2py::{1}(&{2}::{3})>", cls_name, cast_op, method_parent, getter_method->getNameAsString());
+      getter_entry = fmt::format("c2py::getter_from_method_B<{0}, c2py::{1}(&{2}::{3})>", clu::get_fully_qualified_name(cls_info.ptr), cast_op,
+                                 method_parent, getter_method->getNameAsString());
     } else {
       // Use regular getter_from_method for methods declared in this class
       getter_entry = fmt::format("c2py::getter_from_method<c2py::{}(&{})>", cast_op, prop.getter.ptr->getQualifiedNameAsString());
@@ -366,7 +367,7 @@ str_t codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const
   std::stringstream Properties, PropertiesDocs;
   for (auto const &[pyname, prop] : cls_info.properties) {
     logs.prop(fmt::format("{}", pyname));
-    codegen_getter_setter(Properties, PropertiesDocs, pyname, prop, cls_full_name);
+    codegen_getter_setter(Properties, PropertiesDocs, pyname, prop, cls_info);
   }
 
   if (cls_info.synthetize_dict_attribute()) codegen_synth___dict_attribute(code, Properties, cls_info, cls_alias);

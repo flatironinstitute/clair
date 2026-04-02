@@ -40,7 +40,8 @@ struct worker_t {
 
   /// Check that all parameter types are convertible from Python to C++ and,
   /// if test_return_type is true, that the return type is convertible from C++ to Python.
-  /// Emits clang diagnostics for each failing type. Returns false if any check fails.
+  /// Emits clang diagnostics for each failing type.
+  /// Returns true if the function should be kept (all checks pass), false otherwise.
   bool check_convertibility(clang::FunctionDecl const *f, bool test_return_type = true) const;
 
   /// Return the Python name for a class, honoring c2py_rename or falling back to camelCase.

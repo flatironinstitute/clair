@@ -13,7 +13,7 @@ using fnt_ptr_t = clang::FunctionDecl const *;
 
 // -----------------------------------------------------------
 // Operator kind: arithmetic, comparison, and unary
-enum class OpKind { Add, Sub, Mul, Div, Eq, Ne, Lt, Gt, Le, Ge, Neg, Pos };
+enum class OpKind { Add, Sub, Mul, Div, LShift, Eq, Ne, Lt, Gt, Le, Ge, Neg, Pos, IAdd, ISub, IMul, IDiv };
 
 // -----------------------------------------------------------
 

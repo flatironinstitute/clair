@@ -35,6 +35,11 @@ static std::optional<OpKind> operator_name_to_kind(std::string_view name, int ar
   if (name == "operator>") return OpKind::Gt;
   if (name == "operator<=") return OpKind::Le;
   if (name == "operator>=") return OpKind::Ge;
+  if (name == "operator<<") return OpKind::LShift;
+  if (name == "operator+=") return OpKind::IAdd;
+  if (name == "operator-=") return OpKind::ISub;
+  if (name == "operator*=") return OpKind::IMul;
+  if (name == "operator/=") return OpKind::IDiv;
   return std::nullopt;
 }
 
@@ -160,8 +165,23 @@ bool worker_t::is_rejected(clang::Decl const *decl, util::logger const *log) {
 }
 // ------------------------------------------------
 
-// check if function parameter and return type are convertible.
+// Check if function parameter and return type are convertible.
+// Emits clang diagnostics for each failing type.
+// Returns true if the function should be kept (all checks pass), false otherwise.
 bool worker_t::check_convertibility(clang::FunctionDecl const *f, bool test_return_type) const {
+
+  // Types that should cause the function to be silently ignored (no error).
+  // E.g. operator<<(std::ostream&, ...) is for stream output, not a real operator to wrap.
+  // FIXME: to be generalized.
+  auto involves_ignored_type = [](clang::QualType const &ty) {
+    return ty.getAsString().find("ostream") != std::string::npos;
+  };
+
+  // We do this check first, to avoid emitting errors about non-convertible types in functions that we will skip.
+  if (involves_ignored_type(f->getReturnType())) return false;
+  for (auto i : itertools::range(f->getNumParams()))
+    if (involves_ignored_type(f->getParamDecl(i)->getType())) return false;
+
   bool ok = true;
   for (auto i : itertools::range(f->getNumParams())) {
     auto *p = f->getParamDecl(i);
@@ -362,7 +382,10 @@ void worker_t::analyze_operator(clang::FunctionDecl const *f) {
   auto op = operator_name_to_kind(name, arity);
   if (not op) return;
 
-  if (not check_convertibility(f)) return;
+  // In-place operators return a reference (T&) which the c2py runtime discards (it returns self).
+  // Skip the return type check for them.
+  bool is_inplace = (*op == OpKind::IAdd or *op == OpKind::ISub or *op == OpKind::IMul or *op == OpKind::IDiv);
+  if (not check_convertibility(f, /*test_return_type=*/!is_inplace)) return;
 
   // Build the full argument type list
   std::vector<clang::QualType> args;

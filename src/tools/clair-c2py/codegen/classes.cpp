@@ -251,13 +251,19 @@ void codegen_getsetitem(std::ostream &code, cls_info_t const &cls_info, str_t co
 
 void codegen_operators(std::ostream &code, cls_info_t const &cls_info, str_t const &cls_alias) {
 
-  // Map binary arithmetic OpKinds to c2py::OpName strings; returns nullptr for non-arithmetic ops
+  // Map OpKind to c2py::OpName string; returns nullptr for ops not exposed via PyNumberMethods
   auto to_arith_name = [](OpKind k) -> const char * {
     switch (k) {
       case OpKind::Add: return "Add";
       case OpKind::Sub: return "Sub";
       case OpKind::Mul: return "Mul";
       case OpKind::Div: return "Div";
+      case OpKind::LShift: return "LShift";
+      case OpKind::Neg: return "Neg";
+      case OpKind::IAdd: return "IAdd";
+      case OpKind::ISub: return "ISub";
+      case OpKind::IMul: return "IMul";
+      case OpKind::IDiv: return "IDiv";
       default: return nullptr;
     }
   };
@@ -271,14 +277,25 @@ void codegen_operators(std::ostream &code, cls_info_t const &cls_info, str_t con
     if (not op_name or sigs.empty()) continue;
     ++count;
 
-    std::vector<str_t> pairs;
-    for (auto const &sig : sigs) {
-      EXPECTS(sig.size() == 2);
-      pairs.push_back(fmt::format("std::pair<{}, {}>", clu::get_fully_qualified_name(sig[0], ctx), clu::get_fully_qualified_name(sig[1], ctx)));
+    if (kind == OpKind::Neg) {
+      // Unary: arithmetic<Cls, OpName::Neg> : std::tuple<T, ...>
+      std::vector<str_t> types;
+      for (auto const &sig : sigs) {
+        EXPECTS(sig.size() == 1);
+        types.push_back(clu::get_fully_qualified_name(sig[0], ctx));
+      }
+      code << fmt::format("\ntemplate <> struct c2py::arithmetic<{0}, c2py::OpName::{1}> : std::tuple<{2}> {{}};\n", cls_alias, op_name,
+                          join(types, ", "));
+    } else {
+      // Binary: arithmetic<Cls, OpName::X> : std::tuple<std::pair<T1,T2>, ...>
+      std::vector<str_t> pairs;
+      for (auto const &sig : sigs) {
+        EXPECTS(sig.size() == 2);
+        pairs.push_back(fmt::format("std::pair<{}, {}>", clu::get_fully_qualified_name(sig[0], ctx), clu::get_fully_qualified_name(sig[1], ctx)));
+      }
+      code << fmt::format("\ntemplate <> struct c2py::arithmetic<{0}, c2py::OpName::{1}> : std::tuple<{2}> {{}};\n", cls_alias, op_name,
+                          join(pairs, ", "));
     }
-
-    code << fmt::format("\ntemplate <> struct c2py::arithmetic<{0}, c2py::OpName::{1}> : std::tuple<{2}> {{}};\n", cls_alias, op_name,
-                        join(pairs, ", "));
   }
 
   if (count > 0)

@@ -4,6 +4,7 @@
 #include <clang/Sema/Sema.h>
 #include <clang/Sema/Template.h>
 
+#include <algorithm>
 #include "clu/misc.hpp"
 #include "clu/concept.hpp"
 #include "utility/logger.hpp"
@@ -13,6 +14,15 @@ static const struct {
   util::logger rejected = util::logger{&std::cout, "-- ", "\033[1;33mRejecting: \033[0m"};
   util::logger error    = util::logger{&std::cout, "-- ", "\033[1;31mError:  \033[0m"};
 } logs;
+
+// -----------------------------------------------------
+
+static void add_enum(clang::EnumDecl const *enu, worker_t *worker) {
+  if (!enu) return;
+  if (worker->is_rejected(enu, &logs.rejected)) return;
+  if (std::ranges::find(worker->module_info.enums, enu) != worker->module_info.enums.end()) return;
+  worker->module_info.enums.push_back(enu);
+}
 
 // -----------------------------------------------------
 
@@ -106,9 +116,10 @@ void analyze_class(clang::CXXRecordDecl const *cls, worker_t *worker) {
   // Insert in the module class list
   worker->module_info.add_class(worker->get_python_name(cls), cls);
 
-  // Finally analyze recursively the nested classes, as they can be pruned by the namespaces directive
+  // Finally analyze recursively the nested classes and enums, as they can be pruned by the namespaces directive
   for (auto const *d : cls->decls()) {
     if (auto const *inner = llvm::dyn_cast<clang::CXXRecordDecl>(d); inner) analyze_class(inner, worker);
+    if (auto const *enu = llvm::dyn_cast<clang::EnumDecl>(d)) add_enum(enu, worker);
   }
 }
 
@@ -229,7 +240,5 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
 
 template <> void matcher<mtch::Enum>::run(const MatchResult &Result) {
   auto *enu = Result.Nodes.getNodeAs<clang::EnumDecl>("en");
-  if (!enu) return;
-  if (worker->is_rejected(enu, &logs.rejected)) return;
-  worker->module_info.enums.push_back(enu);
+  add_enum(enu, worker);
 }

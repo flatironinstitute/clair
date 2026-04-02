@@ -30,7 +30,7 @@ enum class OpKind { Add, Sub, Mul, Div, Eq, Ne, Lt, Gt, Le, Ge, Neg, Pos };
 // }
 
 struct fnt_info_t {
-  fnt_ptr_t ptr = nullptr;
+  fnt_ptr_t ptr          = nullptr;
   bool rewrite           = true; // fnt_needs_rewrite(ptr);
   cls_ptr_t parent_class = nullptr;
   [[nodiscard]] clang::CXXMethodDecl const *as_method() const { return llvm::dyn_cast_or_null<clang::CXXMethodDecl>(ptr); }
@@ -81,8 +81,8 @@ struct module_info_t {
   str_t documentation;
   clang::FunctionDecl const *module_init = nullptr;
 
-  std::map<str_t, std::vector<fnt_info_t>> functions;     // vector not unique
-  std::vector<clang::EnumDecl const *> enums;             // all enums (including in classes)
+  std::map<str_t, std::vector<fnt_info_t>> functions; // vector not unique
+  std::vector<clang::EnumDecl const *> enums;         // all enums (including in classes)
 
   std::vector<std::pair<str_t, cls_info_t>> classes; // index of cls_table. Must keep order of insertion to have base first
   std::map<cls_ptr_t, long> classes_ptr_to_info;     // reverse search table

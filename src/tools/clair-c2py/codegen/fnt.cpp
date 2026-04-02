@@ -157,14 +157,13 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
                       pyname, fun_counter);
 
   // Use cls_alias if provided, otherwise fall back to computing the FQN of parent_class.
-  auto parent_cls_name = (not cls_alias.empty()) ? cls_alias
-                                                 : (parent_class ? clu::get_fully_qualified_name(parent_class) : str_t{});
+  auto parent_cls_name = (not cls_alias.empty()) ? cls_alias : (parent_class ? clu::get_fully_qualified_name(parent_class) : str_t{});
 
   auto l = [&enforce_method, parent_class, &parent_cls_name](fnt_info_t const &f_info) {
-    auto *f    = f_info.ptr;
-    auto *m    = llvm::dyn_cast_or_null<clang::CXXMethodDecl>(f);
-    auto args  = fnt_params_with_default(f);
-    auto fname = (m and parent_class ? parent_cls_name + "::" + f->getNameAsString() : f->getQualifiedNameAsString());
+    auto *f        = f_info.ptr;
+    auto *m        = llvm::dyn_cast_or_null<clang::CXXMethodDecl>(f);
+    auto args      = fnt_params_with_default(f);
+    auto fname     = (m and parent_class ? parent_cls_name + "::" + f->getNameAsString() : f->getQualifiedNameAsString());
     auto fname_log = (m and parent_class ? clu::get_fully_qualified_name(parent_class) + "::" + f->getNameAsString() : f->getQualifiedNameAsString());
 
     auto cfun_or_cmethod = std::string{enforce_method and (not m) ? "cmethod" : "cfun"};
@@ -176,9 +175,9 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
 
     if (f_info.rewrite) {
       auto targs     = f->getTemplateSpecializationArgs() ? "<" + fnt_tparams(f) + ">" : "";
-      auto call_name = m and parent_class and not m->isStatic()
-                          ? std::string{f->getTemplateSpecializationArgs() ? "self.template " : "self."} + f->getNameAsString() + targs
-                          : fname + targs;
+      auto call_name = m and parent_class and not m->isStatic() ?
+         std::string{f->getTemplateSpecializationArgs() ? "self.template " : "self."} + f->getNameAsString() + targs :
+         fname + targs;
 
       if (m and parent_class and not m->isStatic())
         return fmt::format(R"RAW( c2py::cmethod([]({0} {6} & self {1} {2}) -> decltype(auto) {{ return {3}({4}); }}, "self" {1} {5}))RAW", //
@@ -217,8 +216,8 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
   // the call function are special
   if (pyname == "__call__")
     code << '\n'
-         << fmt::format(R"RAW(  template <> inline constexpr ternaryfunc c2py::tp_call<{0}> = c2py::pyfkw<_c2py_fun_{1}>;  )RAW",
-                        parent_cls_name, fun_counter)
+         << fmt::format(R"RAW(  template <> inline constexpr ternaryfunc c2py::tp_call<{0}> = c2py::pyfkw<_c2py_fun_{1}>;  )RAW", parent_cls_name,
+                        fun_counter)
          << '\n';
   else { // generic case
     // is one of the methods static ?
@@ -278,7 +277,9 @@ void codegen::write_dispatch_constructors(std::ostream &code, std::string const 
 
   // doc string for dispatched constructors
   auto [doc, param_types, return_types] = pydoc(flist);
-  code << '\n' << fmt::format(R"RAW(template <> const std::string c2py::tp_ctor_doc<{0}> = _c2py_init_{1}.doc(R"DOC({2})DOC")RAW", cls_cpp_name, counter, doc);
+  code << '\n'
+       << fmt::format(R"RAW(template <> const std::string c2py::tp_ctor_doc<{0}> = _c2py_init_{1}.doc(R"DOC({2})DOC")RAW", cls_cpp_name, counter,
+                      doc);
   if (not param_types.empty()) {
     auto join_f = [](auto const &vec) { return fmt::format("{{{}}}", codegen::cpp_to_py_types(vec)); };
     code << fmt::format(", {{{}}}", util::join(param_types, join_f, ", "));

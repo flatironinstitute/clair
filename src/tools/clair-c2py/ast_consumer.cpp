@@ -37,7 +37,8 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
     return;
   }
 
-  if (worker->concepts.HasHdf5) logs.note("Found Flatiron/h5 Storable concept. Will generate h5 code for all wrapped classes satisfying this concept.");
+  if (worker->concepts.HasHdf5)
+    logs.note("Found Flatiron/h5 Storable concept. Will generate h5 code for all wrapped classes satisfying this concept.");
 
   // ------- Build the matcher to restrict the match to the namespaces
   auto make_ns_matcher = [&]() -> DeclarationMatcher {

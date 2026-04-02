@@ -99,7 +99,7 @@ str_t codegen_module(module_info_t const &m) {
                     "Hdf5C2pyIncluder"_a     = Hdf5C2pyIncluder.str(),     //
                     "Hdf5RegistrationInit"_a = Hdf5RegistrationInit.str(), //
                     "Hdf5Registration"_a     = Hdf5Registration.str(),     //
-                    "ModuleInitFunction"_a   = ModuleInitFunction);          //
+                    "ModuleInitFunction"_a   = ModuleInitFunction);        //
   } catch (const fmt::format_error &ex) { std::cout << "ERROR" << ex.what() << std::endl; }
 
   return r;

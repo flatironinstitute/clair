@@ -166,7 +166,8 @@ bool worker_t::check_convertibility(clang::FunctionDecl const *f, bool test_retu
   for (auto i : itertools::range(f->getNumParams())) {
     auto *p = f->getParamDecl(i);
     auto ty = p->getType();
-    if ((not ty->isVoidType()) and (not clu::satisfy_concept(ty, this->concepts.IsConvertiblePy2C, this->ci)) and (not this->module_info.is_wrapped(ty))) {
+    if ((not ty->isVoidType()) and (not clu::satisfy_concept(ty, this->concepts.IsConvertiblePy2C, this->ci))
+        and (not this->module_info.is_wrapped(ty))) {
       clu::emit_error(p, "c2py: Can not convert this argument from python to C++");
       ok = false;
     }
@@ -198,8 +199,7 @@ bool worker_t::check_convertibility(clang::FunctionDecl const *f, bool test_retu
 //--------------------------------------------------------
 
 str_t worker_t::get_python_name(clang::CXXRecordDecl const *cls) const {
-  if (auto rename = clu::get_annotation_value(cls, "c2py_rename"))
-    return *rename;
+  if (auto rename = clu::get_annotation_value(cls, "c2py_rename")) return *rename;
   return util::camel_case(cls->getNameAsString());
 }
 
@@ -330,9 +330,9 @@ std::vector<fnt_info_t> rm_const_overloads(std::vector<fnt_info_t> const &mlist)
   // For each param signature, record the index of the preferred overload (non-const wins).
   std::map<llvm::SmallVector<clang::QualType>, size_t> best;
   for (size_t i = 0; i < mlist.size(); ++i) {
-    auto params   = get_param_types(mlist[i]);
-    auto *method  = llvm::dyn_cast_or_null<clang::CXXMethodDecl>(mlist[i].ptr);
-    bool is_const = method && method->isConst();
+    auto params         = get_param_types(mlist[i]);
+    auto *method        = llvm::dyn_cast_or_null<clang::CXXMethodDecl>(mlist[i].ptr);
+    bool is_const       = method && method->isConst();
     auto [it, inserted] = best.try_emplace(std::move(params), i);
     if (!inserted && !is_const) it->second = i; // non-const wins
   }
@@ -367,8 +367,7 @@ void worker_t::analyze_operator(clang::FunctionDecl const *f) {
   // Build the full argument type list
   std::vector<clang::QualType> args;
   if (method) args.push_back(method->getThisType()->getPointeeType().getUnqualifiedType());
-  for (unsigned i = 0; i < f->getNumParams(); ++i)
-    args.push_back(f->getParamDecl(i)->getType().getNonReferenceType().getUnqualifiedType());
+  for (unsigned i = 0; i < f->getNumParams(); ++i) args.push_back(f->getParamDecl(i)->getType().getNonReferenceType().getUnqualifiedType());
 
   // Associate with the class of the first argument; fall back to second if first is not wrapped
   auto *cli = module_info.get_wrapped_cls_info(args[0]);
@@ -399,8 +398,10 @@ void worker_t::scan_class_elements(cls_info_t &cls_info, cls_ptr_t cls) {
     else if (auto *f = llvm::dyn_cast<clang::FieldDecl>(decl)) {
       auto ty = f->getType();
       if (not this->module_info.is_wrapped(ty)) {
-        if (not clu::satisfy_concept(ty, this->concepts.IsConvertiblePy2C, this->ci)) clu::emit_error(f, "c2py: Can not be converted from python to C++");
-        if (not clu::satisfy_concept(ty, this->concepts.IsConvertibleC2Py, this->ci)) clu::emit_error(f, "c2py: Can not be converted from C++ to python");
+        if (not clu::satisfy_concept(ty, this->concepts.IsConvertiblePy2C, this->ci))
+          clu::emit_error(f, "c2py: Can not be converted from python to C++");
+        if (not clu::satisfy_concept(ty, this->concepts.IsConvertibleC2Py, this->ci))
+          clu::emit_error(f, "c2py: Can not be converted from C++ to python");
       }
       cls_info.fields.push_back(f);
     }

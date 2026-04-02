@@ -136,8 +136,7 @@ static cls_info_t *find_wrapped_cls_for_first_arg(clang::FunctionDecl const *f, 
     return nullptr;
   }
   auto *first_arg_type = as_CXXRecordDecl(f->getParamDecl(0)->getType());
-  if (auto it = M.classes_ptr_to_info.find(first_arg_type); it != M.classes_ptr_to_info.end())
-    return &M.classes[it->second].second;
+  if (auto it = M.classes_ptr_to_info.find(first_arg_type); it != M.classes_ptr_to_info.end()) return &M.classes[it->second].second;
   clu::emit_error(f->getParamDecl(0), "c2py: First argument is not a class being wrapped");
   return nullptr;
 }
@@ -204,20 +203,17 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
 
   // ---- property annotations on free functions
   if (auto prop_name = clu::get_annotation_value(f, "c2py_property_get")) {
-    if (auto *cli = find_wrapped_cls_for_first_arg(f, M))
-      cli->properties[*prop_name].getter = fnt_info_t{.ptr = f, .rewrite = false};
+    if (auto *cli = find_wrapped_cls_for_first_arg(f, M)) cli->properties[*prop_name].getter = fnt_info_t{.ptr = f, .rewrite = false};
     return;
   }
   if (auto prop_name = clu::get_annotation_value(f, "c2py_property_set")) {
-    if (auto *cli = find_wrapped_cls_for_first_arg(f, M))
-      cli->properties[*prop_name].setters.push_back(fnt_info_t{.ptr = f, .rewrite = false});
+    if (auto *cli = find_wrapped_cls_for_first_arg(f, M)) cli->properties[*prop_name].setters.push_back(fnt_info_t{.ptr = f, .rewrite = false});
     return;
   }
 
   // ---- wrap as method of the class of the first argument
   if (clu::has_annotation(f, "c2py_wrap_as_method")) {
-    if (auto *cli = find_wrapped_cls_for_first_arg(f, M))
-      cli->methods[worker->get_python_name(f)].push_back(fnt_info_t{.ptr = f, .rewrite = false});
+    if (auto *cli = find_wrapped_cls_for_first_arg(f, M)) cli->methods[worker->get_python_name(f)].push_back(fnt_info_t{.ptr = f, .rewrite = false});
     return;
   }
 

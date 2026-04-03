@@ -9,7 +9,7 @@
 #include "clu/cmd_line_arg.hpp"
 #include "utility/macros.hpp"
 #include "utility/logger.hpp"
-#include "action.hpp"
+#include "custom_action.hpp"
 #include "configuration.hpp"
 
 namespace cl = llvm::cl;

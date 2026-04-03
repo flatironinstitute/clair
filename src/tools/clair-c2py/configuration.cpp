@@ -21,14 +21,16 @@ template <typename T> T get_toml_value(const toml::table &table, const std::stri
   if (auto value = table[key].value<T>()) return *value;
   throw std::runtime_error("Missing or invalid '" + key + "' in TOML file");
 }
-// ----------------------------------------
+
+// ------------------------------
 
 // Generic helper function to extract a value from a TOML table or use a default
 template <typename T> T get_toml_value_or_default(const toml::table &table, const std::string &key, const T &default_value) {
   if (auto value = table[key].value<T>()) return *value;
   return default_value;
 }
-// ----------------------------------------
+
+// ------------------------------
 
 // Helper function to format error messages with context
 std::string format_toml_error(const toml::parse_error &err) {
@@ -53,7 +55,7 @@ std::string format_toml_error(const toml::parse_error &err) {
   return oss.str();
 }
 
-// ----------------------------------------
+// ------------------------------
 
 configuration read_configuration(std::string const &toml_file_name) try {
   configuration config{""}; // nothing
@@ -133,7 +135,7 @@ catch (const std::exception &ex) {
   throw std::runtime_error("Error processing TOML file: " + toml_file_name + "\n" + std::string(ex.what()));
 }
 
-//--------------------------------------------------
+// ------------------------------
 
 void write_configuration(configuration const &config, std::string const &toml_file_name) {
 // #embed is C, it will be C++23, meanwhile we silence the warning that we use a C extension

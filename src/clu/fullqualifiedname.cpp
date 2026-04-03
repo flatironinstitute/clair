@@ -88,7 +88,7 @@ namespace clu {
     return {};
   }
 
-  // ----------------------------------
+  // ------------------------------
 
   str_t get_fully_qualified_name(clang::QualType const &t, clang::ASTContext &ctx, bool canonical) {
 
@@ -126,7 +126,7 @@ namespace clu {
     //return clean_libc_mess(t.getAsString(policy));
   }
 
-  // ----------------------------------------------
+  // ------------------------------
 
   str_t get_fully_qualified_name(clang::TypeDecl const *t, bool canonical) {
 #if LLVM_VERSION_MAJOR >= 22

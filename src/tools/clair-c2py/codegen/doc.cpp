@@ -1,6 +1,6 @@
 #include "doc.hpp"
 #include "clu/doc_string.hpp"
-#include "../data.hpp"
+#include "../wdata.hpp"
 #include "clu/fullqualifiedname.hpp"
 #include <clang/AST/DeclCXX.h>
 #include "clang/Lex/Lexer.h"
@@ -20,7 +20,7 @@ static const struct {
   util::logger warn = util::logger{&std::cout, "-- ", "\033[1;31mDoc warning: \033[0m"};
 } logs;
 
-// -----------------------------------------------
+// ------------------------------
 
 std::tuple<str_t, std::vector<std::vector<str_t>>, std::vector<str_t>> pydoc(std::vector<fnt_info_t> const &f_list) {
   // extract and format relevant doc strings (function, parameter and return descriptions)
@@ -140,7 +140,7 @@ str_t pydoc(cls_info_t const &cls) {
   return fs.str();
 }
 
-// ----------------------------------------------
+// ------------------------------
 
 // vector of [name, c++ type, initializer, doc]
 std::vector<std::vector<std::string>> get_fields_info(cls_info_t const &cls_info) {

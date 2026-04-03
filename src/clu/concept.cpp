@@ -48,3 +48,13 @@ bool clu::satisfy_concept(clang::QualType const &ty, clang::ConceptDecl const *c
   //if (not s.IsSatisfied) ci->getSema().DiagnoseUnsatisfiedConstraint(s);
   return !error and s.IsSatisfied;
 }
+
+// ------------------------------
+
+bool clu::concept_holder::is_satisfied_by(clang::QualType const &ty) const {
+  return concept_decl and satisfy_concept(ty, concept_decl, ci);
+}
+
+bool clu::concept_holder::is_satisfied_by(clang::CXXRecordDecl const *cls) const {
+  return concept_decl and satisfy_concept(cls, concept_decl, ci);
+}

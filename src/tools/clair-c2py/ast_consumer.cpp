@@ -9,6 +9,7 @@
 #include "clu/misc.hpp"
 #include "utility/logger.hpp"
 #include "./matchers.hpp"
+#include "./scan_classes.hpp"
 
 namespace fs = std::filesystem;
 using clang::ast_matchers::MatchFinder;
@@ -25,19 +26,19 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
 
   // ------- Match some concepts in c2py::concepts
   {
-    matcher<mtch::Concept> ma{worker};
+    matcher<mtch::Concept> ma{wdata};
     MatchFinder mf;
     mf.addMatcher(namespaceDecl(hasName("c2py"), forEach(namespaceDecl(hasName("concepts"), forEach(namedDecl().bind("conceptDecl"))))), &ma);
     // a few concepts that may be present in known library
     mf.addMatcher(namedDecl(namedDecl().bind("conceptDecl"), hasName("h5::Storable")), &ma);
     mf.matchAST(ctx);
   }
-  if (worker->concepts.IsConvertiblePy2C == nullptr) {
+  if (not wdata->concepts.IsConvertiblePy2C) {
     llvm::errs() << "Can not find the c2py concepts. Internal error. It should never happen. Aborting.";
     return;
   }
 
-  if (worker->concepts.HasHdf5)
+  if (wdata->concepts.HasHdf5)
     logs.note("Found Flatiron/h5 Storable concept. Will generate h5 code for all wrapped classes satisfying this concept.");
 
   // ------- Build the matcher to restrict the match to the namespaces
@@ -46,7 +47,7 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
     // e.g. namespace A::B would yield
     // namespaceDecl(hasName("A"), hasDeclContext(namespaceDecl(hasName("B"))
     std::vector<DeclarationMatcher> ns_matcher_list;
-    for (const auto &parts : worker->config._namespaces_list) {
+    for (const auto &parts : wdata->config._namespaces_list) {
       DeclarationMatcher m = namespaceDecl(hasName(parts[0]));
       for (int i = 1; i < int(parts.size()); ++i) { m = namespaceDecl(hasName(parts[i]), hasDeclContext(m)); }
       ns_matcher_list.push_back(m);
@@ -68,25 +69,25 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
 
   // add the arguments for the names if the option is set
   auto add_name = [&](auto l, auto... x) {
-    if (auto &s = worker->config.match_names; !s.empty())
+    if (auto &s = wdata->config.match_names; !s.empty())
       return l(std::move(x)..., matchesName(s));
     else
       return l(std::move(x)...);
   };
   // add the arguments for namespace if the option is set
   auto add_ns = [&](auto l, auto... x) {
-    if (not worker->config._namespaces_list.empty()) {
+    if (not wdata->config._namespaces_list.empty()) {
       return add_name(l, std::move(x)..., hasDeclContext(make_ns_matcher()));
     } else
       return add_name(l, std::move(x)...);
   };
   // add the arguments for the file if the option is set
   auto add_match_files = [&](auto l, auto... x) {
-    if (auto &s = worker->config.match_files; !s.empty()) {
-      //llvm::errs() << "Source file: " << fs::path{worker->module_info.sourcefile}.filename() << "\n";
-      //llvm::errs() << "Match files: " << worker->config.match_files << "\n";
+    if (auto &s = wdata->config.match_files; !s.empty()) {
+      //llvm::errs() << "Source file: " << fs::path{wdata->module_info.sourcefile}.filename() << "\n";
+      //llvm::errs() << "Match files: " << wdata->config.match_files << "\n";
       // optimization : if the match file is exactly the main file, we can use isExpansionInMainFile which is much faster
-      if (fs::path{worker->module_info.sourcefile}.filename() == s)
+      if (fs::path{wdata->module_info.sourcefile}.filename() == s)
         return add_ns(l, std::move(x)..., isExpansionInMainFile());
       else
         return add_ns(l, std::move(x)..., isExpansionInFileMatching(s));
@@ -96,7 +97,7 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
   };
   // add the arguments for the names if the option is set
   auto add_excludes = [&](auto l) {
-    if (auto &s = worker->config.exclude_system_headers)
+    if (auto &s = wdata->config.exclude_system_headers)
       return add_match_files(l, unless(isExpansionInSystemHeader()));
     else
       return add_match_files(l);
@@ -118,9 +119,9 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
   // Pass 1: Match classes and enums first, so all classes are collected
   // before we process functions (which may reference these classes)
   MatchFinder mf1, mf2;
-  matcher<mtch::Cls> ma_cls{worker};
-  matcher<mtch::Enum> ma_enum{worker};
-  matcher<mtch::ModuleClsWrap> ma_using{worker};
+  matcher<mtch::Cls> ma_cls{wdata};
+  matcher<mtch::Enum> ma_enum{wdata};
+  matcher<mtch::ModuleClsWrap> ma_using{wdata};
 
   mf1.addMatcher(add_excludes(call_cls).bind("class"), &ma_cls);
   mf1.addMatcher(add_excludes(call_enum).bind("en"), &ma_enum);
@@ -132,12 +133,13 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
   if (ctx.getDiagnostics().hasErrorOccurred()) return;
 
   // Pass 2: Match functions after that all classes are known
-  matcher<mtch::Fnt> ma_f{worker};
+  matcher<mtch::Fnt> ma_f{wdata};
   mf2.addMatcher(add_excludes(call_fun).bind("func"), &ma_f);
   mf2.matchAST(ctx);
   if (ctx.getDiagnostics().hasErrorOccurred()) return;
 
   // -------- done ----------
   // NB must be run HERE, as it may require the DiagnosticsEngine...
-  worker->run();
+  for (auto &[_, v] : wdata->module_info.functions) v = make_unique(v);
+  scan_classes(*wdata);
 }

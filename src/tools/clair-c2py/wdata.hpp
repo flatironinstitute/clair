@@ -2,11 +2,17 @@
 #include <regex>
 #include <map>
 #include <optional>
-#include "utility/string_tools.hpp"
-#include "utility/logger.hpp"
+
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/Support/Regex.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclTemplate.h"
-#include "llvm/ADT/STLExtras.h"
+#include "clang/Frontend/CompilerInstance.h"
+
+#include "./configuration.hpp"
+#include "clu/concept.hpp"
+#include "utility/string_tools.hpp"
+#include "utility/logger.hpp"
 
 using cls_ptr_t = clang::CXXRecordDecl const *;
 using fnt_ptr_t = clang::FunctionDecl const *;
@@ -15,31 +21,23 @@ using fnt_ptr_t = clang::FunctionDecl const *;
 // Operator kind: arithmetic, comparison, and unary
 enum class OpKind { Add, Sub, Mul, Div, LShift, Eq, Ne, Lt, Gt, Le, Ge, Neg, Pos, IAdd, ISub, IMul, IDiv };
 
-// -----------------------------------------------------------
-
-// // Template specializations can use a function pointer (&f<targs>) unless
-// // the template has a parameter pack, which c2py's dispatcher can't handle.
-// inline bool fnt_needs_rewrite(fnt_ptr_t f) {
-//   if (!f) return true;
-//   auto *info = f->getTemplateSpecializationInfo();
-//   if (!info) return true; // non-template: rewrite
-//   // Check if the template declaration has a parameter pack
-//   for (auto *p : info->getTemplate()->getTemplateParameters()->asArray())
-//     if (p->isParameterPack()) return true;
-//   return false;
-// }
-
+// ----------------------- fnt_info_t ------------------------------------
+// Carries a function/method declaration pointer and wrapping metadata.
 struct fnt_info_t {
   fnt_ptr_t ptr          = nullptr;
-  bool rewrite           = true; // fnt_needs_rewrite(ptr);
+  bool rewrite           = true;
   cls_ptr_t parent_class = nullptr;
   [[nodiscard]] clang::CXXMethodDecl const *as_method() const { return llvm::dyn_cast_or_null<clang::CXXMethodDecl>(ptr); }
 };
 
-// -----------------------------------------------------------
-// Serialization method
+/// Deduplicate a list of functions, keeping the best redeclaration per group.
+std::vector<fnt_info_t> make_unique(std::vector<fnt_info_t> const &flist);
+
+// -------------------  Serialization method ----------------------------------------
 enum class Serialization { None, Tuple, H5, Repr };
 
+// ----------------------- cls_info_t ------------------------------------
+// Collects all wrapping data for a C++ class: methods, constructors, fields, operators, and properties.
 struct cls_info_t {
   cls_ptr_t ptr;
   cls_ptr_t base                                   = nullptr;
@@ -70,8 +68,8 @@ struct cls_info_t {
   bool synthetize_dict_attribute() const { return synthetize_init_from_pydict(); }
 };
 
-// -----------------------------------------------------------
-
+// ----------------------- module_info_t ------------------------------------
+// Aggregates all wrapping data for a Python module: functions, classes, enums, and source metadata.
 struct module_info_t {
 
   str_t module_name;
@@ -87,22 +85,44 @@ struct module_info_t {
   std::vector<std::pair<str_t, cls_info_t>> classes; // index of cls_table. Must keep order of insertion to have base first
   std::map<cls_ptr_t, long> classes_ptr_to_info;     // reverse search table
 
-  void add_class(std::string_view name, clang::CXXRecordDecl const *cls) {
-    if (classes_ptr_to_info.contains(cls)) return; // already wrapped.
-    classes.emplace_back(name, cls_info_t{.ptr = cls});
-    classes_ptr_to_info[cls] = long(classes.size() - 1); // index in classes
-  }
+  // Add a class to the module; silently ignored if already registered.
+  void add_class(std::string_view name, clang::CXXRecordDecl const *cls);
 
-  cls_ptr_t get_wrapped_cls(clang::QualType ty) const {
-    clang::CXXRecordDecl const *cls = ty->getAsCXXRecordDecl();
-    if (!cls) cls = ty->getPointeeCXXRecordDecl();
-    return (cls and classes_ptr_to_info.contains(cls)) ? cls : nullptr;
-  }
+  // Return the wrapped class pointer for a type, or nullptr if not wrapped.
+  cls_ptr_t get_wrapped_cls(clang::QualType ty) const;
 
-  cls_info_t *get_wrapped_cls_info(clang::QualType ty) {
-    auto cls = get_wrapped_cls(ty);
-    return cls ? &classes[classes_ptr_to_info.at(cls)].second : nullptr;
-  }
+  // Return a pointer to the cls_info_t for a wrapped type, or nullptr.
+  cls_info_t *get_wrapped_cls_info(clang::QualType ty);
 
-  bool is_wrapped(clang::QualType ty) const { return get_wrapped_cls(ty) != nullptr; }
+  // Return true if the type corresponds to a wrapped class.
+  bool is_wrapped(clang::QualType ty) const;
+};
+
+// ----------------------- wdata_t ------------------------------------
+// Per-translation-unit working state: compiler instance, configuration, resolved concepts, and collected module data.
+struct wdata_t {
+  clang::CompilerInstance *ci;
+  configuration config;
+
+  std::optional<llvm::Regex> reject_names; // only regex, the other ones are used directly in the ASTMatcher
+
+  // Concepts matched from c2py and h5 library (if present).
+  // Resolved by the ASTConsumer; concept_holder::is_satisfied_by(...) returns false if not found.
+  struct {
+    clu::concept_holder IsConvertiblePy2C;
+    clu::concept_holder IsConvertibleC2Py;
+    clu::concept_holder HasSerializeLikeBoost;
+    clu::concept_holder HasHdf5;
+    clu::concept_holder HasNonDeletedDefaultConstructor;
+  } concepts;
+
+  // Preprocessor will detect if the input has included the generated cxx file
+  // and store the result in this variable.
+  bool input_has_included_generated_cxx = false;
+  std::vector<std::string> deps; // dependencies collected by the preprocessor
+
+  // All the information about the module including the classes, methods, etc.
+  module_info_t module_info;
+
+  wdata_t(clang::CompilerInstance *ci, configuration const &config);
 };

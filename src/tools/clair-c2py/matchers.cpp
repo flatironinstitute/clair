@@ -9,22 +9,25 @@
 #include "clu/concept.hpp"
 #include "utility/logger.hpp"
 #include "utility/macros.hpp"
+#include "./decl_utils.hpp"
+#include "./check_convertibility.hpp"
+#include "./analyze_operator.hpp"
 
 static const struct {
   util::logger rejected = util::logger{&std::cout, "-- ", "\033[1;33mRejecting: \033[0m"};
   util::logger error    = util::logger{&std::cout, "-- ", "\033[1;31mError:  \033[0m"};
 } logs;
 
-// -----------------------------------------------------
+// ------------------------------
 
-static void add_enum(clang::EnumDecl const *enu, worker_t *worker) {
+static void add_enum(clang::EnumDecl const *enu, wdata_t *wdata) {
   if (!enu) return;
-  if (worker->is_rejected(enu, &logs.rejected)) return;
-  if (std::ranges::find(worker->module_info.enums, enu) != worker->module_info.enums.end()) return;
-  worker->module_info.enums.push_back(enu);
+  if (should_reject(enu, wdata->reject_names, &logs.rejected)) return;
+  if (std::ranges::find(wdata->module_info.enums, enu) != wdata->module_info.enums.end()) return;
+  wdata->module_info.enums.push_back(enu);
 }
 
-// -----------------------------------------------------
+// ------------------------------
 
 template <> void matcher<mtch::Concept>::run(const MatchResult &Result) {
 
@@ -34,20 +37,20 @@ template <> void matcher<mtch::Concept>::run(const MatchResult &Result) {
     auto cname = cpt->getName().str();
 
     if (cname == "IsConvertiblePy2C")
-      worker->concepts.IsConvertiblePy2C = cpt;
+      wdata->concepts.IsConvertiblePy2C = {cpt, wdata->ci};
     else if (cname == "IsConvertibleC2Py")
-      worker->concepts.IsConvertibleC2Py = cpt;
+      wdata->concepts.IsConvertibleC2Py = {cpt, wdata->ci};
     else if (cname == "HasSerializeLikeBoost")
-      worker->concepts.HasSerializeLikeBoost = cpt;
+      wdata->concepts.HasSerializeLikeBoost = {cpt, wdata->ci};
     else if (cname == "HasNonDeletedDefaultConstructor")
-      worker->concepts.HasNonDeletedDefaultConstructor = cpt;
+      wdata->concepts.HasNonDeletedDefaultConstructor = {cpt, wdata->ci};
     else if (cname == "Storable")
-      worker->concepts.HasHdf5 = cpt;
+      wdata->concepts.HasHdf5 = {cpt, wdata->ci};
     // else ignore the others concepts
   }
 }
 
-// --------------------------------------------------------------------------------
+// ------------------------------
 
 // Match the using PythonClass = my_class<...> in c2py_module namespace
 // in the case of a class template specialization only
@@ -60,7 +63,7 @@ template <> void matcher<mtch::ModuleClsWrap>::run(const MatchResult &Result) {
         // The alias (e.g. A<int>) was not instantiated in the code.
         // Clang is lazy with aliases, so we use Sema to instantiate it ourselves.
         clang::CXXRecordDecl *Pattern = ctsd->getSpecializedTemplate()->getTemplatedDecl();
-        auto &SemaRef                 = worker->ci->getSema();
+        auto &SemaRef                 = wdata->ci->getSema();
 
         SemaRef.InstantiateClass(ctsd->getLocation(),                        // PointOfInstantiation
                                  ctsd,                                       // Instantiation
@@ -71,15 +74,15 @@ template <> void matcher<mtch::ModuleClsWrap>::run(const MatchResult &Result) {
         if (ctsd->isInvalidDecl()) clu::emit_error(d, "c2py: Error in instantiating the class on the right hand side of the alias");
       }
     }
-    worker->module_info.add_class(d->getName().str(), cls);
+    wdata->module_info.add_class(d->getName().str(), cls);
   }
 }
 
-// -------------------------------------------------
+// ------------------------------
 
-// the analysis part of the class matcher
+// the registration part of the class matcher
 // pulled out because it recursively calls itself on nested classes
-void analyze_class(clang::CXXRecordDecl const *cls, worker_t *worker) {
+static void register_class(clang::CXXRecordDecl const *cls, wdata_t *wdata) {
 
   if (!cls) return; // just in case
   if (cls->getASTContext().getDiagnostics().hasErrorOccurred()) return;
@@ -104,33 +107,33 @@ void analyze_class(clang::CXXRecordDecl const *cls, worker_t *worker) {
   // ---- Apply the filters
 
   // apply c2py_ignore and reject_names
-  if (worker->is_rejected(cls, &logs.rejected)) return;
+  if (should_reject(cls, wdata->reject_names, &logs.rejected)) return;
 
   // reject a class which already HAS a converter Py2C
   // otherwise the wrapping would take precedence
-  if (clu::satisfy_concept(cls, worker->concepts.IsConvertiblePy2C, worker->ci)) {
+  if (wdata->concepts.IsConvertiblePy2C.is_satisfied_by(cls)) {
     logs.rejected(fmt::format(R"RAW({0} [{1}])RAW", cls->getQualifiedNameAsString(), "Already has a converter"));
     return;
   }
 
   // Insert in the module class list
-  worker->module_info.add_class(worker->get_python_name(cls), cls);
+  wdata->module_info.add_class(get_python_name(cls), cls);
 
-  // Finally analyze recursively the nested classes and enums, as they can be pruned by the namespaces directive
+  // Finally register recursively the nested classes and enums, as they can be pruned by the namespaces directive
   for (auto const *d : cls->decls()) {
-    if (auto const *inner = llvm::dyn_cast<clang::CXXRecordDecl>(d); inner) analyze_class(inner, worker);
-    if (auto const *enu = llvm::dyn_cast<clang::EnumDecl>(d)) add_enum(enu, worker);
+    if (auto const *inner = llvm::dyn_cast<clang::CXXRecordDecl>(d); inner) register_class(inner, wdata);
+    if (auto const *enu = llvm::dyn_cast<clang::EnumDecl>(d)) add_enum(enu, wdata);
   }
 }
 
-// -------------------------------------------------
+// ------------------------------
 
 template <> void matcher<mtch::Cls>::run(const clang::ast_matchers::MatchFinder::MatchResult &Result) {
   const auto *cls = Result.Nodes.getNodeAs<clang::CXXRecordDecl>("class");
-  analyze_class(cls, this->worker);
+  register_class(cls, this->wdata);
 }
 
-// -------------------------------------------------
+// ------------------------------
 
 static clang::CXXRecordDecl *as_CXXRecordDecl(clang::QualType qtype) {
   qtype = qtype.getNonReferenceType().getCanonicalType();
@@ -151,7 +154,7 @@ static cls_info_t *find_wrapped_cls_for_first_arg(clang::FunctionDecl const *f, 
   clu::emit_error(f->getParamDecl(0), "c2py: First argument is not a class being wrapped");
   return nullptr;
 }
-// -------------------------------------------------
+// ------------------------------
 template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
 
   auto *f = Result.Nodes.getNodeAs<clang::FunctionDecl>("func");
@@ -186,12 +189,12 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
   }
 
   // apply c2py_ignore and the reject_name regex
-  auto &M = worker->module_info;
-  if (worker->is_rejected(f, &logs.rejected)) return;
+  auto &M = wdata->module_info;
+  if (should_reject(f, wdata->reject_names, &logs.rejected)) return;
 
   // Special treatment for operator
   if (f->getNameAsString().starts_with("operator")) {
-    worker->analyze_operator(f);
+    analyze_operator(f, *wdata);
     return;
   }
 
@@ -210,7 +213,7 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
   }
 
   // ----- Check convertibility
-  if (not worker->check_convertibility(f)) return;
+  if (not check_convertibility(f, *wdata)) return;
 
   // ---- property annotations on free functions
   if (auto prop_name = clu::get_annotation_value(f, "c2py_property_get")) {
@@ -224,17 +227,17 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
 
   // ---- wrap as method of the class of the first argument
   if (clu::has_annotation(f, "c2py_wrap_as_method")) {
-    if (auto *cli = find_wrapped_cls_for_first_arg(f, M)) cli->methods[worker->get_python_name(f)].push_back(fnt_info_t{.ptr = f, .rewrite = false});
+    if (auto *cli = find_wrapped_cls_for_first_arg(f, M)) cli->methods[get_python_name(f)].push_back(fnt_info_t{.ptr = f, .rewrite = false});
     return;
   }
 
   // ---- generic free function
-  M.functions[worker->get_python_name(f)].push_back(fnt_info_t{f});
+  M.functions[get_python_name(f)].push_back(fnt_info_t{f});
 }
 
-// -------------------------------------------------
+// ------------------------------
 
 template <> void matcher<mtch::Enum>::run(const MatchResult &Result) {
   auto *enu = Result.Nodes.getNodeAs<clang::EnumDecl>("en");
-  add_enum(enu, worker);
+  add_enum(enu, wdata);
 }

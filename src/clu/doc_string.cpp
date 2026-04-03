@@ -66,7 +66,7 @@ namespace clu {
       return {}; // no comment is not an error
   }
 
-  // -----------------------------------------------
+  // ------------------------------
 
   doc_string_t::doc_string_t(const clang::Decl *d) : d_(d), ctx_(&d->getASTContext()) {
     // get FullComment of a declaration

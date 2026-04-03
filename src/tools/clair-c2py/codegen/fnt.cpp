@@ -41,13 +41,17 @@ str_t fnt_params(fnt_ptr_t f) {
 str_t fnt_params_with_default(clang::FunctionDecl const *f) {
 
   // best_redecl() in worker.cpp already picks the declaration with defaults/names,
-  // but for template specializations we need the original template declaration.
-  // if f is a template specialization, we take the original declaration (template)
+  // but for template specializations we need the original template declaration
+  // for parameter names and default argument expressions.
+  // However, for resolving types (e.g. in braced-init defaults), we need the
+  // instantiated function's parameter types, not the unresolved template parameter types.
+  clang::FunctionDecl const *f_for_types = f;
   if (auto *info = f->getTemplateSpecializationInfo(); info and info->isExplicitInstantiationOrSpecialization())
     f = info->getTemplate()->getTemplatedDecl();
 
   // extract the default argument of a parameter declaration
-  auto extract_default_argument = [](clang::ParmVarDecl const *p) -> str_t {
+  // p_type is the resolved parameter type from the instantiated function
+  auto extract_default_argument = [](clang::ParmVarDecl const *p, clang::QualType p_type) -> str_t {
     clang::Expr const *defarg = p->getDefaultArg();
     EXPECTS(defarg);
     defarg = defarg->IgnoreParenImpCasts();
@@ -71,7 +75,16 @@ str_t fnt_params_with_default(clang::FunctionDecl const *f) {
     // replace everything before '{' with the fully qualified type name.
     // This handles both bare braced-init-lists and Type{args} where the type may contain
     // unqualified namespace-scoped aliases (e.g. myint_t instead of ns::myint_t).
-    if (auto pos = s.find('{'); pos != str_t::npos) s = clu::get_fully_qualified_name(p->getType(), *ctx) + s.substr(pos);
+    // Use the resolved type (p_type) rather than p->getType() which may be an
+    // unresolved template parameter (e.g. type-parameter-0-2) for specializations.
+    if (auto pos = s.find('{'); pos != str_t::npos) {
+      // Strip reference and cv-qualifiers to get a constructible type for braced-init.
+      // e.g. "const array_const_view<dcomplex, 3> &" -> "array_const_view<dcomplex, 3>"
+      auto bare_type = p_type.getNonReferenceType();
+      bare_type.removeLocalConst();
+      bare_type.removeLocalVolatile();
+      s = clu::get_fully_qualified_name(bare_type, *ctx) + s.substr(pos);
+    }
     return s;
   };
   // --------
@@ -79,12 +92,12 @@ str_t fnt_params_with_default(clang::FunctionDecl const *f) {
   // prepare the string of "A"_a = A_default, chain.
   str_t pyargs = join( // NB always a , at the front ...
      itertools::range(f->getNumParams()),
-     [f, &extract_default_argument](int i) {
+     [f, f_for_types, &extract_default_argument](int i) {
        clang::ParmVarDecl const *p = f->getParamDecl(i);
        // FIXME : rewrite with 2 fromat...
        // FIXME : start with , if anything : do NOT join ...
        auto res = fmt::format(R"RAW( "{0}")RAW", p->getNameAsString());
-       if (p->hasDefaultArg()) { res += "_a = " + extract_default_argument(p); }
+       if (p->hasDefaultArg()) { res += "_a = " + extract_default_argument(p, f_for_types->getParamDecl(i)->getType()); }
        return res;
      },
      ',');

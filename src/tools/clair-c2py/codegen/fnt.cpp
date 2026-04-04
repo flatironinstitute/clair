@@ -80,10 +80,7 @@ str_t fnt_params_with_default(clang::FunctionDecl const *f) {
     if (auto pos = s.find('{'); pos != str_t::npos) {
       // Strip reference and cv-qualifiers to get a constructible type for braced-init.
       // e.g. "const array_const_view<dcomplex, 3> &" -> "array_const_view<dcomplex, 3>"
-      auto bare_type = p_type.getNonReferenceType();
-      bare_type.removeLocalConst();
-      bare_type.removeLocalVolatile();
-      s = clu::get_fully_qualified_name(bare_type, *ctx) + s.substr(pos);
+      s = clu::get_fully_qualified_name(p_type.getNonReferenceType().getUnqualifiedType(), *ctx) + s.substr(pos);
     }
     return s;
   };

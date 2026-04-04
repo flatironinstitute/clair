@@ -52,7 +52,7 @@ template <> void matcher<mtch::Concept>::run(const MatchResult &Result) {
 
 // ------------------------------
 
-// Match the using PythonClass = my_class<...> in c2py_module namespace
+// Match the using PythonName = my_class<...> in c2py_module namespace
 // in the case of a class template specialization only
 template <> void matcher<mtch::ModuleClsWrap>::run(const MatchResult &Result) {
   auto *d = Result.Nodes.getNodeAs<clang::TypeAliasDecl>("decl");
@@ -135,6 +135,7 @@ template <> void matcher<mtch::Cls>::run(const clang::ast_matchers::MatchFinder:
 
 // ------------------------------
 
+/// Return the underlying CXXRecordDecl if the canonical type is a C++ class/struct, or nullptr otherwise.
 static clang::CXXRecordDecl *as_CXXRecordDecl(clang::QualType qtype) {
   qtype = qtype.getNonReferenceType().getCanonicalType();
   if (auto *rtype = qtype->getAs<clang::RecordType>())
@@ -142,8 +143,11 @@ static clang::CXXRecordDecl *as_CXXRecordDecl(clang::QualType qtype) {
   return nullptr; // Not a class/struct type
 }
 
-// Validate that f has at least one parameter whose type is a wrapped class.
-// Returns the corresponding cls_info_t, or nullptr after emitting an error.
+// ------------------------------
+
+// Find the cls_info_t for the first parameter of f, which must be a wrapped class.
+// Returns a pointer to it, or nullptr after emitting an error if f has no parameters
+// or its first parameter is not a wrapped class.
 static cls_info_t *find_wrapped_cls_for_first_arg(clang::FunctionDecl const *f, module_info_t &M) {
   if (f->param_size() == 0) {
     clu::emit_error(f, "c2py: This annotated function must take at least 1 argument (self)");
@@ -154,7 +158,9 @@ static cls_info_t *find_wrapped_cls_for_first_arg(clang::FunctionDecl const *f, 
   clu::emit_error(f->getParamDecl(0), "c2py: First argument is not a class being wrapped");
   return nullptr;
 }
+
 // ------------------------------
+
 template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
 
   auto *f = Result.Nodes.getNodeAs<clang::FunctionDecl>("func");

@@ -1,10 +1,10 @@
 #pragma once
+#include "llvm/Support/Regex.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "utility/logger.hpp"
 #include "utility/string_tools.hpp"
 #include <optional>
-#include "llvm/Support/Regex.h"
 
 /// Check whether decl should be skipped due to a c2py_ignore annotation
 /// or a qualified name matching reject_names. Logs the reason if log is provided.

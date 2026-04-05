@@ -1,6 +1,4 @@
 #include <iostream>
-#include "llvm/ADT/DenseSet.h"
-
 #include "clu/misc.hpp"
 #include "clu/concept.hpp"
 #include "utility/logger.hpp"
@@ -9,6 +7,7 @@
 #include "./analyze_operator.hpp"
 #include "./decl_utils.hpp"
 #include "./scan_classes.hpp"
+#include "utility/string_tools.hpp"
 
 static const struct {
   util::logger rejected = util::logger{&std::cout, "-- ", "\033[1;33mRejecting: \033[0m"};
@@ -19,32 +18,21 @@ static const struct {
 // When both a const and non-const method share the same parameter types, keep only the non-const version.
 // Preserves original order.
 static std::vector<fnt_info_t> rm_const_overloads(std::vector<fnt_info_t> const &mlist) {
-
-  auto get_param_types = [](fnt_info_t const &fi) {
-    llvm::SmallVector<clang::QualType> params;
-    params.reserve(fi.ptr->getNumParams());
-    for (auto const *p : fi.ptr->parameters()) params.push_back(p->getType());
-    return params;
-  };
-
-  // For each param signature, record the index of the preferred overload (non-const wins).
-  std::map<llvm::SmallVector<clang::QualType>, size_t> best;
-  for (size_t i = 0; i < mlist.size(); ++i) {
-    auto params         = get_param_types(mlist[i]);
-    auto *method        = llvm::dyn_cast_or_null<clang::CXXMethodDecl>(mlist[i].ptr);
-    bool is_const       = method && method->isConst();
-    auto [it, inserted] = best.try_emplace(std::move(params), i);
-    if (!inserted && !is_const) it->second = i; // non-const wins
-  }
-
-  // Collect winners in original order.
-  llvm::DenseSet<size_t> winner_indices;
-  for (auto const &[_, idx] : best) winner_indices.insert(idx);
-
   std::vector<fnt_info_t> result;
-  result.reserve(winner_indices.size());
-  for (size_t i = 0; i < mlist.size(); ++i)
-    if (winner_indices.contains(i)) result.push_back(mlist[i]);
+  std::unordered_map<std::string, size_t> sig_idx; // signature -> index in result
+
+  for (auto const &f : mlist) {
+    auto signature = util::join(f.ptr->parameters(), [](auto const *p) { return p->getType().getAsString(); }, ",");
+    auto it        = sig_idx.find(signature);
+    if (it == sig_idx.end()) {
+      sig_idx.emplace(signature, result.size());
+      result.push_back(f);
+    } else {
+      auto *cur = result[it->second].as_method();
+      auto *m   = f.as_method();
+      if (cur && cur->isConst() && m && !m->isConst()) result[it->second] = f;
+    }
+  }
   return result;
 }
 

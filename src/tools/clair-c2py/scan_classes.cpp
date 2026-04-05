@@ -38,6 +38,10 @@ static std::vector<fnt_info_t> rm_const_overloads(std::vector<fnt_info_t> const 
 
 // ------------------------------
 
+// Classify a single method declaration and, if wrappable, append it to the appropriate
+// slot in cls_info (constructors, getitems/setitems, operator table, properties, or methods).
+// cls is the class whose decl list is being scanned (may differ from cls_info.ptr for base classes).
+// Returns early without touching cls_info for deleted, private, or unwrappable declarations.
 static void analyze_one_method(clang::FunctionDecl const *f, cls_info_t &cls_info, cls_ptr_t cls, wdata_t &wd) {
 
   if (f->isDeleted()) return;
@@ -60,8 +64,7 @@ static void analyze_one_method(clang::FunctionDecl const *f, cls_info_t &cls_inf
   // ---- operators : keep only [] and ()
   if (name.starts_with("operator")) {
     if (name == "operator[]") {
-      // Do not check the return type, only the parameters for the setitem, it is coded differently
-      // than other functions
+      // For setitem (non-const): skip return type check (test_return_type = false), only parameter types matter.
       if (check_convertibility(m, wd, m->isConst())) (m->isConst() ? cls_info.getitems : cls_info.setitems).push_back({m});
     } else if (name == "operator()") {
       if (check_convertibility(m, wd)) cls_info.methods["__call__"].push_back({m});
@@ -110,7 +113,7 @@ static void analyze_one_method(clang::FunctionDecl const *f, cls_info_t &cls_inf
 
 // ------------------------------
 
-// Given cls, stores its methods and friend functions
+// Scan cls and append its public methods (including explicit template specializations) and fields into cls_info.
 static void scan_class_elements(cls_info_t &cls_info, cls_ptr_t cls, wdata_t &wd) {
 
   for (clang::Decl *decl : cls->decls()) { // all declarations in the class
@@ -170,14 +173,14 @@ static void scan_class(wdata_t &wd, cls_info_t &cls_info) {
       cls_info.base = c;
     }
   }
-  // finally we remove the const/non const duplicate in methods
+  // Deduplicate redeclarations, then drop const/non-const pairs keeping the non-const version.
   for (auto &[n, v] : cls_info.methods) {
-    v = make_unique(v);
+    v = make_unique_decls(v);
     v = rm_const_overloads(v);
   }
 
   // Check that the class is default constructible if it has no wrapped constructors
-  if (cls_info.constructors.empty() and not cls_info.synthetize_dict_attribute()
+  if (cls_info.constructors.empty() and not cls_info.synthetize_init_from_pydict()
       and not wd.concepts.HasNonDeletedDefaultConstructor.is_satisfied_by(cls_info.ptr))
     clu::emit_error(cls_info.ptr, "This class has no wrapped constructor and is not default constructible.");
 }

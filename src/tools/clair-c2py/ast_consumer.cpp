@@ -140,6 +140,6 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
 
   // -------- done ----------
   // NB must be run HERE, as it may require the DiagnosticsEngine...
-  for (auto &[_, v] : wdata->module_info.functions) v = make_unique(v);
+  for (auto &[_, v] : wdata->module_info.functions) v = make_unique_decls(v);
   scan_classes(*wdata);
 }

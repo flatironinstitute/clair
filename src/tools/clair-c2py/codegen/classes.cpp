@@ -1,3 +1,4 @@
+#include "./cls_tools.hpp"
 #include "./fnt.hpp"
 #include "./utils.hpp"
 #include <fmt/core.h>
@@ -17,23 +18,6 @@ static const struct {
   util::logger cls_details = util::logger{&std::cout, "-- ", "\033[1;32m         -- \033[0m"};
   util::logger prop        = util::logger{&std::cout, "-- ", "\033[1;32m  Property: \033[0m"};
 } logs;
-
-// ===================================================================
-
-// FIXME : move it up
-// Find the initializer of a FieldDecl
-// NB the case of a template class is specific, as the getInClassInitializer
-// would not work there.
-clang::Expr const *get_field_initializer(clang::FieldDecl const *f) {
-  if (clang::Expr const *init = f->getInClassInitializer()) return init; // non-template structs
-
-  // If f is from a template instantiation, find the original field in the primary template
-  if (auto const *cls = dyn_cast<clang::CXXRecordDecl>(f->getParent()))
-    if (auto const *tip = cls->getTemplateInstantiationPattern())
-      for (clang::FieldDecl const *f_tpl : tip->fields())
-        if (f_tpl->getName() == f->getName()) return f_tpl->getInClassInitializer(); // Retrieve from primary template
-  return nullptr;
-}
 
 // ===================================================================
 
@@ -403,7 +387,7 @@ str_t codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const
     codegen_getter_setter(Properties, PropertiesDocs, pyname, prop, cls_info);
   }
 
-  if (cls_info.synthetize_dict_attribute()) codegen_synth___dict_attribute(code, Properties, cls_info, cls_alias);
+  if (cls_info.synthetize_init_from_pydict()) codegen_synth___dict_attribute(code, Properties, cls_info, cls_alias);
 
   code << PropertiesDocs.str();
 

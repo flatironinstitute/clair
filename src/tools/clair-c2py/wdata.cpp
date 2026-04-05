@@ -22,7 +22,7 @@ static const clang::FunctionDecl *best_redecl(const clang::FunctionDecl *f) {
 
 // ------------------------------
 
-std::vector<fnt_info_t> make_unique(std::vector<fnt_info_t> const &flist) {
+std::vector<fnt_info_t> make_unique_decls(std::vector<fnt_info_t> const &flist) {
   llvm::DenseSet<const clang::FunctionDecl *> seen; // LLVM recommended replacement of std::set
   std::vector<fnt_info_t> res;
   seen.reserve(flist.size());

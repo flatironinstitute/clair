@@ -31,7 +31,7 @@ struct fnt_info_t {
 };
 
 /// Deduplicate a list of functions, keeping the best redeclaration per group.
-std::vector<fnt_info_t> make_unique(std::vector<fnt_info_t> const &flist);
+std::vector<fnt_info_t> make_unique_decls(std::vector<fnt_info_t> const &flist);
 
 // -------------------  Serialization method ----------------------------------------
 enum class Serialization { None, Tuple, H5, Repr };
@@ -55,7 +55,7 @@ struct cls_info_t {
     fnt_info_t getter;
     std::vector<fnt_info_t> setters;
   };
-  std::map<str_t, property> properties = {}; // pyname -> list of C++ overloads
+  std::map<str_t, property> properties = {}; // pyname -> property (getter + setters)
 
   // operators: op -> list of signatures (each signature = full argument type list)
   // e.g. Add -> {{A, A}, {A, int}}, Neg -> {{A}}
@@ -64,8 +64,6 @@ struct cls_info_t {
   // Do we need to synthesize a constructor, as the class has only a {}
   // aggregate initialization
   bool synthetize_init_from_pydict() const { return (ptr->isAggregate() and (ptr->getNumBases() == 0)); }
-
-  bool synthetize_dict_attribute() const { return synthetize_init_from_pydict(); }
 };
 
 // ----------------------- module_info_t ------------------------------------

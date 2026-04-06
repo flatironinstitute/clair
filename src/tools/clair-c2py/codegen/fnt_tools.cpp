@@ -65,6 +65,11 @@ str_t fnt_params_with_default(clang::FunctionDecl const *f) {
   clang::FunctionDecl const *f_for_types = f;
   if (auto *info = f->getTemplateSpecializationInfo(); info and info->isExplicitInstantiationOrSpecialization())
     f = info->getTemplate()->getTemplatedDecl();
+  // For members of class template instantiations, Clang does not propagate
+  // default arguments to the instantiated parameters. Retrieve the pattern
+  // (the member in the primary class template) which carries the defaults.
+  else if (auto *pattern = f->getInstantiatedFromMemberFunction())
+    f = pattern;
 
   // extract the default argument of a parameter declaration
   // p_type is the resolved parameter type from the instantiated function

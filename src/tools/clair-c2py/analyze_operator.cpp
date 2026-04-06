@@ -1,5 +1,6 @@
 #include "./analyze_operator.hpp"
 #include "./check_convertibility.hpp"
+#include "clu/misc.hpp"
 
 // ------------------------------
 
@@ -45,6 +46,22 @@ void analyze_operator(clang::FunctionDecl const *f, wdata_t &wd) {
   // Skip the return type check for them.
   bool skip_return_check = (*op == OpKind::IAdd or *op == OpKind::ISub or *op == OpKind::IMul or *op == OpKind::IDiv or *op == OpKind::LShift);
   if (not check_convertibility(f, wd, /*test_return_type=*/!skip_return_check)) return;
+
+  // For LShift, verify return type is T& where T is the class (canonical for operator<<).
+  // The Python wrapping assumes this: it calls the operator and discards the returned reference.
+  if (*op == OpKind::LShift) {
+    auto ret = f->getReturnType();
+    clang::CXXRecordDecl const *class_decl;
+    if (method)
+      class_decl = method->getParent();
+    else
+      class_decl = f->getParamDecl(0)->getType().getNonReferenceType()->getAsCXXRecordDecl();
+    auto *ret_record = ret->isLValueReferenceType() ? ret.getNonReferenceType()->getAsCXXRecordDecl() : nullptr;
+    if (not ret_record or ret_record != class_decl) {
+      clu::emit_error(f, "c2py: operator<< must return T& where T is the class");
+      return;
+    }
+  }
 
   // Build the full argument type list
   std::vector<clang::QualType> args;

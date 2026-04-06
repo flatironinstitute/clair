@@ -45,7 +45,7 @@ static llvm::SmallVector<str_t, 16> unique_param_names(clang::FunctionDecl const
 // e.g. f(A a, B b = 2) --->   a,b
 str_t fnt_params(fnt_ptr_t f) {
   auto names = unique_param_names(f);
-  return join(itertools::range(f->getNumParams()), [&names](int i) { return names[i]; }, ',');
+  return join(names, ',');
 }
 
 // ------------------------------
@@ -73,9 +73,9 @@ str_t fnt_param_with_types(fnt_ptr_t f) {
 // same with tpl parameters
 str_t fnt_tparams(fnt_ptr_t f) {
   clang::ASTContext *ctx = &f->getASTContext();
-  // Collect explicit template arguments. In C++, template parameters after a
-  // parameter pack must be deduced and cannot be explicitly specified, so we
-  // stop emitting arguments once we encounter a pack (expanding its elements).
+  // Collect explicit template arguments, expanding any parameter pack into its
+  // elements. Arguments after a pack cannot be explicitly specified (they must
+  // be deduced), so we stop after expanding it.
   std::vector<str_t> tparams;
   for (auto &&ta : f->getTemplateSpecializationArgs()->asArray()) {
     if (ta.getKind() == clang::TemplateArgument::Pack) {

@@ -3,6 +3,8 @@
 #include <fmt/format.h>
 using namespace fmt::literals;
 #include <itertools/itertools.hpp>
+#include <llvm/ADT/SmallVector.h>
+#include <llvm/ADT/StringMap.h>
 #include <clang/AST/DeclTemplate.h>
 #include "clu/fullqualifiedname.hpp"
 #include "clu/misc.hpp"
@@ -21,19 +23,19 @@ static str_t param_name(clang::ParmVarDecl const *p, int i) {
 // duplicates from parameter pack expansion by appending indices.
 // e.g. f(G g, Args... args) instantiated with Args={double,char}
 // has params (g, args, args) -> returns {"g", "args0", "args1"}.
-static std::vector<str_t> unique_param_names(clang::FunctionDecl const *f) {
+static llvm::SmallVector<str_t, 16> unique_param_names(clang::FunctionDecl const *f) {
   int n = f->getNumParams();
-  std::vector<str_t> names(n);
-  for (int i = 0; i < n; ++i) names[i] = param_name(f->getParamDecl(i), i);
+  llvm::SmallVector<str_t, 16> names(n);
+  llvm::StringMap<std::pair<int, int>> seen; // base_name -> {first_idx, next_suffix}
 
-  // Count occurrences of each name.
-  std::map<str_t, int> counts;
-  for (auto const &name : names) ++counts[name];
-
-  // Suffix duplicates with an index.
-  std::map<str_t, int> seen;
   for (int i = 0; i < n; ++i) {
-    if (counts[names[i]] > 1) { names[i] += fmt::format("{}", seen[names[i]]++); }
+    names[i]            = param_name(f->getParamDecl(i), i);
+    auto [it, inserted] = seen.try_emplace(names[i], i, 0);
+    if (!inserted) {
+      auto &[first_idx, next] = it->second;
+      if (next == 0) { names[first_idx] += '0'; next = 1; }
+      names[i] += fmt::format("{}", next++);
+    }
   }
   return names;
 }

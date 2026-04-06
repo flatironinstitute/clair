@@ -40,10 +40,11 @@ void analyze_operator(clang::FunctionDecl const *f, wdata_t &wd) {
   auto op = operator_name_to_kind(name, arity);
   if (not op) return;
 
-  // In-place operators return a reference (T&) which the c2py runtime discards (it returns self).
+  // In-place operators and LShift return a reference (T&) which the c2py runtime discards
+  // (in-place returns self; LShift copies the result via auto return type deduction in arith_op::invoke).
   // Skip the return type check for them.
-  bool is_inplace = (*op == OpKind::IAdd or *op == OpKind::ISub or *op == OpKind::IMul or *op == OpKind::IDiv);
-  if (not check_convertibility(f, wd, /*test_return_type=*/!is_inplace)) return;
+  bool skip_return_check = (*op == OpKind::IAdd or *op == OpKind::ISub or *op == OpKind::IMul or *op == OpKind::IDiv or *op == OpKind::LShift);
+  if (not check_convertibility(f, wd, /*test_return_type=*/!skip_return_check)) return;
 
   // Build the full argument type list
   std::vector<clang::QualType> args;

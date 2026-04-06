@@ -69,10 +69,14 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
   auto parent_cls_name = (not cls_alias.empty()) ? cls_alias : (parent_class ? clu::get_fully_qualified_name(parent_class) : str_t{});
 
   auto l = [&enforce_method, parent_class, &parent_cls_name](fnt_info_t const &f_info) {
-    auto *f        = f_info.ptr;
-    auto *m        = llvm::dyn_cast_or_null<clang::CXXMethodDecl>(f);
-    auto args      = fnt_params_with_default(f);
-    auto fname     = (m and parent_class ? parent_cls_name + "::" + f->getNameAsString() : f->getQualifiedNameAsString());
+    auto *f   = f_info.ptr;
+    auto *m   = llvm::dyn_cast_or_null<clang::CXXMethodDecl>(f);
+    auto args = fnt_params_with_default(f);
+    // Inline friend functions (defined inside a class body) are only found via ADL,
+    // so they must be called unqualified. They are not CXXMethodDecls.
+    bool is_inline_friend = (not m) and f->getFriendObjectKind() != clang::Decl::FOK_None;
+    auto fname            = (m and parent_class ? parent_cls_name + "::" + f->getNameAsString() :
+                                                  (is_inline_friend ? f->getNameAsString() : f->getQualifiedNameAsString()));
     auto fname_log = (m and parent_class ? clu::get_fully_qualified_name(parent_class) + "::" + f->getNameAsString() : f->getQualifiedNameAsString());
 
     auto cfun_or_cmethod = std::string{enforce_method and (not m) ? "cmethod" : "cfun"};

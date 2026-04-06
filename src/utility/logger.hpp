@@ -5,8 +5,15 @@
 #include <utility>
 #include <fmt/core.h>
 #include <fmt/format.h>
+#include <llvm/ADT/StringRef.h>
 
 #include "string_tools.hpp"
+
+template <> struct fmt::formatter<llvm::StringRef> : fmt::formatter<std::string_view> {
+  auto format(llvm::StringRef s, fmt::format_context &ctx) const {
+    return fmt::formatter<std::string_view>::format({s.data(), s.size()}, ctx);
+  }
+};
 
 namespace util {
   class logger {

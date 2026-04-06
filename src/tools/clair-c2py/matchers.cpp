@@ -205,6 +205,9 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
   auto &M = wdata->module_info;
   if (should_reject(f, wdata->reject_names, &logs.rejected)) return;
 
+  // h5_write/h5_read are HDF5 serialization helpers, never meant to be wrapped
+  if (auto name = f->getNameAsString(); name == "h5_write" || name == "h5_read") return;
+
   // Special treatment for operator
   if (f->getNameAsString().starts_with("operator")) {
     analyze_operator(f, *wdata);

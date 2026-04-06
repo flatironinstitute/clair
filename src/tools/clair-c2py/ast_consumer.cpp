@@ -103,7 +103,9 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
       return add_match_files(l);
   };
   // Final call of the chain, for classes, enums and functions
-  // Function are special, as we have to exclude methods and friend declarations
+  // Functions are special: exclude methods. Friend declarations (both inline
+  // definitions and out-of-class declarations) are matched; deduplication
+  // against out-of-class definitions is handled in the Fnt matcher callback.
   auto call_cls = [&](auto... x) {
     return cxxRecordDecl(std::move(x)...); //excludes);
   };
@@ -111,8 +113,7 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
     return enumDecl(std::move(x)...); //excludes);
   };
   auto call_fun = [&](auto... x) {
-    auto excludes = unless(anyOf(cxxMethodDecl(), hasAncestor(friendDecl())));
-    return functionDecl(std::move(x)..., excludes);
+    return functionDecl(std::move(x)..., unless(cxxMethodDecl()));
   };
 
   // ------- Match the AST in two passes

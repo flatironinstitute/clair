@@ -186,17 +186,38 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
   // Reject function template declaration
   if (f->getDescribedFunctionTemplate()) return;
 
+  // Reject functions with dependent (unresolved) types.
+  // This filters out the pattern FunctionDecl of friend functions defined inside 
+  // class templates whose types still contain template parameters like `type-parameter-0-0`.
+  if (f->getType()->isDependentType()) return;
+
   // method should not be here
   EXPECTS(not llvm::isa<clang::CXXMethodDecl>(f));
 
+  // Deduplicate friend declarations vs out-of-class definitions.
+  // If this is a friend declaration (not a definition) and the definition
+  // exists in this TU, skip — the definition will be matched separately.
+  // If no definition is visible (defined in another .cpp), keep the declaration.
+  if (f->getFriendObjectKind() != clang::Decl::FOK_None and not f->isThisDeclarationADefinition())
+    if (f->getDefinition()) return;
+
+  // Wrapping c2py functions makes no sense, and is probably a mistake in the configuration or includes. Panic...
   if (f->getQualifiedNameAsString().starts_with("c2py::")) {
-    logs.error("FATAL ERROR: incorrect configuration or includes. It requests wrapping c2py functions which makes no sense.");
+    logs.error("FATAL ERROR: incorrect configuration or includes. It requests wrapping c2py functions, which makes no sense.");
     std::abort();
   }
 
   // apply c2py_ignore and the reject_name regex
   auto &M = wdata->module_info;
   if (should_reject(f, wdata->reject_names, &logs.rejected)) return;
+
+  // h5_write/h5_read/h5_read_construct  are HDF5 serialization helpers, never meant to be wrapped
+  // if we use the h5 method.
+  if (wdata->concepts.HasHdf5)
+    if (auto name = f->getName(); name == "h5_write" || name == "h5_read" || name == "h5_read_construct") {
+      logs.rejected(fmt::format(R"RAW({0} [treated directly in h5 support])RAW", name));
+      return;
+    }
 
   // Special treatment for operator
   if (f->getNameAsString().starts_with("operator")) {

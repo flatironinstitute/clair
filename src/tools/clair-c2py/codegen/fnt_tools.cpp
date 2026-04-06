@@ -17,11 +17,33 @@ static str_t param_name(clang::ParmVarDecl const *p, int i) {
   return n.empty() ? fmt::format("_p_{}", i) : n;
 }
 
+// Compute unique parameter names for a function, disambiguating
+// duplicates from parameter pack expansion by appending indices.
+// e.g. f(G g, Args... args) instantiated with Args={double,char}
+// has params (g, args, args) -> returns {"g", "args0", "args1"}.
+static std::vector<str_t> unique_param_names(clang::FunctionDecl const *f) {
+  int n = f->getNumParams();
+  std::vector<str_t> names(n);
+  for (int i = 0; i < n; ++i) names[i] = param_name(f->getParamDecl(i), i);
+
+  // Count occurrences of each name.
+  std::map<str_t, int> counts;
+  for (auto const &name : names) ++counts[name];
+
+  // Suffix duplicates with an index.
+  std::map<str_t, int> seen;
+  for (int i = 0; i < n; ++i) {
+    if (counts[names[i]] > 1) { names[i] += fmt::format("{}", seen[names[i]]++); }
+  }
+  return names;
+}
+
 // ------------------------------
 
 // e.g. f(A a, B b = 2) --->   a,b
 str_t fnt_params(fnt_ptr_t f) {
-  return join(itertools::range(f->getNumParams()), [f](int i) { return param_name(f->getParamDecl(i), i); }, ',');
+  auto names = unique_param_names(f);
+  return join(itertools::range(f->getNumParams()), [&names](int i) { return names[i]; }, ',');
 }
 
 // ------------------------------
@@ -40,7 +62,8 @@ str_t fnt_paramtypes(fnt_ptr_t f) {
 
 // e.g. f(A a, B b = 2) --->   A a, B b
 str_t fnt_param_with_types(fnt_ptr_t f) {
-  return join(itertools::range(f->getNumParams()), [f](int i) { return fnt_param_type(f, i) + ' ' + param_name(f->getParamDecl(i), i); }, ',');
+  auto names = unique_param_names(f);
+  return join(itertools::range(f->getNumParams()), [f, &names](int i) { return fnt_param_type(f, i) + ' ' + names[i]; }, ',');
 }
 
 // ------------------------------
@@ -48,7 +71,18 @@ str_t fnt_param_with_types(fnt_ptr_t f) {
 // same with tpl parameters
 str_t fnt_tparams(fnt_ptr_t f) {
   clang::ASTContext *ctx = &f->getASTContext();
-  return join(f->getTemplateSpecializationArgs()->asArray(), [&ctx](auto &&ta) { return clu::get_name_of_TemplateArgument(ta, ctx); }, ',');
+  // Collect explicit template arguments. In C++, template parameters after a
+  // parameter pack must be deduced and cannot be explicitly specified, so we
+  // stop emitting arguments once we encounter a pack (expanding its elements).
+  std::vector<str_t> tparams;
+  for (auto &&ta : f->getTemplateSpecializationArgs()->asArray()) {
+    if (ta.getKind() == clang::TemplateArgument::Pack) {
+      for (auto const &elem : ta.pack_elements()) tparams.push_back(clu::get_name_of_TemplateArgument(elem, ctx));
+      break;
+    }
+    tparams.push_back(clu::get_name_of_TemplateArgument(ta, ctx));
+  }
+  return join(tparams, [](auto const &s) { return s; }, ',');
 }
 
 // ------------------------------
@@ -104,13 +138,16 @@ str_t fnt_params_with_default(clang::FunctionDecl const *f) {
   // --------
 
   // prepare the string of "A"_a = A_default, chain.
+  // Use the instantiated function's param count: the original template declaration
+  // may have extra parameters from unexpanded packs (e.g. Args&&...args when Args is empty).
+  auto names   = unique_param_names(f_for_types);
   str_t pyargs = join( // NB always a , at the front ...
-     itertools::range(f->getNumParams()),
-     [f, f_for_types, &extract_default_argument](int i) {
-       clang::ParmVarDecl const *p = f->getParamDecl(i);
-       // FIXME : rewrite with 2 fromat...
-       // FIXME : start with , if anything : do NOT join ...
-       auto res = fmt::format(R"RAW( "{0}")RAW", p->getNameAsString());
+     itertools::range(f_for_types->getNumParams()),
+     [f, f_for_types, &extract_default_argument, &names](int i) {
+       // Use template declaration for names/defaults when available, but fall back to
+       // the instantiated function for expanded pack parameters beyond the template's count.
+       clang::ParmVarDecl const *p = (i < (int)f->getNumParams()) ? f->getParamDecl(i) : f_for_types->getParamDecl(i);
+       auto res                    = fmt::format(R"RAW( "{0}")RAW", names[i]);
        if (p->hasDefaultArg()) { res += "_a = " + extract_default_argument(p, f_for_types->getParamDecl(i)->getType()); }
        return res;
      },

@@ -201,8 +201,9 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
   if (f->getFriendObjectKind() != clang::Decl::FOK_None and not f->isThisDeclarationADefinition())
     if (f->getDefinition()) return;
 
+  // Wrapping c2py functions makes no sense, and is probably a mistake in the configuration or includes. Panic...
   if (f->getQualifiedNameAsString().starts_with("c2py::")) {
-    logs.error("FATAL ERROR: incorrect configuration or includes. It requests wrapping c2py functions which makes no sense.");
+    logs.error("FATAL ERROR: incorrect configuration or includes. It requests wrapping c2py functions, which makes no sense.");
     std::abort();
   }
 
@@ -210,8 +211,13 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
   auto &M = wdata->module_info;
   if (should_reject(f, wdata->reject_names, &logs.rejected)) return;
 
-  // h5_write/h5_read are HDF5 serialization helpers, never meant to be wrapped
-  if (auto name = f->getNameAsString(); name == "h5_write" || name == "h5_read") return;
+  // h5_write/h5_read/h5_read_construct  are HDF5 serialization helpers, never meant to be wrapped
+  // if we use the h5 method.
+  if (wdata->concepts.HasHdf5)
+    if (auto name = f->getName(); name == "h5_write" || name == "h5_read" || name == "h5_read_construct") {
+      logs.rejected(fmt::format(R"RAW({0} [treated directly in h5 support])RAW", name));
+      return;
+    }
 
   // Special treatment for operator
   if (f->getNameAsString().starts_with("operator")) {

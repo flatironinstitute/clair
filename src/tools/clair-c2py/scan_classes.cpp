@@ -56,7 +56,7 @@ static void analyze_one_method(clang::FunctionDecl const *f, cls_info_t &cls_inf
   auto name = m->getNameAsString();
 
   // hdf5_format is an HDF5 serialization helper, never meant to be wrapped
-  if (name == "hdf5_format") return;
+  if (wd.concepts.HasHdf5 and name == "hdf5_format") return;
 
   // ---- constructors
   if (llvm::isa<clang::CXXConstructorDecl>(m)) {

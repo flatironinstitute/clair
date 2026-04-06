@@ -43,10 +43,7 @@ static llvm::SmallVector<str_t, 16> unique_param_names(clang::FunctionDecl const
 // ------------------------------
 
 // e.g. f(A a, B b = 2) --->   a,b
-str_t fnt_params(fnt_ptr_t f) {
-  auto names = unique_param_names(f);
-  return join(names, ',');
-}
+str_t fnt_params(fnt_ptr_t f) { return join(unique_param_names(f), ','); }
 
 // ------------------------------
 

@@ -186,6 +186,11 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
   // Reject function template declaration
   if (f->getDescribedFunctionTemplate()) return;
 
+  // Reject functions with dependent (unresolved) types.
+  // This filters out the pattern FunctionDecl of friend functions defined inside 
+  // class templates whose types still contain template parameters like `type-parameter-0-0`.
+  if (f->getType()->isDependentType()) return;
+
   // method should not be here
   EXPECTS(not llvm::isa<clang::CXXMethodDecl>(f));
 

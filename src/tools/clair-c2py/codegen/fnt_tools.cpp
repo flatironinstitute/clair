@@ -3,6 +3,8 @@
 #include <fmt/format.h>
 using namespace fmt::literals;
 #include <itertools/itertools.hpp>
+#include <llvm/ADT/SmallVector.h>
+#include <llvm/ADT/StringMap.h>
 #include <clang/AST/DeclTemplate.h>
 #include "clu/fullqualifiedname.hpp"
 #include "clu/misc.hpp"
@@ -17,12 +19,41 @@ static str_t param_name(clang::ParmVarDecl const *p, int i) {
   return n.empty() ? fmt::format("_p_{}", i) : n;
 }
 
+// ---------------------------------------
+//
+// Compute unique parameter names for a function, disambiguating
+// duplicates from parameter pack expansion by appending indices.
+// e.g. f(G g, Args... args) instantiated with Args={double,char}
+// has params (g, args, args) -> returns {"g", "args0", "args1"}.
+static llvm::SmallVector<str_t, 16> unique_param_names(clang::FunctionDecl const *f) {
+  int n = f->getNumParams();
+  llvm::SmallVector<str_t, 16> names(n);
+  for (int i = 0; i < n; ++i) names[i] = param_name(f->getParamDecl(i), i);
+
+  // Duplicate names only arise from expanded template parameter packs.
+  // In the common case, skip the disambiguation entirely.
+  auto *targs = f->getTemplateSpecializationArgs();
+  if (!targs) return names;
+  bool has_pack = llvm::any_of(targs->asArray(), [](auto &a) { return a.getKind() == clang::TemplateArgument::Pack; });
+  if (!has_pack) return names;
+
+  // Disambiguate: e.g. (g, args, args) -> (g, args0, args1)
+  llvm::StringMap<std::pair<int, int>> seen;
+  for (int i = 0; i < n; ++i) {
+    auto [it, inserted] = seen.try_emplace(names[i], i, 0);
+    if (!inserted) {
+      auto &[first_idx, next] = it->second;
+      if (next == 0) { names[first_idx] += '0'; next = 1; }
+      names[i] += fmt::format("{}", next++);
+    }
+  }
+  return names;
+}
+
 // ------------------------------
 
 // e.g. f(A a, B b = 2) --->   a,b
-str_t fnt_params(fnt_ptr_t f) {
-  return join(itertools::range(f->getNumParams()), [f](int i) { return param_name(f->getParamDecl(i), i); }, ',');
-}
+str_t fnt_params(fnt_ptr_t f) { return join(unique_param_names(f), ','); }
 
 // ------------------------------
 
@@ -40,7 +71,8 @@ str_t fnt_paramtypes(fnt_ptr_t f) {
 
 // e.g. f(A a, B b = 2) --->   A a, B b
 str_t fnt_param_with_types(fnt_ptr_t f) {
-  return join(itertools::range(f->getNumParams()), [f](int i) { return fnt_param_type(f, i) + ' ' + param_name(f->getParamDecl(i), i); }, ',');
+  auto names = unique_param_names(f);
+  return join(itertools::range(f->getNumParams()), [f, &names](int i) { return fnt_param_type(f, i) + ' ' + names[i]; }, ',');
 }
 
 // ------------------------------
@@ -48,7 +80,18 @@ str_t fnt_param_with_types(fnt_ptr_t f) {
 // same with tpl parameters
 str_t fnt_tparams(fnt_ptr_t f) {
   clang::ASTContext *ctx = &f->getASTContext();
-  return join(f->getTemplateSpecializationArgs()->asArray(), [&ctx](auto &&ta) { return clu::get_name_of_TemplateArgument(ta, ctx); }, ',');
+  // Collect explicit template arguments, expanding any parameter pack into its
+  // elements. Arguments after a pack cannot be explicitly specified (they must
+  // be deduced), so we stop after expanding it.
+  std::vector<str_t> tparams;
+  for (auto &&ta : f->getTemplateSpecializationArgs()->asArray()) {
+    if (ta.getKind() == clang::TemplateArgument::Pack) {
+      for (auto const &elem : ta.pack_elements()) tparams.push_back(clu::get_name_of_TemplateArgument(elem, ctx));
+      break;
+    }
+    tparams.push_back(clu::get_name_of_TemplateArgument(ta, ctx));
+  }
+  return join(tparams, [](auto const &s) { return s; }, ',');
 }
 
 // ------------------------------
@@ -104,13 +147,16 @@ str_t fnt_params_with_default(clang::FunctionDecl const *f) {
   // --------
 
   // prepare the string of "A"_a = A_default, chain.
+  // Use the instantiated function's param count: the original template declaration
+  // may have extra parameters from unexpanded packs (e.g. Args&&...args when Args is empty).
+  auto names   = unique_param_names(f_for_types);
   str_t pyargs = join( // NB always a , at the front ...
-     itertools::range(f->getNumParams()),
-     [f, f_for_types, &extract_default_argument](int i) {
-       clang::ParmVarDecl const *p = f->getParamDecl(i);
-       // FIXME : rewrite with 2 fromat...
-       // FIXME : start with , if anything : do NOT join ...
-       auto res = fmt::format(R"RAW( "{0}")RAW", p->getNameAsString());
+     itertools::range(f_for_types->getNumParams()),
+     [f, f_for_types, &extract_default_argument, &names](int i) {
+       // Use template declaration for names/defaults when available, but fall back to
+       // the instantiated function for expanded pack parameters beyond the template's count.
+       clang::ParmVarDecl const *p = (i < (int)f->getNumParams()) ? f->getParamDecl(i) : f_for_types->getParamDecl(i);
+       auto res                    = fmt::format(R"RAW( "{0}")RAW", names[i]);
        if (p->hasDefaultArg()) { res += "_a = " + extract_default_argument(p, f_for_types->getParamDecl(i)->getType()); }
        return res;
      },

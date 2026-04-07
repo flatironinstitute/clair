@@ -19,6 +19,8 @@ static str_t param_name(clang::ParmVarDecl const *p, int i) {
   return n.empty() ? fmt::format("_p_{}", i) : n;
 }
 
+// ---------------------------------------
+//
 // Compute unique parameter names for a function, disambiguating
 // duplicates from parameter pack expansion by appending indices.
 // e.g. f(G g, Args... args) instantiated with Args={double,char}
@@ -26,10 +28,18 @@ static str_t param_name(clang::ParmVarDecl const *p, int i) {
 static llvm::SmallVector<str_t, 16> unique_param_names(clang::FunctionDecl const *f) {
   int n = f->getNumParams();
   llvm::SmallVector<str_t, 16> names(n);
-  llvm::StringMap<std::pair<int, int>> seen; // base_name -> {first_idx, next_suffix}
+  for (int i = 0; i < n; ++i) names[i] = param_name(f->getParamDecl(i), i);
 
+  // Duplicate names only arise from expanded template parameter packs.
+  // In the common case, skip the disambiguation entirely.
+  auto *targs = f->getTemplateSpecializationArgs();
+  if (!targs) return names;
+  bool has_pack = llvm::any_of(targs->asArray(), [](auto &a) { return a.getKind() == clang::TemplateArgument::Pack; });
+  if (!has_pack) return names;
+
+  // Disambiguate: e.g. (g, args, args) -> (g, args0, args1)
+  llvm::StringMap<std::pair<int, int>> seen;
   for (int i = 0; i < n; ++i) {
-    names[i]            = param_name(f->getParamDecl(i), i);
     auto [it, inserted] = seen.try_emplace(names[i], i, 0);
     if (!inserted) {
       auto &[first_idx, next] = it->second;

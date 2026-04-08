@@ -139,7 +139,7 @@ template <> void matcher<mtch::Cls>::run(const clang::ast_matchers::MatchFinder:
 static clang::CXXRecordDecl *as_CXXRecordDecl(clang::QualType qtype) {
   qtype = qtype.getNonReferenceType().getCanonicalType();
   if (auto *rtype = qtype->getAs<clang::RecordType>())
-    if (auto *cxxrec = llvm::dyn_cast<clang::CXXRecordDecl>(rtype->getDecl())) return cxxrec;
+    if (auto *cxxrec = llvm::dyn_cast<clang::CXXRecordDecl>(rtype->getDecl())) return cxxrec->getCanonicalDecl();
   return nullptr; // Not a class/struct type
 }
 

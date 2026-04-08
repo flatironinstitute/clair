@@ -41,9 +41,10 @@ std::vector<fnt_info_t> make_unique_decls(std::vector<fnt_info_t> const &flist) 
 // ------------------------------
 
 void module_info_t::add_class(std::string_view name, clang::CXXRecordDecl const *cls) {
-  if (classes_ptr_to_info.contains(cls)) return; // already registered
+  auto *key = cls->getCanonicalDecl();
+  if (classes_ptr_to_info.contains(key)) return; // already registered
   classes.emplace_back(name, cls_info_t{.ptr = cls});
-  classes_ptr_to_info[cls] = long(classes.size() - 1);
+  classes_ptr_to_info[key] = long(classes.size() - 1);
 }
 
 // ------------------------------
@@ -51,6 +52,7 @@ void module_info_t::add_class(std::string_view name, clang::CXXRecordDecl const 
 cls_ptr_t module_info_t::get_wrapped_cls(clang::QualType ty) const {
   clang::CXXRecordDecl const *cls = ty->getAsCXXRecordDecl();
   if (!cls) cls = ty->getPointeeCXXRecordDecl();
+  if (cls) cls = cls->getCanonicalDecl();
   return (cls and classes_ptr_to_info.contains(cls)) ? cls : nullptr;
 }
 

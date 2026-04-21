@@ -121,6 +121,9 @@ str_t codegen_wrap_info(module_info_t const &m) {
 // =========== hxx generation ==============
 
 str_t codegen_hxx(module_info_t const &m) {
+  auto wrap_info = codegen_wrap_info(m);
+  if (wrap_info.empty()) return {};
+
   std::stringstream hxx;
   hxx << "#include <c2py/c2py.hpp>\n\n";
   hxx << fmt::format(R"RAW(
@@ -128,7 +131,7 @@ str_t codegen_hxx(module_info_t const &m) {
     #define C2PY_HXX_DECLARATION_{0}_GUARDS
     )RAW",
                      m.module_name);
-  hxx << codegen_wrap_info(m);
+  hxx << wrap_info;
   hxx << "\n#endif";
 
   return hxx.str();

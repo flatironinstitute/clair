@@ -5,14 +5,17 @@ Across multiple modules
 
 When developing larger projects, you may need to create multiple C++ Python extension modules that communicate with each other. For example, module B might need to use a class defined and wrapped in module A.
 
-``clair-c2py`` generates two files for each wrapped module:
+``clair-c2py`` generates up to two files for each wrapped module:
 
-- A ``.wrap.cxx`` file (the implementation of the bindings)
-- A ``.wrap.hxx`` file (a small header declaring which classes are wrapped in A)
+- A ``.wrap.cxx`` file (the implementation of the bindings), always generated.
+- A ``.wrap.hxx`` file (a small header declaring which classes are wrapped in A),
+  generated only if module A wraps at least one class.
 
 The ``.wrap.hxx`` file allows other modules to know the type wrapped in module A.
 Technically, it just specializes of the
 ``c2py::is_wrapped<T>`` variable for each type ``T`` wrapped in module A.
+Modules that wrap only free functions and/or enums do not produce a ``.wrap.hxx``,
+since there is no per-class information to share.
 
 Example: Two communicating modules
 ===================================

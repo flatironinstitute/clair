@@ -64,7 +64,8 @@ void custom_action::EndSourceFileAction() {
 
   log(fmt::format("\033[1;34m[Success] \033[0m"));
   log(fmt::format("   Generated Python bindings: {} [included in {}]", outfilename, wdata->module_info.sourcefile));
-  log(fmt::format("             headers        : {} [to be used with other modules, cf doc]", outfilename_hxx));
+  if (not code_hxx.empty())
+    log(fmt::format("             headers        : {} [to be used with other modules, cf doc]", outfilename_hxx));
 
   if (not std::getenv("CLAIR_SKIP_CLANG_FORMAT")) {
     log("Running clang-format ...");
@@ -74,13 +75,13 @@ void custom_action::EndSourceFileAction() {
                                                       )
                                  .get(); // because of FallBack the get is always valid
 
-    code     = clu::clang_format(code, clang_format_style);
-    code_hxx = clu::clang_format(code_hxx, clang_format_style);
+    code = clu::clang_format(code, clang_format_style);
+    if (not code_hxx.empty()) code_hxx = clu::clang_format(code_hxx, clang_format_style);
     log("Done.");
   }
 
   std::ofstream(outfilename) << code;
-  std::ofstream(outfilename_hxx) << code_hxx;
+  if (not code_hxx.empty()) std::ofstream(outfilename_hxx) << code_hxx;
 
   // Examine if the preprocessor has found the include of the generated file in the module.
   if (not wdata->input_has_included_generated_cxx) {

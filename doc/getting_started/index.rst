@@ -36,9 +36,10 @@ The ``clair_c2py`` tool automatizes this task
 
 It outputs/updates the following files:
 
-* ``getting_started.wrap.cxx`` contains the generated bindings (based on **c2py**) which have to be compiled together with the 
+* ``getting_started.wrap.cxx`` contains the generated bindings (based on **c2py**) which have to be compiled together with the
   original C++ code.
 * ``getting_started.wrap.hxx`` contains some additional information (only needed when working with :ref:`multiple_modules`).
+  It is only generated if the module wraps at least one class (there is no useful content otherwise).
 * ``getting_started.cpp`` is updated to ``#include`` the file ``getting_started.wrap.cxx``.
 
 After the bindings have been generated, the only thing left to do is to compile ``getting_started.cpp`` into a Python module.

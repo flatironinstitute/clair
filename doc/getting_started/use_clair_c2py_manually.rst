@@ -21,8 +21,10 @@ Generate Python Bindings
    
    clair-c2py getting_started.cpp -- -std=c++20 `c2py_flags -i`
 
-This generates the C++/Python binding files ``getting_started.wrap.cxx`` and ``getting_started.wrap.hxx``, and updates the 
-original source file ``getting_started.cpp`` to include the generated bindings. 
+This generates the C++/Python binding file ``getting_started.wrap.cxx`` and updates the
+original source file ``getting_started.cpp`` to include the generated bindings.
+A companion header ``getting_started.wrap.hxx`` is also generated when the module wraps at least one class
+(see :ref:`multiple_modules`).
 
 See :ref:`generate_python_bindings_and_compile` for some more background information.
 

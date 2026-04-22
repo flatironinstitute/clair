@@ -8,8 +8,8 @@ execute_process(COMMAND ${CMAKE_CXX_COMPILER} -print-resource-dir
 set(CLANG_RESOURCE_DIR "${CLANG_RESOURCE_DIR}" CACHE PATH "Clang resource directory")
 
 find_package(Clang REQUIRED CONFIG HINTS ${LLVM_ROOT} $ENV{LLVM_ROOT} ${Clang_ROOT} $ENV{Clang_ROOT} ${CLANG_RESOURCE_DIR}/../../..)
-if(LLVM_VERSION VERSION_LESS 19.0.0)
-  message(FATAL_ERROR "LLVM version ${LLVM_VERSION} is not supported. Please use LLVM 19.0.0 or later. Use LLVM_ROOT to specify a different LLVM installation.")
+if(LLVM_VERSION VERSION_LESS 20.0.0)
+  message(FATAL_ERROR "LLVM version ${LLVM_VERSION} is not supported. Please use LLVM 20.0.0 or later. Use LLVM_ROOT to specify a different LLVM installation.")
 endif()
 
 message(STATUS "LLVM_VERSION : ${LLVM_VERSION}")

@@ -202,14 +202,17 @@
   <section id="across-multiple-modules">
 <span id="multiple-modules"></span><h1>Across multiple modules<a class="headerlink" href="#across-multiple-modules" title="Link to this heading"></a></h1>
 <p>When developing larger projects, you may need to create multiple C++ Python extension modules that communicate with each other. For example, module B might need to use a class defined and wrapped in module A.</p>
-<p><code class="docutils literal notranslate"><span class="pre">clair-c2py</span></code> generates two files for each wrapped module:</p>
+<p><code class="docutils literal notranslate"><span class="pre">clair-c2py</span></code> generates up to two files for each wrapped module:</p>
 <ul class="simple">
-<li><p>A <code class="docutils literal notranslate"><span class="pre">.wrap.cxx</span></code> file (the implementation of the bindings)</p></li>
-<li><p>A <code class="docutils literal notranslate"><span class="pre">.wrap.hxx</span></code> file (a small header declaring which classes are wrapped in A)</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">.wrap.cxx</span></code> file (the implementation of the bindings), always generated.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">.wrap.hxx</span></code> file (a small header declaring which classes are wrapped in A),
+generated only if module A wraps at least one class.</p></li>
 </ul>
 <p>The <code class="docutils literal notranslate"><span class="pre">.wrap.hxx</span></code> file allows other modules to know the type wrapped in module A.
 Technically, it just specializes of the
-<code class="docutils literal notranslate"><span class="pre">c2py::is_wrapped&lt;T&gt;</span></code> variable for each type <code class="docutils literal notranslate"><span class="pre">T</span></code> wrapped in module A.</p>
+<code class="docutils literal notranslate"><span class="pre">c2py::is_wrapped&lt;T&gt;</span></code> variable for each type <code class="docutils literal notranslate"><span class="pre">T</span></code> wrapped in module A.
+Modules that wrap only free functions and/or enums do not produce a <code class="docutils literal notranslate"><span class="pre">.wrap.hxx</span></code>,
+since there is no per-class information to share.</p>
 <section id="example-two-communicating-modules">
 <h2>Example: Two communicating modules<a class="headerlink" href="#example-two-communicating-modules" title="Link to this heading"></a></h2>
 <section id="module-a-defining-a-class">

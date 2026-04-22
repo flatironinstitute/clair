@@ -236,7 +236,8 @@ This is a piece of C++ code which <em>adapts</em> the C++ functions and classes 
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">getting_started.wrap.cxx</span></code> contains the generated bindings (based on <strong>c2py</strong>) which have to be compiled together with the
 original C++ code.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">getting_started.wrap.hxx</span></code> contains some additional information (only needed when working with <a class="reference internal" href="../reference/multiple.html#multiple-modules"><span class="std std-ref">Across multiple modules</span></a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">getting_started.wrap.hxx</span></code> contains some additional information (only needed when working with <a class="reference internal" href="../reference/multiple.html#multiple-modules"><span class="std std-ref">Across multiple modules</span></a>).
+It is only generated if the module wraps at least one class (there is no useful content otherwise).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">getting_started.cpp</span></code> is updated to <code class="docutils literal notranslate"><span class="pre">#include</span></code> the file <code class="docutils literal notranslate"><span class="pre">getting_started.wrap.cxx</span></code>.</p></li>
 </ul>
 <p>After the bindings have been generated, the only thing left to do is to compile <code class="docutils literal notranslate"><span class="pre">getting_started.cpp</span></code> into a Python module.</p>

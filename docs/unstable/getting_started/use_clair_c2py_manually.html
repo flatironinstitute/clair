@@ -213,8 +213,10 @@ clang++<span class="w"> </span>getting_started.cpp<span class="w"> </span>-std<s
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>clair-c2py<span class="w"> </span>getting_started.cpp<span class="w"> </span>--<span class="w"> </span>-std<span class="o">=</span>c++20<span class="w"> </span><span class="sb">`</span>c2py_flags<span class="w"> </span>-i<span class="sb">`</span>
 </pre></div>
 </div>
-<p>This generates the C++/Python binding files <code class="docutils literal notranslate"><span class="pre">getting_started.wrap.cxx</span></code> and <code class="docutils literal notranslate"><span class="pre">getting_started.wrap.hxx</span></code>, and updates the
-original source file <code class="docutils literal notranslate"><span class="pre">getting_started.cpp</span></code> to include the generated bindings.</p>
+<p>This generates the C++/Python binding file <code class="docutils literal notranslate"><span class="pre">getting_started.wrap.cxx</span></code> and updates the
+original source file <code class="docutils literal notranslate"><span class="pre">getting_started.cpp</span></code> to include the generated bindings.
+A companion header <code class="docutils literal notranslate"><span class="pre">getting_started.wrap.hxx</span></code> is also generated when the module wraps at least one class
+(see <a class="reference internal" href="../reference/multiple.html#multiple-modules"><span class="std std-ref">Across multiple modules</span></a>).</p>
 <p>See <a class="reference internal" href="index.html#generate-python-bindings-and-compile"><span class="std std-ref">Generate Python Bindings and Compile the Module</span></a> for some more background information.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>

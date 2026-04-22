@@ -26,7 +26,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {os: ubuntu-24.04, cc: clang-19, cxx: clang++-19, doc: ON }
+          - {os: ubuntu-24.04, cc: clang-20, cxx: clang++-20, doc: ON }
           - {os: macos-14, cc: clang, cxx: clang++, doc: OFF }
 
     runs-on: ${{ matrix.os }}
@@ -48,13 +48,13 @@ jobs:
         sudo apt-get install lsb-release wget software-properties-common &&
         sudo apt-get install
         ccache
-        clang-19
+        clang-20
         g++
         doxygen
-        llvm-19-dev
-        libclang-19-dev
+        llvm-20-dev
+        libclang-20-dev
         libomp-dev
-        clang-format-19
+        clang-format-20
         libgmp-dev
         libhdf5-dev
         libopenblas-dev

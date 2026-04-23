@@ -49,6 +49,7 @@ struct cls_info_t {
   bool has_size_method                             = false;
   bool has_iterator                                = false;
   bool has_hdf5                                    = false;
+  bool has_hash                                    = false;
   Serialization serialization                      = Serialization::None;
 
   struct property {
@@ -112,6 +113,7 @@ struct wdata_t {
     clu::concept_holder HasSerializeLikeBoost;
     clu::concept_holder HasHdf5;
     clu::concept_holder HasNonDeletedDefaultConstructor;
+    clu::concept_holder Hashable;
   } concepts;
 
   // Preprocessor will detect if the input has included the generated cxx file

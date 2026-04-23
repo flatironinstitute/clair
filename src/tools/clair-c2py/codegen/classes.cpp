@@ -305,6 +305,10 @@ str_t codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const
   // -- tp_name
   code << '\n' << fmt::format(R"RAW(template <> inline constexpr auto c2py::tp_name<{0}> = "{1}.{2}";)RAW", cls_alias, full_module_name, cls_py_name);
 
+  // -- tp_hash: wire Python __hash__ to c2py::tp_hash_impl (dispatches to std::hash<T>)
+  if (cls_info.has_hash)
+    code << '\n' << fmt::format(R"RAW(template <> constexpr hashfunc c2py::tp_hash<{0}> = c2py::tp_hash_impl<{0}>;)RAW", cls_alias);
+
   // ---------- Methods ------------
   {
     std::stringstream MethodDecls, MethodTable, MethodDocs;

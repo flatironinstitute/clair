@@ -154,6 +154,9 @@ static void scan_class(wdata_t &wd, cls_info_t &cls_info) {
   // h5
   cls_info.has_hdf5 = wd.concepts.HasHdf5.is_satisfied_by(cls_info.ptr);
 
+  // hash: Python __hash__ support via std::hash<T>
+  cls_info.has_hash = wd.concepts.Hashable.is_satisfied_by(cls_info.ptr);
+
   // Serialization
   if (wd.concepts.HasSerializeLikeBoost.is_satisfied_by(cls_info.ptr))
     cls_info.serialization = Serialization::Tuple;

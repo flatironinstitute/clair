@@ -46,6 +46,8 @@ template <> void matcher<mtch::Concept>::run(const MatchResult &Result) {
       wdata->concepts.HasNonDeletedDefaultConstructor = {cpt, wdata->ci};
     else if (cname == "Storable")
       wdata->concepts.HasHdf5 = {cpt, wdata->ci};
+    else if (cname == "Hashable")
+      wdata->concepts.Hashable = {cpt, wdata->ci};
     // else ignore the others concepts
   }
 }

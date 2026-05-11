@@ -214,7 +214,7 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
   // h5_write/h5_read/h5_read_construct  are HDF5 serialization helpers, never meant to be wrapped
   // if we use the h5 method.
   if (wdata->concepts.HasHdf5)
-    if (auto name = f->getName(); name == "h5_write" || name == "h5_read" || name == "h5_read_construct") {
+    if (auto name = f->getNameAsString(); name == "h5_write" || name == "h5_read" || name == "h5_read_construct") {
       logs.rejected(fmt::format(R"RAW({0} [treated directly in h5 support])RAW", name));
       return;
     }

@@ -114,6 +114,9 @@ struct wdata_t {
     clu::concept_holder HasNonDeletedDefaultConstructor;
   } concepts;
 
+  clang::VarTemplateDecl *is_wrapped_vtd         = nullptr; // c2py::is_wrapped<T>
+  clang::ClassTemplateDecl *py_converter_ctd = nullptr; // c2py::py_converter<T>
+
   // Preprocessor will detect if the input has included the generated cxx file
   // and store the result in this variable.
   bool input_has_included_generated_cxx = false;

@@ -38,6 +38,23 @@ void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {
     return;
   }
 
+  // c2py::concepts is a child of the c2py namespace; walk the parent to find is_wrapped and py_converter.
+  auto *c2py_ns = wdata->concepts.IsConvertiblePy2C.concept_decl->getDeclContext()->getParent();
+  for (auto *D : c2py_ns->decls()) {
+    if (auto *vtd = llvm::dyn_cast<clang::VarTemplateDecl>(D); vtd && vtd->getName() == "is_wrapped")
+      wdata->is_wrapped_vtd = const_cast<clang::VarTemplateDecl *>(vtd);
+    if (auto *ctd = llvm::dyn_cast<clang::ClassTemplateDecl>(D); ctd && ctd->getName() == "py_converter")
+      wdata->py_converter_ctd = const_cast<clang::ClassTemplateDecl *>(ctd);
+  }
+  if (not wdata->is_wrapped_vtd) {
+    llvm::errs() << "Internal error: could not find c2py::is_wrapped variable template. Aborting.\n";
+    std::abort();
+  }
+  if (not wdata->py_converter_ctd) {
+    llvm::errs() << "Internal error: could not find c2py::py_converter class template. Aborting.\n";
+    std::abort();
+  }
+
   if (wdata->concepts.HasHdf5)
     logs.note("Found Flatiron/h5 Storable concept. Will generate h5 code for all wrapped classes satisfying this concept.");
 

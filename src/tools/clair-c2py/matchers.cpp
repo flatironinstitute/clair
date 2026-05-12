@@ -7,6 +7,7 @@
 #include <algorithm>
 #include "clu/misc.hpp"
 #include "clu/concept.hpp"
+#include "clu/inject_bool_vartempl_specialization.hpp"
 #include "utility/logger.hpp"
 #include "utility/macros.hpp"
 #include "./decl_utils.hpp"
@@ -17,6 +18,14 @@ static const struct {
   util::logger rejected = util::logger{&std::cout, "-- ", "\033[1;33mRejecting: \033[0m"};
   util::logger error    = util::logger{&std::cout, "-- ", "\033[1;31mError:  \033[0m"};
 } logs;
+
+static clang::QualType cls_qual_type(clang::CXXRecordDecl const *cls) {
+#if LLVM_VERSION_MAJOR >= 22
+  return cls->getASTContext().getCanonicalTagType(cls);
+#else
+  return cls->getASTContext().getTagDeclType(cls);
+#endif
+}
 
 // ------------------------------
 
@@ -75,6 +84,8 @@ template <> void matcher<mtch::ModuleClsWrap>::run(const MatchResult &Result) {
       }
     }
     wdata->module_info.add_class(d->getName().str(), cls);
+    clu::inject_bool_vartempl_specialization(wdata->ci->getSema(), wdata->is_wrapped_vtd,
+                               cls_qual_type(cls), true);
   }
 }
 
@@ -109,15 +120,36 @@ static void register_class(clang::CXXRecordDecl const *cls, wdata_t *wdata) {
   // apply c2py_ignore and reject_names
   if (should_reject(cls, wdata->reject_names, &logs.rejected)) return;
 
-  // reject a class which already HAS a converter Py2C
-  // otherwise the wrapping would take precedence
-  if (wdata->concepts.IsConvertiblePy2C.is_satisfied_by(cls)) {
-    logs.rejected(fmt::format(R"RAW({0} [{1}])RAW", cls->getQualifiedNameAsString(), "Already has a converter"));
-    return;
+  // Reject a class that already has an explicit converter, either because:
+  // (a) is_wrapped<cls>=true was injected (wrapped in another module), or
+  // (b) an explicit py_converter<cls> specialization exists in source (e.g. py_converter_as_any).
+  // We check the AST directly to avoid evaluating IsConvertiblePy2C, which would cache
+  // is_wrapped<cls>=false and poison subsequent concept checks after we inject true below.
+  {
+    auto &Ctx    = wdata->ci->getASTContext();
+    auto clstype = Ctx.getCanonicalType(cls_qual_type(cls));
+    clang::TemplateArgument Arg{clstype};
+    void *IP = nullptr;
+    if (auto *ex = wdata->is_wrapped_vtd->findSpecialization({Arg}, IP);
+        ex and ex->getTemplateSpecializationKind() == clang::TSK_ExplicitSpecialization) {
+      logs.rejected(fmt::format(R"RAW({0} [{1}])RAW", cls->getQualifiedNameAsString(), "Already has a converter (is_wrapped = true)"));
+      return;
+    }
+    IP = nullptr;
+    if (auto *ex = wdata->py_converter_ctd->findSpecialization({Arg}, IP);
+        ex and ex->getTemplateSpecializationKind() == clang::TSK_ExplicitSpecialization) {
+      logs.rejected(fmt::format(R"RAW({0} [{1}])RAW", cls->getQualifiedNameAsString(),
+                                "Already has a converter (Explicit py_converter specialization in source)"));
+      return;
+    }
   }
 
   // Insert in the module class list
   wdata->module_info.add_class(get_python_name(cls), cls);
+  // mark as wrapped in the AST
+  // so that check_convertibility sees is_wrapped<cls> = true for subsequent checks.
+  clu::inject_bool_vartempl_specialization(wdata->ci->getSema(), wdata->is_wrapped_vtd,
+                             cls_qual_type(cls), true);
 
   // Finally register recursively the nested classes and enums, as they can be pruned by the namespaces directive
   for (auto const *d : cls->decls()) {

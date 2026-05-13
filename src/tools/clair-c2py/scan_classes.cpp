@@ -10,7 +10,7 @@
 #include "utility/string_tools.hpp"
 
 static const struct {
-  util::logger rejected = util::logger{&std::cout, "-- ", "\033[1;33mRejecting: \033[0m"};
+  util::logger rejected = util::logger{"-- ", "\033[1;33mRejecting: \033[0m", 1};
 } logs;
 
 // ------------------------------

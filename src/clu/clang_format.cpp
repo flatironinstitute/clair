@@ -7,7 +7,7 @@ std::string clu::clang_format(std::string const &code, clang::format::FormatStyl
   auto replacements = clang::format::reformat(style, code, range);
   auto result       = clang::tooling::applyAllReplacements(code, replacements);
   if (not result) { // just in case...
-    auto error_log = util::logger{&std::cerr, "-- ", "\033[1;35mwarning: \033[0m"};
+    auto error_log = util::logger{"-- ", "\033[1;35mwarning: \033[0m", 0};
     error_log("Code can not be clang formatted. Formatting has failed.");
     return code;
   } else

@@ -13,8 +13,8 @@ using namespace fmt::literals;
 
 using util::join;
 static const struct {
-  util::logger mod = util::logger{&std::cout, "-- ", "\033[1;32mModule: \033[0m"};
-  util::logger enu = util::logger{&std::cout, "-- ", "\033[1;32mEnum: \033[0m"};
+  util::logger mod = util::logger{"-- ", "\033[1;32mModule: \033[0m", 1};
+  util::logger enu = util::logger{"-- ", "\033[1;32mEnum: \033[0m",   1};
 } logs;
 
 // =========== module code template ==============

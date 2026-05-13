@@ -1,7 +1,7 @@
 #pragma once
+#include <fstream>
 #include <iostream>
 #include <ostream>
-#include <sstream>
 #include <utility>
 #include <fmt/core.h>
 #include <fmt/format.h>
@@ -18,53 +18,55 @@ template <> struct fmt::formatter<llvm::StringRef> : fmt::formatter<std::string_
 namespace util {
   class logger {
 
-    std::ostream *out = nullptr;
-    bool activated    = false;
-    std::string intro;
-    std::string intro_spaces;
-    std::string head_line;
-    std::string head_line_spaces = std::string(head_line.size(), ' ');
+    inline static int s_verbose          = 0;  // threshold from CLAIR_VERBOSE env var
+    inline static std::string s_log;           // log file path, set once per run
+    inline static std::ofstream s_log_stream;  // always-on file output
+
+    bool active_    = false;
+    int  verbosity_ = 1;
+    std::string intro_;
+    std::string intro_spaces_;
+    std::string head_line_;
+    std::string head_line_spaces_;
+
+    void emit_(std::ostream &os, const char *mess) const {
+      auto spl = split(std::string{mess}, '\n');
+      os << head_line_ << intro_;
+      int c = 0;
+      for (auto const &x : spl) {
+        if (c++ > 0) os << '\n' << head_line_spaces_ << intro_spaces_;
+        os << x;
+      }
+      os << '\n';
+    }
 
     public:
-    // ~logger() { *out << std::endl; }
 
     logger() = default;
 
-    logger(std::ostream *out_, str_t headline, std::string introduction = {})
-       : out(out_), activated(true), intro{std::move(introduction)}, intro_spaces(intro.size(), ' '), head_line(std::move(headline)) {}
+    logger(str_t headline, std::string introduction = {}, int verbosity = 1)
+       : active_{true}, verbosity_{verbosity}, intro_{std::move(introduction)},
+         intro_spaces_(intro_.size(), ' '), head_line_{str_t{headline}},
+         head_line_spaces_(head_line_.size(), ' ') {}
 
-    logger(logger l, str_t const &additional_head) : logger(std::move(l)) { head_line += additional_head; }
+    logger(logger l, str_t const &additional_head) : logger(std::move(l)) { head_line_ += additional_head; }
 
     void operator()(std::string const &mess) const { this->operator()(mess.c_str()); }
 
     void operator()(const char *mess) const {
-      if (not activated) return;
-      auto s = mess;
-      *out << head_line << intro;
-      auto spl = split(std::string{s}, '\n');
-      int c    = 0;
-      for (auto const &x : spl) {
-        if (c++ > 0) *out << '\n' << head_line_spaces << intro_spaces;
-        (*out) << x;
-      }
-      // lazy_split(
-      //    s,
-      //    [self = this, c = 0](auto &&s) mutable {
-      //      if (c++ > 0) (*self->out) << '\n' << self->head_line_spaces << self->intro_spaces;
-      //      (*self->out) << s;
-      //    },
-      //    '\n');
-      *out << '\n';
+      if (!active_) return;
+      if (verbosity_ <= s_verbose) emit_(std::cerr, mess);
+      if (s_log_stream.is_open()) emit_(s_log_stream, mess);
     }
 
     template <typename... T> void operator()(fmt::format_string<T...> const &s, T &&...args) const { operator()(fmt::format(s, args...)); }
 
-    void activate() { activated = true; }
-    void deactivate() { activated = false; }
+    static void set_verbose(int v) { s_verbose = v; }
+    static void set_log(std::string path) { s_log = std::move(path); s_log_stream.open(s_log); }
 
-    static logger error() { return logger{&std::cerr, "-- ", "\033[1;31merror: \033[0m"}; }
-    static logger warning() { return logger{&std::cerr, "-- ", "\033[1;35mwarning: \033[0m"}; }
-    static logger debug() { return logger{&std::cerr, "-- ", "\033[1;31mDEBUG: \033[0m"}; }
+    static logger error()   { return {"-- ", "\033[1;31merror: \033[0m",   0}; }
+    static logger warning() { return {"-- ", "\033[1;35mwarning: \033[0m", 0}; }
+    static logger debug()   { return {"-- ", "\033[1;31mDEBUG: \033[0m",   1}; }
   };
 
 } // namespace util

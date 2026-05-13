@@ -54,7 +54,7 @@ int main(int argc, const char **argv) try {
 
   struct {
     util::logger error  = util::logger::error();
-    util::logger report = util::logger{&std::cout, "-- ", ""};
+    util::logger report = util::logger{"-- ", "", 0};
   } const logs;
 
   // ----- Parse the options in the command line

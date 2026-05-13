@@ -14,7 +14,7 @@
 namespace fs = std::filesystem;
 using clang::ast_matchers::MatchFinder;
 static const struct {
-  util::logger note = util::logger{&std::cout, "-- ", "\033[1;32mNote:  \033[0m"};
+  util::logger note = util::logger{"-- ", "\033[1;32mNote:  \033[0m", 1};
 } logs;
 
 void ast_consumer::HandleTranslationUnit(clang::ASTContext &ctx) {

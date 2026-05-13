@@ -14,9 +14,9 @@ using namespace fmt::literals;
 using util::join;
 
 static const struct {
-  util::logger cls         = util::logger{&std::cout, "-- ", "\033[1;32mClass: \033[0m"};
-  util::logger cls_details = util::logger{&std::cout, "-- ", "\033[1;32m         -- \033[0m"};
-  util::logger prop        = util::logger{&std::cout, "-- ", "\033[1;32m  Property: \033[0m"};
+  util::logger cls         = util::logger{"-- ", "\033[1;32mClass: \033[0m",      1};
+  util::logger cls_details = util::logger{"-- ", "\033[1;32m         -- \033[0m", 1};
+  util::logger prop        = util::logger{"-- ", "\033[1;32m  Property: \033[0m", 1};
 } logs;
 
 // ===================================================================

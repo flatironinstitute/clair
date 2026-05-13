@@ -13,7 +13,7 @@
 
 namespace fs = std::filesystem;
 static const struct {
-  util::logger error = util::logger{&std::cout, "-- ", "\033[1;31mError:  \033[0m"};
+  util::logger error = util::logger{"-- ", "\033[1;31mError:  \033[0m", 0};
 } logs;
 
 // Generic helper function to extract a value from a TOML table or throw an error if missing

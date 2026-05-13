@@ -19,6 +19,14 @@ bool custom_action::BeginInvocation(clang::CompilerInstance &CI) {
   // Skip function bodies, it gains parsing time, and we do not need them.
   // CI.getInvocation().getFrontendOpts().SkipFunctionBodies = 1;
 
+  if (const char *val = std::getenv("CLAIR_VERBOSE")) {
+    try {
+      util::logger::set_verbose(std::stoi(val));
+    } catch (std::exception const &) {
+      util::logger::warning()(fmt::format("CLAIR_VERBOSE='{}' is not a valid integer, ignoring", val));
+    }
+  }
+
   // Force color diagnostics if requested via environment variables
   // This ensures colors work even when output is redirected to a pipe
   if (std::getenv("CLICOLOR_FORCE") || std::getenv("LLVM_FORCE_COLOR")) { CI.getDiagnosticOpts().ShowColors = true; }
@@ -51,7 +59,7 @@ void custom_action::ExecuteAction() {
 
 void custom_action::EndSourceFileAction() {
 
-  util::logger log = util::logger{&std::cout, "-- ", ""};
+  util::logger log = util::logger{"-- ", "", 1};
 
   auto &ci = this->getCompilerInstance();
   if (ci.getASTContext().getDiagnostics().hasErrorOccurred()) return;

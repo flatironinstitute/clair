@@ -13,4 +13,4 @@ howto*
 *.cxx
 *.hxx
 *.so
-
+*.log

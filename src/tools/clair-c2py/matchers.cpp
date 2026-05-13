@@ -15,8 +15,8 @@
 #include "./analyze_operator.hpp"
 
 static const struct {
-  util::logger rejected = util::logger{&std::cout, "-- ", "\033[1;33mRejecting: \033[0m"};
-  util::logger error    = util::logger{&std::cout, "-- ", "\033[1;31mError:  \033[0m"};
+  util::logger rejected = util::logger{"-- ", "\033[1;33mRejecting: \033[0m", 1};
+  util::logger error    = util::logger{"-- ", "\033[1;31mError:  \033[0m",    0};
 } logs;
 
 static clang::QualType cls_qual_type(clang::CXXRecordDecl const *cls) {

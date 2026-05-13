@@ -25,7 +25,7 @@ int main(int argc, const char **argv) try {
 
   struct {
     //util::logger error  = util::logger::error();
-    util::logger report = util::logger{&std::cout, "-- ", ""};
+    util::logger report = util::logger{"-- ", "", 0};
   } const logs;
 
   // logs.report(fmt::format(R"RAW(Using clang version {}.{}.{})RAW", __clang_major__, __clang_minor__, __clang_patchlevel__));

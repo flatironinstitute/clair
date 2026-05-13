@@ -16,4 +16,5 @@ Reference documentation
    c2py
    hdf5
    nda
+   env_vars
 

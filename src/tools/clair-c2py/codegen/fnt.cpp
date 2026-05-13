@@ -17,11 +17,11 @@ using namespace fmt::literals;
 using util::join;
 
 static const struct {
-  util::logger fun   = util::logger{&std::cout, "-- ", "\033[1;32mFunction: \033[0m"};
-  util::logger meth  = util::logger{&std::cout, "-- ", "\033[1;32m  Method: \033[0m"};
-  util::logger fun_c = util::logger{&std::cout, "-- ", "\033[1;32m        . \033[0m"};
-  //util::logger method = util::logger{&std::cout, "-- ", "\033[1;32m      -- method: \033[0m"};
-  //util::logger constructors = util::logger{&std::cout, "-- ", "\033[1;34m  Constructor: \033[0m"};
+  util::logger fun   = util::logger{"-- ", "\033[1;32mFunction: \033[0m", 1};
+  util::logger meth  = util::logger{"-- ", "\033[1;32m  Method: \033[0m", 1};
+  util::logger fun_c = util::logger{"-- ", "\033[1;32m        . \033[0m", 2};
+  //util::logger method = util::logger{"-- ", "\033[1;32m      -- method: \033[0m", 1};
+  //util::logger constructors = util::logger{"-- ", "\033[1;34m  Constructor: \033[0m", 1};
 } logs;
 
 // ===================================================================

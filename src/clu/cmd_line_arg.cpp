@@ -22,7 +22,7 @@ namespace clu {
     const char *sdkroot = std::getenv("SDKROOT");
     if (!sdkroot || std::string(sdkroot).empty()) {
       setenv("SDKROOT", SDKROOT, 1);                                      // overwrite = 1, for this process only
-      util::logger{&std::cout, "-- ", ""}("SDKROOT set to: "s + SDKROOT); // report !
+      util::logger{"-- ", "", 1}("SDKROOT set to: "s + SDKROOT); // report !
     } else {
       if (sdkroot != std::string{SDKROOT}) // SDKROOT is set but not to the expected value. That is strange.
         util::logger::warning()("\033[1;31m SDKROOT inconsistent between xcrun --show-sdk-path and the environement variable \033[0m");

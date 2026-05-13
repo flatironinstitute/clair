@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include "llvm/ADT/DenseSet.h"
+#include "utility/logger.hpp"
 
 // ------------------------------
 
@@ -77,6 +78,8 @@ wdata_t::wdata_t(clang::CompilerInstance *ci, configuration const &config) : ci{
   module_info.sourcefile_full_stem = p.parent_path() / p.stem();
   module_info.package_name         = config.package_name;
   module_info.documentation        = config.documentation;
+
+  util::logger::set_log(module_info.sourcefile_full_stem + ".log");
 
   // Validity of the regex is checked in the configuration constructor
   if (not config.reject_names.empty()) this->reject_names = llvm::Regex(config.reject_names);

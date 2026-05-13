@@ -17,7 +17,7 @@
 using namespace fmt::literals;
 
 static const struct {
-  util::logger warn = util::logger{&std::cout, "-- ", "\033[38;5;212mDoc warning: \033[0m"};
+  util::logger warn = util::logger{"-- ", "\033[38;5;212mDoc warning: \033[0m", 0};
 } logs;
 
 // ------------------------------

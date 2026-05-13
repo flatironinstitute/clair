@@ -36,7 +36,12 @@ endif()
 # Create an Interface target for the Clang and LLVM Libraries
 #===============================================================
 add_library(clang_llvm INTERFACE)
-target_link_libraries(clang_llvm INTERFACE clang-cpp $<$<PLATFORM_ID:Linux>:LLVMSupport>)
+if(LLVM_LINK_LLVM_DYLIB)
+  # LLVM was built with a monolithic libLLVM.so; component static libs depend on it
+  target_link_libraries(clang_llvm INTERFACE clang-cpp $<$<PLATFORM_ID:Linux>:LLVM>)
+else()
+  target_link_libraries(clang_llvm INTERFACE clang-cpp $<$<PLATFORM_ID:Linux>:LLVMSupport>)
+endif()
 target_include_directories(clang_llvm SYSTEM INTERFACE ${CLANG_INCLUDE_DIRS} ${LLVM_INCLUDE_DIRS})
 
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")

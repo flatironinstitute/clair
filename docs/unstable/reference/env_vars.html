@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Converters &mdash; clair - Automatic Python/C++ bindings  documentation</title>
+  <title>Environment Variables &mdash; clair - Automatic Python/C++ bindings  documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b20cc3f5" />
       <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=417d15d8" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=8f9e6779" />
@@ -22,8 +22,8 @@
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="c2py" href="c2py.html" />
-    <link rel="prev" title="Across multiple modules" href="multiple.html" /> 
+    <link rel="next" title="Notebook integration" href="../notebook.html" />
+    <link rel="prev" title="TRIQS/nda" href="nda.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -155,20 +155,20 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Converters</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#default-converters">Default converters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#custom-converters-for-user-defined-types">Custom converters for user-defined types</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#set-up-for-third-party-libraries">Set up for third party libraries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="converters.html">Converters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="converters.html#default-converters">Default converters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="converters.html#custom-converters-for-user-defined-types">Custom converters for user-defined types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="converters.html#set-up-for-third-party-libraries">Set up for third party libraries</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="c2py.html">c2py</a></li>
 <li class="toctree-l2"><a class="reference internal" href="hdf5.html">HDF5 (TRIQS/h5 Integration)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="nda.html">TRIQS/nda</a></li>
-<li class="toctree-l2"><a class="reference internal" href="env_vars.html">Environment Variables</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="env_vars.html#clair-verbose">CLAIR_VERBOSE</a></li>
-<li class="toctree-l3"><a class="reference internal" href="env_vars.html#clair-skip-clang-format">CLAIR_SKIP_CLANG_FORMAT</a></li>
-<li class="toctree-l3"><a class="reference internal" href="env_vars.html#clicolor-force-llvm-force-color">CLICOLOR_FORCE / LLVM_FORCE_COLOR</a></li>
-<li class="toctree-l3"><a class="reference internal" href="env_vars.html#sdkroot-macos-only">SDKROOT <em>(macOS only)</em></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Environment Variables</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#clair-verbose">CLAIR_VERBOSE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#clair-skip-clang-format">CLAIR_SKIP_CLANG_FORMAT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#clicolor-force-llvm-force-color">CLICOLOR_FORCE / LLVM_FORCE_COLOR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sdkroot-macos-only">SDKROOT <em>(macOS only)</em></a></li>
 </ul>
 </li>
 </ul>
@@ -196,9 +196,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Reference documentation</a></li>
-      <li class="breadcrumb-item active">Converters</li>
+      <li class="breadcrumb-item active">Environment Variables</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/reference/converters.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/reference/env_vars.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -206,159 +206,121 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="converters">
-<span id="id1"></span><h1>Converters<a class="headerlink" href="#converters" title="Link to this heading"></a></h1>
-<section id="default-converters">
-<h2>Default converters<a class="headerlink" href="#default-converters" title="Link to this heading"></a></h2>
-<p>The following types are convertible</p>
-<table class="docutils align-default" id="id2">
-<caption><span class="caption-text">Default converters</span><a class="headerlink" href="#id2" title="Link to this table"></a></caption>
+  <section id="environment-variables">
+<span id="env-vars"></span><h1>Environment Variables<a class="headerlink" href="#environment-variables" title="Link to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">clair-c2py</span></code> reads several environment variables to control its runtime behaviour.</p>
+<table class="docutils align-default">
 <colgroup>
-<col style="width: 28.6%" />
-<col style="width: 23.8%" />
-<col style="width: 23.8%" />
-<col style="width: 23.8%" />
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
-<tr class="row-odd"><th class="head"><p>C++ type</p></th>
-<th class="head"><p>Python type</p></th>
-<th class="head"><p>Bidirectional</p></th>
-<th class="head"><p>Note</p></th>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>int/long</p></td>
-<td><p>int</p></td>
-<td><p>yes</p></td>
-<td></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">CLAIR_VERBOSE</span></code></p></td>
+<td><p>Verbosity level for diagnostic output (see <a class="reference internal" href="#clair-verbose"><span class="std std-ref">below</span></a>).</p></td>
 </tr>
-<tr class="row-odd"><td><p>double</p></td>
-<td><p>float</p></td>
-<td><p>yes</p></td>
-<td></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">CLAIR_SKIP_CLANG_FORMAT</span></code></p></td>
+<td><p>Disable automatic <code class="docutils literal notranslate"><span class="pre">clang-format</span></code> of generated files (see <a class="reference internal" href="#clair-skip-clang-format"><span class="std std-ref">below</span></a>).</p></td>
 </tr>
-<tr class="row-even"><td><p>std::complex&lt;double&gt;</p></td>
-<td><p>complex</p></td>
-<td><p>yes</p></td>
-<td></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">CLICOLOR_FORCE</span></code> / <code class="docutils literal notranslate"><span class="pre">LLVM_FORCE_COLOR</span></code></p></td>
+<td><p>Force coloured Clang diagnostics even when output is redirected.</p></td>
 </tr>
-<tr class="row-odd"><td><p>std::string</p></td>
-<td><p>str</p></td>
-<td><p>yes</p></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><p>std::vector&lt;T&gt;</p></td>
-<td><p>list</p></td>
-<td><p>yes</p></td>
-<td><p>if T is convertible</p></td>
-</tr>
-<tr class="row-odd"><td><p>std::tuple&lt;T…&gt;</p></td>
-<td><p>tuple</p></td>
-<td><p>yes</p></td>
-<td><p>if T… are convertible</p></td>
-</tr>
-<tr class="row-even"><td><p>std::pair&lt;T1, T2&gt;</p></td>
-<td><p>tuple</p></td>
-<td><p>yes</p></td>
-<td><p>if T1, T2 are convertible</p></td>
-</tr>
-<tr class="row-odd"><td><p>std::function&lt;R(T…)&gt;</p></td>
-<td><p>lambda</p></td>
-<td><p>yes</p></td>
-<td><p>if R, T… are convertible</p></td>
-</tr>
-<tr class="row-even"><td><p>std::variant&lt;T…&gt;</p></td>
-<td><p>tuple</p></td>
-<td><p>yes</p></td>
-<td><p>if T… are convertible</p></td>
-</tr>
-<tr class="row-odd"><td><p>std::map&lt;K, V&gt;</p></td>
-<td><p>dict</p></td>
-<td><p>yes</p></td>
-<td><p>if K, V are convertible</p></td>
-</tr>
-<tr class="row-even"><td><p>std::array&lt;T, N&gt;</p></td>
-<td><p>list</p></td>
-<td><p>yes</p></td>
-<td><p>if T is convertible</p></td>
-</tr>
-<tr class="row-odd"><td><p>std::optional&lt;T&gt;</p></td>
-<td><p>Convertion of T or None</p></td>
-<td><p>yes</p></td>
-<td><p>If T is convertible</p></td>
-</tr>
-<tr class="row-even"><td><p>std::span&lt;std::byte&gt;</p></td>
-<td><p>bytes</p></td>
-<td><p>Python -&gt; C++ only</p></td>
-<td></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">SDKROOT</span></code> <em>(macOS only)</em></p></td>
+<td><p>Override the macOS SDK root path used by the compiler.</p></td>
 </tr>
 </tbody>
 </table>
-<p>Note that convertibility is composable: <code class="code docutils literal notranslate"><span class="pre">std::vector&lt;T&gt;</span></code> is convertible is <code class="code docutils literal notranslate"><span class="pre">T</span></code> is,
-so <code class="code docutils literal notranslate"><span class="pre">std::vector&lt;std::tuple&lt;T,</span> <span class="pre">U</span> <span class="pre">,</span> <span class="pre">W&gt;&gt;</span></code> is if <code class="code docutils literal notranslate"><span class="pre">T,U,W</span></code> are.</p>
+<hr class="docutils" />
+<section id="clair-verbose">
+<span id="id1"></span><h2>CLAIR_VERBOSE<a class="headerlink" href="#clair-verbose" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">CLAIR_VERBOSE</span></code> controls how much diagnostic output <code class="docutils literal notranslate"><span class="pre">clair-c2py</span></code> writes to the screen.
+It must be set to a non-negative integer. The default is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+<p><strong>Screen output</strong> is shown on <code class="docutils literal notranslate"><span class="pre">stderr</span></code> and is gated by a per-logger verbosity level:
+a message with verbosity <em>V</em> is printed to the screen only when <code class="docutils literal notranslate"><span class="pre">CLAIR_VERBOSE</span> <span class="pre">&gt;=</span> <span class="pre">V</span></code>.</p>
+<p><strong>Log file output</strong> is independent of <code class="docutils literal notranslate"><span class="pre">CLAIR_VERBOSE</span></code>: every run creates a file
+<code class="docutils literal notranslate"><span class="pre">&lt;module&gt;.log</span></code> in the same directory as the source file, and all logger output is
+written to it unconditionally.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The log file contains ANSI colour codes. Opening it with a plain text editor
+or <code class="docutils literal notranslate"><span class="pre">cat</span></code> will show raw escape sequences. Use <code class="docutils literal notranslate"><span class="pre">less</span> <span class="pre">-R</span></code> to render colours
+correctly:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>less<span class="w"> </span>-R<span class="w"> </span>mymodule.log
+</pre></div>
+</div>
+</div>
+<p>Verbosity levels in use:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 85.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Level</p></th>
+<th class="head"><p>What is shown on screen</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0</span></code> (default)</p></td>
+<td><p>Errors, warnings, and configuration errors only.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
+<td><p>The above, plus a summary of every wrapped entity (modules, classes,
+functions, methods, enums, properties) and rejection notices.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">2</span></code></p></td>
+<td><p>The above, plus per-overload detail for every dispatched function or method.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Usage examples:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Silent on screen; mymodule.log is always written</span>
+clair-c2py<span class="w"> </span>mymodule.cpp<span class="w"> </span>--<span class="w"> </span>-std<span class="o">=</span>c++20
+
+<span class="c1"># Show wrapped entities on screen</span>
+<span class="nv">CLAIR_VERBOSE</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>clair-c2py<span class="w"> </span>mymodule.cpp<span class="w"> </span>--<span class="w"> </span>-std<span class="o">=</span>c++20
+
+<span class="c1"># Show per-overload detail</span>
+<span class="nv">CLAIR_VERBOSE</span><span class="o">=</span><span class="m">2</span><span class="w"> </span>clair-c2py<span class="w"> </span>mymodule.cpp<span class="w"> </span>--<span class="w"> </span>-std<span class="o">=</span>c++20
+
+<span class="c1"># Inspect the full log after any run</span>
+less<span class="w"> </span>-R<span class="w"> </span>mymodule.log
+</pre></div>
+</div>
+<hr class="docutils" />
 </section>
-<section id="custom-converters-for-user-defined-types">
-<h2>Custom converters for user-defined types<a class="headerlink" href="#custom-converters-for-user-defined-types" title="Link to this heading"></a></h2>
-<p>In some cases, it may be necessary to define custom converters for user-defined types
-into some <em>existing</em> Python type.
-Note that this is different from wrapping a C++ class to a Python, which creates a <strong>new</strong> Python type.</p>
-<p>In order to define a custom converter, specialize the <code class="code docutils literal notranslate"><span class="pre">c2py::py_converter</span></code> struct.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">py_converter</span><span class="w"> </span><span class="p">{</span>
-
-<span class="w">  </span><span class="c1">// [Optional] Name of the Python type, used in error messages and docstrings.</span>
-<span class="w">  </span><span class="c1">// Can be a static constexpr string or a static function returning std::string.</span>
-<span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="k">constexpr</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">tp_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;...&quot;</span><span class="p">;</span>
-<span class="w">  </span><span class="c1">// or: static std::string tp_name() { return &quot;...&quot;; }</span>
-
-<span class="w">  </span><span class="c1">// C++ to Python.</span>
-<span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="nf">c2py</span><span class="p">(</span><span class="k">auto</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="n">x</span><span class="p">);</span>
-
-<span class="w">  </span><span class="c1">// Python to C++</span>
-<span class="w">  </span><span class="c1">// Return true iff the object can A PRIORI be converted.</span>
-<span class="w">  </span><span class="c1">// This is normally a type check.</span>
-<span class="w">  </span><span class="c1">// An error may still occur in the conversion, e.g. int overflow.</span>
-<span class="w">  </span><span class="c1">// raise_exception: in case of failure, sets an error message as a Python exception.</span>
-<span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="nf">is_convertible</span><span class="p">(</span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">ob</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">raise_exception</span><span class="p">)</span><span class="w"> </span><span class="k">noexcept</span><span class="p">;</span>
-
-<span class="w">  </span><span class="c1">// Python to C++</span>
-<span class="w">  </span><span class="c1">// Convert, assuming that is_convertible is true.</span>
-<span class="w">  </span><span class="c1">// Can still throw C++ exceptions.</span>
-<span class="w">  </span><span class="c1">// Returns a T or a T&amp; (for wrapped types).</span>
-<span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="p">[</span><span class="n">T</span><span class="o">&amp;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">T</span><span class="p">]</span><span class="w"> </span><span class="n">py2c</span><span class="p">(</span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">ob</span><span class="p">);</span>
-<span class="p">};</span>
+<section id="clair-skip-clang-format">
+<span id="id2"></span><h2>CLAIR_SKIP_CLANG_FORMAT<a class="headerlink" href="#clair-skip-clang-format" title="Link to this heading"></a></h2>
+<p>By default, <code class="docutils literal notranslate"><span class="pre">clair-c2py</span></code> runs <code class="docutils literal notranslate"><span class="pre">clang-format</span></code> on the generated <code class="docutils literal notranslate"><span class="pre">&lt;module&gt;.wrap.cxx</span></code>
+and <code class="docutils literal notranslate"><span class="pre">&lt;module&gt;.wrap.hxx</span></code> files before writing them to disk.
+Setting <code class="docutils literal notranslate"><span class="pre">CLAIR_SKIP_CLANG_FORMAT</span></code> to any value disables this step:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">CLAIR_SKIP_CLANG_FORMAT</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>clair-c2py<span class="w"> </span>mymodule.cpp<span class="w"> </span>--<span class="w"> </span>-std<span class="o">=</span>c++20
+</pre></div>
+</div>
+<p>This can be useful to speed up iterative development or when <code class="docutils literal notranslate"><span class="pre">clang-format</span></code> is
+not available in the build environment.</p>
+</section>
+<hr class="docutils" />
+<section id="clicolor-force-llvm-force-color">
+<h2>CLICOLOR_FORCE / LLVM_FORCE_COLOR<a class="headerlink" href="#clicolor-force-llvm-force-color" title="Link to this heading"></a></h2>
+<p>Clang normally disables colour diagnostics when its output is redirected to a pipe
+or file. Setting either <code class="docutils literal notranslate"><span class="pre">CLICOLOR_FORCE</span></code> or <code class="docutils literal notranslate"><span class="pre">LLVM_FORCE_COLOR</span></code> to any non-empty
+value forces colour output regardless:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">CLICOLOR_FORCE</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>clair-c2py<span class="w"> </span>mymodule.cpp<span class="w"> </span>--<span class="w"> </span>-std<span class="o">=</span>c++20<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>less<span class="w"> </span>-R
 </pre></div>
 </div>
 </section>
-<section id="set-up-for-third-party-libraries">
-<span id="third-party-lib"></span><h2>Set up for third party libraries<a class="headerlink" href="#set-up-for-third-party-libraries" title="Link to this heading"></a></h2>
-<p>If you are developing a third-party C++ library and
-want to provide specializations for some of the types defined by the library,
-we recommend placing them in a separate header file (e.g., <cite>converters.hpp</cite>).
-To avoid polluting your library’s main header for non-Python users, conditionally include this file only when building with clair/c2py:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// my_library/my_library.hpp file</span>
-<span class="c1">// ...</span>
-<span class="c1">//</span>
-<span class="cp">#ifdef C2PY_INCLUDED</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;my_library/converters.hpp&gt;</span>
-<span class="cp">#endif</span>
-</pre></div>
-</div>
-<ul class="simple">
-<li><p>The <cite>c2py</cite> library defines the <cite>C2PY_INCLUDED</cite> macro, so including the library like</p></li>
-</ul>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;my_library/my_library.hpp&gt;</span>
-</pre></div>
-</div>
-<p>will <strong>automatically</strong> include the converters when <cite>c2py</cite> is included.
-For a concrete example, cf e.g. the
-<a class="reference external" href="https://github.com/TRIQS/nda">TRIQS nda</a> library.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The c2py library must be included <strong>first</strong>, hence before any library header that defines custom converters.
-<code class="docutils literal notranslate"><span class="pre">clair-c2py</span></code> will <em>reject</em> the code otherwise, in order to ensure that the C2PY_INCLUDED macros is properly
-defined before any custom library headers are included.</p>
-</div>
+<hr class="docutils" />
+<section id="sdkroot-macos-only">
+<h2>SDKROOT <em>(macOS only)</em><a class="headerlink" href="#sdkroot-macos-only" title="Link to this heading"></a></h2>
+<p>On macOS, <code class="docutils literal notranslate"><span class="pre">clair-c2py</span></code> needs the path to the active SDK. If <code class="docutils literal notranslate"><span class="pre">SDKROOT</span></code> is not set,
+it is auto-detected via <code class="docutils literal notranslate"><span class="pre">xcrun</span> <span class="pre">--show-sdk-path</span></code> and set for the current process.
+If it is set but does not match the value returned by <code class="docutils literal notranslate"><span class="pre">xcrun</span></code>, a warning is emitted.
+This variable is ignored on Linux.</p>
 </section>
 </section>
 
@@ -366,8 +328,8 @@ defined before any custom library headers are included.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="multiple.html" class="btn btn-neutral float-left" title="Across multiple modules" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="c2py.html" class="btn btn-neutral float-right" title="c2py" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="nda.html" class="btn btn-neutral float-left" title="TRIQS/nda" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../notebook.html" class="btn btn-neutral float-right" title="Notebook integration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

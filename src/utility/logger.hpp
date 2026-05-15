@@ -66,7 +66,7 @@ namespace util {
 
     static logger error()   { return {"-- ", "\033[1;31merror: \033[0m",   0}; }
     static logger warning() { return {"-- ", "\033[1;35mwarning: \033[0m", 0}; }
-    static logger debug()   { return {"-- ", "\033[1;31mDEBUG: \033[0m",   1}; }
+    static logger debug()   { return {"-- ", "\033[1;31mDEBUG: \033[0m",   5}; }
   };
 
 } // namespace util

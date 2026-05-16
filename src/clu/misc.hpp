@@ -41,6 +41,12 @@ namespace clu {
     emit_error(d->getBeginLoc(), d->getASTContext(), FormatString);
   }
 
+  // Emit a note at the decl d with a runtime string message.
+  inline void emit_note(clang::Decl const *d, std::string const &msg) {
+    auto &DE = d->getASTContext().getDiagnostics();
+    DE.Report(d->getBeginLoc(), DE.getCustomDiagID(clang::DiagnosticsEngine::Note, "%0")) << msg;
+  }
+
   // Same as emit_error, but with warning.
   template <unsigned N> void emit_warning(clang::Decl const *d, const char (&FormatString)[N]) { //NOLINT
     auto &ctx                    = d->getASTContext();

@@ -5,6 +5,19 @@
 #include "clu/misc.hpp"
 #include "clu/concept.hpp"
 
+// Strip reference, pointer, and cv-qualifiers to obtain the base type name for table lookup.
+static std::string base_type_name(clang::QualType ty) {
+  ty = ty.getNonReferenceType();
+  if (ty->isPointerType()) ty = ty->getPointeeType();
+  return ty.getUnqualifiedType().getAsString();
+}
+
+// Emit a note suggesting an #include if the type appears in the wrapped_type_to_header table.
+static void suggest_header(clang::Decl const *d, clang::QualType ty, wdata_t const &wd) {
+  if (auto it = wd.wrapped_type_to_header.find(base_type_name(ty)); it != wd.wrapped_type_to_header.end())
+    clu::emit_note(d, "consider adding: #include \"" + it->second + "\"");
+}
+
 // ------------------------------
 // Validates that every return statement in a reference-returning method
 // returns a member of `this` (at any depth).
@@ -115,6 +128,7 @@ bool check_convertibility(clang::FunctionDecl const *f, wdata_t const &wd, bool 
     auto ty = p->getType();
     if ((not ty->isVoidType()) and (not wd.concepts.IsConvertiblePy2C.is_satisfied_by(ty)) and (not wd.module_info.is_wrapped(ty))) {
       clu::emit_error(p, "c2py: Can not convert this argument from python to C++");
+      suggest_header(p, ty, wd);
       ok = false;
     }
   }
@@ -125,6 +139,7 @@ bool check_convertibility(clang::FunctionDecl const *f, wdata_t const &wd, bool 
       ok = false;
     } else if ((not ty->isVoidType()) and (not wd.concepts.IsConvertibleC2Py.is_satisfied_by(ty)) and (not wd.module_info.is_wrapped(ty))) {
       clu::emit_error(f, "c2py: Can not be converted from C++ to python");
+      suggest_header(f, ty, wd);
       ok = false;
     } else {
       if (ty->isReferenceType()) { // further checks if we return a reference

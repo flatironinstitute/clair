@@ -122,6 +122,10 @@ struct wdata_t {
   bool input_has_included_generated_cxx = false;
   std::vector<std::string> deps; // dependencies collected by the preprocessor
 
+  // Table of fully-qualified type names -> .hxx filename, built by scanning the source directory.
+  // Populated in the constructor; used in check_convertibility to suggest #include directives.
+  std::map<str_t, str_t> wrapped_type_to_header;
+
   // All the information about the module including the classes, methods, etc.
   module_info_t module_info;
 

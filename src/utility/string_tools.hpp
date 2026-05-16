@@ -12,20 +12,20 @@ namespace util {
 
   // ------- trim a string: trim (both sides), rtrim (right only), ltrim
 
-  const str_t whitespace_and_star = " \n\r\t\f\v";
+  const str_t whitespace = " \n\r\t\f\v";
 
-  inline str_t trim(const str_t &s, str_t const &delim = whitespace_and_star) {
+  inline str_t trim(const str_t &s, str_t const &delim = whitespace) {
     size_t start = s.find_first_not_of(delim);
     size_t end   = s.find_last_not_of(delim);
     return (end == str_t::npos) ? "" : s.substr(start, end + 1 - start);
   }
 
-  inline str_t ltrim(const str_t &s, str_t const &delim = whitespace_and_star) {
+  inline str_t ltrim(const str_t &s, str_t const &delim = whitespace) {
     size_t start = s.find_first_not_of(delim);
     return (start == str_t::npos) ? "" : s.substr(start);
   }
 
-  inline str_t rtrim(const str_t &s, str_t const &delim = whitespace_and_star) {
+  inline str_t rtrim(const str_t &s, str_t const &delim = whitespace) {
     size_t end = s.find_last_not_of(delim);
     return (end == str_t::npos) ? "" : s.substr(0, end + 1);
   }

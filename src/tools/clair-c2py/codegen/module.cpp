@@ -40,7 +40,7 @@ str_t codegen_module(module_info_t const &m) {
     logs.enu(qname);
     EnumDecls << fmt::format(
        R"RAW( 
-       template <> std::map<{0}, str_t> c2py::enum_to_string<{0}> = {{ {1} }};)RAW",
+       template <> const std::map<{0}, str_t> c2py::enum_to_string<{0}> = {{ {1} }};)RAW",
        qname,
        join(
           enu->enumerators(), [&qname](auto &&val) { return fmt::format(R"RAW( {{ {0}::{1}, "{1}" }} )RAW", qname, val->getNameAsString()); }, ','));

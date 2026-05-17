@@ -67,7 +67,9 @@ extern "C" __attribute__((visibility("default"))) PyObject *PyInit_{modulename}(
   m = PyModule_Create(&module_def);
   if (m == NULL) return NULL;
 
-  auto &conv_table = *c2py::conv_table_sptr.get();
+  if (not c2py::conv_table_sptr) c2py::conv_table_sptr = c2py::get_pto_table();
+  if (not c2py::conv_table_sptr) return NULL;
+  auto &conv_table = *c2py::conv_table_sptr;
 
   conv_table[std::type_index(typeid(c2py::py_range)).name()] = &c2py::wrap_pytype<c2py::py_range>;
 #define _add_type(T, N) c2py::add_type_object_to_main<T>(N, m, conv_table)

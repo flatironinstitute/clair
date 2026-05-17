@@ -417,6 +417,8 @@ str_t codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const
   // ----------- import other modules
 
   // -- tp_doc
+  // ORDERING INVARIANT: tp_doc<T> must be emitted after tp_ctor_doc<T> (written by
+  // write_dispatch_constructors into MethodDecls).
   auto cls_doc = pydoc(cls_info);
   code << '\n'
        << fmt::format(R"RAW(template <> const std::string c2py::tp_doc<{0}> = R"DOC({1})DOC" + )RAW", cls_alias, cls_doc)

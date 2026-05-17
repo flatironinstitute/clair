@@ -116,6 +116,8 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
   code << ";\n";
 
   // ---- write the doc  ----
+  // ORDERING INVARIANT: _c2py_doc_* must be emitted to the 'doc' stream (which the caller
+  // flushes BEFORE the method/function table).
   auto [fdoc, param_types, return_types] = pydoc(flist);
   doc << '\n' << fmt::format(R"RAW( static const auto _c2py_doc_{0} = _c2py_fun_{0}.doc(R"DOC({1})DOC")RAW", fun_counter, fdoc);
   if (not param_types.empty() or not return_types.empty()) {
@@ -152,7 +154,7 @@ void codegen::write_dispatch_constructors(std::ostream &code, std::string const 
                                           std::vector<fnt_info_t> const &flist) {
 
   static long counter = 0;
-  code << fmt::format(R"RAW( static auto _c2py_init_{} = c2py::dispatcher_c_kw_t {{ )RAW", counter) << '\n';
+  code << fmt::format(R"RAW( static const auto _c2py_init_{} = c2py::dispatcher_c_kw_t {{ )RAW", counter) << '\n';
 
   logs.meth("__init__");
 

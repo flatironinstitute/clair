@@ -68,7 +68,7 @@ template <> void matcher<mtch::ModuleClsWrap>::run(const MatchResult &Result) {
   assert(d);
   if (auto *cls = d->getUnderlyingType()->getAsCXXRecordDecl()) {
     if (auto *ctsd = llvm::dyn_cast<clang::ClassTemplateSpecializationDecl>(cls)) {
-      if (not cls->hasDefinition() and not ctsd->isCompleteDefinition()) {
+      if (not cls->hasDefinition() and not ctsd->isCompleteDefinition() and ctsd->getSpecializationKind() != clang::TSK_ExplicitSpecialization) {
         // The alias (e.g. A<int>) was not instantiated in the code.
         // Clang is lazy with aliases, so we use Sema to instantiate it ourselves.
         clang::CXXRecordDecl *Pattern = ctsd->getSpecializedTemplate()->getTemplatedDecl();

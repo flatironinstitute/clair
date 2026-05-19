@@ -21,10 +21,10 @@ message(STATUS "clair version : ${PROJECT_VERSION}")
 message(STATUS "clair Git hash: ${PROJECT_GIT_HASH}")
 
 # Assert that install directory is provided and is absolute path.
-if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT OR (NOT IS_ABSOLUTE ${CMAKE_INSTALL_PREFIX}))
-  message(FATAL_ERROR "CMAKE_INSTALL_PREFIX must be specified and must be an absolute path.\n There is no default.\n Current value : ${CMAKE_INSTALL_PREFIX}\n.  e.g. ... -DCMAKE_INSTALL_PREFIX=$HOME/clair_install")
-endif()
 if(NOT IS_SUBPROJECT)
+  if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT OR (NOT IS_ABSOLUTE ${CMAKE_INSTALL_PREFIX}))
+    message(FATAL_ERROR "CMAKE_INSTALL_PREFIX must be specified and must be an absolute path.\n There is no default.\n Current value : ${CMAKE_INSTALL_PREFIX}\n.  e.g. ... -DCMAKE_INSTALL_PREFIX=$HOME/clair_install")
+  endif()
   message(STATUS "-------- CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX} --------")
 endif()
 set(clair_BINARY_DIR ${PROJECT_BINARY_DIR} CACHE STRING "Binary directory of the clair Project")

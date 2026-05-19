@@ -11,52 +11,60 @@ message(STATUS "-------- LLVM / Clang detection -------------")
 include(clang_detection)
 
 # fmt
-message(STATUS "-------- Fetch & Configure FMT -------------")
-include(FetchContent)
-FetchContent_Declare(
- fmt
- GIT_REPOSITORY https://github.com/fmtlib/fmt.git
- GIT_TAG        main
- EXCLUDE_FROM_ALL
-)
-FetchContent_MakeAvailable(fmt)
-set_property(TARGET fmt PROPERTY POSITION_INDEPENDENT_CODE ON)
+if(NOT TARGET fmt)
+  message(STATUS "-------- Fetch & Configure FMT -------------")
+  include(FetchContent)
+  FetchContent_Declare(
+  fmt
+  GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+  GIT_TAG        main
+  EXCLUDE_FROM_ALL
+  )
+  FetchContent_MakeAvailable(fmt)
+  set_property(TARGET fmt PROPERTY POSITION_INDEPENDENT_CODE ON)
+else()
+  message(STATUS "-------- Reusing existing fmt target -------------")
+endif()
 
 # toml++
-message(STATUS "-------- Fetch & Configure toml++ -------------")
-FetchContent_Declare(
-  tomlplusplus
-  GIT_REPOSITORY https://github.com/marzer/tomlplusplus.git
-  GIT_TAG v3.4.0
-  #GIT_TAG        master
-  EXCLUDE_FROM_ALL
-)
-FetchContent_MakeAvailable(tomlplusplus)
+if(NOT TARGET tomlplusplus::tomlplusplus)
+  message(STATUS "-------- Fetch & Configure toml++ -------------")
+  include(FetchContent)
+  FetchContent_Declare(
+    tomlplusplus
+    GIT_REPOSITORY https://github.com/marzer/tomlplusplus.git
+    GIT_TAG v3.4.0
+    EXCLUDE_FROM_ALL
+  )
+  FetchContent_MakeAvailable(tomlplusplus)
+else()
+  message(STATUS "-------- Reusing existing tomlplusplus target -------------")
+endif()
 
 # ========= Dynamic Analyzer Checks ==========
 
-option(ASAN OFF "Compile library and executables with LLVM Address Sanitizer")
+option(ASAN "Compile library and executables with LLVM Address Sanitizer" OFF)
 if(ASAN)
   if(NOT TARGET asan)
     find_package(sanitizer REQUIRED COMPONENTS asan)
   endif()
 endif()
 
-option(UBSAN OFF "Compile library and executables with LLVM Undefined Behavior Sanitizer")
+option(UBSAN "Compile library and executables with LLVM Undefined Behavior Sanitizer" OFF)
 if(UBSAN)
   if(NOT TARGET ubsan)
     find_package(sanitizer REQUIRED COMPONENTS ubsan)
   endif()
 endif()
 
-option(MSAN OFF "Compile library and executables with LLVM Memory Sanitizer")
+option(MSAN "Compile library and executables with LLVM Memory Sanitizer" OFF)
 if(MSAN)
   if(NOT TARGET msan)
     find_package(sanitizer REQUIRED COMPONENTS msan)
   endif()
 endif()
 
-option(TSAN OFF "Compile library and executables with LLVM Thread Sanitizer")
+option(TSAN "Compile library and executables with LLVM Thread Sanitizer" OFF)
 if(TSAN)
   if(NOT TARGET tsan)
     find_package(sanitizer REQUIRED COMPONENTS tsan)

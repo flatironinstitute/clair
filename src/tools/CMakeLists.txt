@@ -3,7 +3,7 @@ function(add_tool TOOL_NAME)
     message(FATAL_ERROR "Tool directory '${TOOL_NAME}' does not exist.")
   endif()
 
-  file(GLOB_RECURSE TOOL_SOURCES "${TOOL_NAME}/*.cpp")
+  file(GLOB_RECURSE TOOL_SOURCES "${TOOL_NAME}/*.cpp" ${ARGN})
 
   add_executable(${TOOL_NAME} ${TOOL_SOURCES})
   
@@ -21,4 +21,4 @@ function(add_tool TOOL_NAME)
 endfunction()
 
 add_tool(annotate-fnt)
-add_tool(clair-c2py)
+add_tool(clair-c2py "ir/*.cpp")

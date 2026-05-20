@@ -1,21 +1,23 @@
 #pragma once
-#include <regex>
 #include <map>
+#include <memory>
 #include <optional>
+#include <string_view>
 
-#include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/Regex.h"
 #include "clang/AST/DeclCXX.h"
-#include "clang/AST/DeclTemplate.h"
 #include "clang/Frontend/CompilerInstance.h"
 
+#include "../ir/types.hpp"
 #include "./configuration.hpp"
 #include "clu/concept.hpp"
 #include "utility/string_tools.hpp"
-#include "utility/logger.hpp"
 
-using cls_ptr_t = clang::CXXRecordDecl const *;
-using fnt_ptr_t = clang::FunctionDecl const *;
+// Non-owning observer aliases: raw const pointers into IR node pools owned by module_info_t.
+using cls_ptr_t   = ir::RecordDecl const *;
+using fnt_ptr_t   = ir::FunctionDecl const *;
+using field_ptr_t = ir::FieldDecl const *;
+using enum_ptr_t  = ir::EnumDecl const *;
 
 // -----------------------------------------------------------
 // Operator kind: arithmetic, comparison, and unary
@@ -23,11 +25,12 @@ enum class OpKind { Add, Sub, Mul, Div, LShift, Eq, Ne, Lt, Gt, Le, Ge, Neg, Pos
 
 // ----------------------- fnt_info_t ------------------------------------
 // Carries a function/method declaration pointer and wrapping metadata.
+// Trivially copyable: all members are raw pointers or bools.
 struct fnt_info_t {
-  fnt_ptr_t ptr          = nullptr;
-  bool rewrite           = true;
-  cls_ptr_t parent_class = nullptr;
-  [[nodiscard]] clang::CXXMethodDecl const *as_method() const { return llvm::dyn_cast_or_null<clang::CXXMethodDecl>(ptr); }
+  fnt_ptr_t ptr             = nullptr;
+  bool rewrite              = true;
+  cls_ptr_t parent_class    = nullptr;
+  bool is_inherited_method  = false;
 };
 
 /// Deduplicate a list of functions, keeping the best redeclaration per group.
@@ -39,11 +42,14 @@ enum class Serialization { None, Tuple, H5, Repr };
 // ----------------------- cls_info_t ------------------------------------
 // Collects all wrapping data for a C++ class: methods, constructors, fields, operators, and properties.
 struct cls_info_t {
-  cls_ptr_t ptr;
-  cls_ptr_t base                                   = nullptr;
-  std::map<str_t, std::vector<fnt_info_t>> methods = {}; // pyname -> list of C++ overloads
+  cls_ptr_t ptr  = nullptr;
+  cls_ptr_t base = nullptr;
+
+  std::map<str_t, std::vector<fnt_info_t>> methods = {};
   std::vector<fnt_info_t> constructors             = {};
-  std::vector<clang::FieldDecl *> fields           = {};
+
+  std::vector<field_ptr_t> fields = {};
+
   std::vector<fnt_info_t> getitems                 = {};
   std::vector<fnt_info_t> setitems                 = {};
   bool has_size_method                             = false;
@@ -55,15 +61,11 @@ struct cls_info_t {
     fnt_info_t getter;
     std::vector<fnt_info_t> setters;
   };
-  std::map<str_t, property> properties = {}; // pyname -> property (getter + setters)
+  std::map<str_t, property> properties = {};
 
-  // operators: op -> list of signatures (each signature = full argument type list)
-  // e.g. Add -> {{A, A}, {A, int}}, Neg -> {{A}}
-  std::map<OpKind, std::vector<std::vector<clang::QualType>>> operators = {};
+  std::map<OpKind, std::vector<std::vector<ir::QualType>>> operators = {};
 
-  // Do we need to synthesize a constructor, as the class has only a {}
-  // aggregate initialization
-  bool synthetize_init_from_pydict() const { return (ptr->isAggregate() and (ptr->getNumBases() == 0)); }
+  bool synthetize_init_from_pydict() const { return ptr and ptr->synthetize_init_from_pydict(); }
 };
 
 // ----------------------- module_info_t ------------------------------------
@@ -72,21 +74,34 @@ struct module_info_t {
 
   str_t module_name;
   str_t package_name;
-  str_t sourcefile;           // full path name of the source file, e.g. "/some/path/to/my_module.cpp"
-  str_t sourcefile_full_stem; //  e.g. "/some/path/to/my_module"
+  str_t sourcefile;           // full path name of the source file
+  str_t sourcefile_full_stem;
   str_t documentation;
-  clang::FunctionDecl const *module_init = nullptr;
+  str_t module_init_fqn; // FQN of the module_init function, empty if none
 
-  std::map<str_t, std::vector<fnt_info_t>> functions; // vector not unique
-  std::vector<clang::EnumDecl const *> enums;         // all enums (including in classes)
+  std::map<str_t, std::vector<fnt_info_t>> functions;
+  std::vector<enum_ptr_t> enums;
 
-  std::vector<std::pair<str_t, cls_info_t>> classes; // index of cls_table. Must keep order of insertion to have base first
-  std::map<cls_ptr_t, long> classes_ptr_to_info;     // reverse search table
+  std::vector<std::pair<str_t, cls_info_t>> classes; // Must keep order of insertion to have base first
+  std::map<cls_ptr_t, long> classes_ptr_to_info;     // raw ptr → index
+  std::map<str_t, long> classes_fqn_to_info;         // FQN string → index
+
+  // Ownership pools for IR nodes; all raw pointer aliases above point into these.
+  std::vector<std::unique_ptr<ir::FunctionDecl>> fnt_pool;
+  std::vector<std::unique_ptr<ir::RecordDecl>>   rec_pool;
+  std::vector<std::unique_ptr<ir::FieldDecl>>    field_pool;
+  std::vector<std::unique_ptr<ir::EnumDecl>>     enum_pool;
+
+  // Intern an IR node into the appropriate pool and return a non-owning const pointer.
+  fnt_ptr_t   intern(ir::FunctionDecl);
+  cls_ptr_t   intern(ir::RecordDecl);
+  field_ptr_t intern(ir::FieldDecl);
+  enum_ptr_t  intern(ir::EnumDecl);
 
   // Add a class to the module; silently ignored if already registered.
   void add_class(std::string_view name, clang::CXXRecordDecl const *cls);
 
-  // Return the wrapped class pointer for a type, or nullptr if not wrapped.
+  // Return the wrapped IR class pointer (non-owning) for a type, or nullptr if not wrapped.
   cls_ptr_t get_wrapped_cls(clang::QualType ty) const;
 
   // Return a pointer to the cls_info_t for a wrapped type, or nullptr.
@@ -102,10 +117,9 @@ struct wdata_t {
   clang::CompilerInstance *ci;
   configuration config;
 
-  std::optional<llvm::Regex> reject_names; // only regex, the other ones are used directly in the ASTMatcher
+  std::optional<llvm::Regex> reject_names;
 
   // Concepts matched from c2py and h5 library (if present).
-  // Resolved by the ASTConsumer; concept_holder::is_satisfied_by(...) returns false if not found.
   struct {
     clu::concept_holder IsConvertiblePy2C;
     clu::concept_holder IsConvertibleC2Py;
@@ -114,20 +128,20 @@ struct wdata_t {
     clu::concept_holder HasNonDeletedDefaultConstructor;
   } concepts;
 
-  clang::VarTemplateDecl *is_wrapped_vtd         = nullptr; // c2py::is_wrapped<T>
+  clang::VarTemplateDecl *is_wrapped_vtd    = nullptr; // c2py::is_wrapped<T>
   clang::ClassTemplateDecl *py_converter_ctd = nullptr; // c2py::py_converter<T>
 
-  // Preprocessor will detect if the input has included the generated cxx file
-  // and store the result in this variable.
   bool input_has_included_generated_cxx = false;
-  std::vector<std::string> deps; // dependencies collected by the preprocessor
+  std::vector<std::string> deps;
 
   // Table of fully-qualified type names -> .hxx filename, built by scanning the source directory.
   // Populated in the constructor; used in check_convertibility to suggest #include directives.
   std::map<str_t, str_t> wrapped_type_to_header;
 
-  // All the information about the module including the classes, methods, etc.
   module_info_t module_info;
+
+  // Clang-specific lookup used by concept checking and AST-level analysis in scan_classes.
+  std::map<str_t, clang::CXXRecordDecl const *> clang_cls_by_fqn;
 
   wdata_t(clang::CompilerInstance *ci, configuration const &config);
 };

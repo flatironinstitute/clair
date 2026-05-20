@@ -56,10 +56,10 @@ static void suggest_header(clang::Decl const *d, clang::QualType ty, wdata_t con
 // Anything else (local variable, global) is rejected.
 //
 class check_return_visitor : public clang::RecursiveASTVisitor<check_return_visitor> {
-  fnt_ptr_t f;
+  clang::FunctionDecl const *f;
 
   public:
-  explicit check_return_visitor(fnt_ptr_t f) : f{f} {}
+  explicit check_return_visitor(clang::FunctionDecl const *f) : f{f} {}
 
   // Do not descend into nested scopes (lambdas, local classes) whose
   // return statements belong to the inner function, not to the method.

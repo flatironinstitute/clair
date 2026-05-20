@@ -1,6 +1,6 @@
-#include <iostream>
 #include "clu/misc.hpp"
 #include "clu/concept.hpp"
+#include "clu/fullqualifiedname.hpp"
 #include "utility/logger.hpp"
 
 #include "./check_convertibility.hpp"
@@ -22,15 +22,16 @@ static std::vector<fnt_info_t> rm_const_overloads(std::vector<fnt_info_t> const 
   std::unordered_map<std::string, size_t> sig_idx; // signature -> index in result
 
   for (auto const &f : mlist) {
-    auto signature = util::join(f.ptr->parameters(), [](auto const *p) { return p->getType().getAsString(); }, ",");
+    if (not f.ptr) continue;
+    auto signature = util::join(f.ptr->params, [](auto const &p) { return p.type.name; }, ",");
     auto it        = sig_idx.find(signature);
     if (it == sig_idx.end()) {
       sig_idx.emplace(signature, result.size());
       result.push_back(f);
     } else {
-      auto *cur = result[it->second].as_method();
-      auto *m   = f.as_method();
-      if (cur && cur->isConst() && m && !m->isConst()) result[it->second] = f;
+      bool cur_is_const = result[it->second].ptr and result[it->second].ptr->is_const_method;
+      bool f_is_const   = f.ptr->is_const_method;
+      if (cur_is_const && !f_is_const) result[it->second] = f;
     }
   }
   return result;
@@ -40,9 +41,9 @@ static std::vector<fnt_info_t> rm_const_overloads(std::vector<fnt_info_t> const 
 
 // Classify a single method declaration and, if wrappable, append it to the appropriate
 // slot in cls_info (constructors, getitems/setitems, operator table, properties, or methods).
-// cls is the class whose decl list is being scanned (may differ from cls_info.ptr for base classes).
+// cls is the clang decl of the class being scanned (may differ from the wrapped class for base classes).
 // Returns early without touching cls_info for deleted, private, or unwrappable declarations.
-static void analyze_one_method(clang::FunctionDecl const *f, cls_info_t &cls_info, cls_ptr_t cls, wdata_t &wd) {
+static void analyze_one_method(clang::FunctionDecl const *f, cls_info_t &cls_info, clang::CXXRecordDecl const *cls, wdata_t &wd) {
 
   if (f->isDeleted()) return;
   auto *m = llvm::dyn_cast<clang::CXXMethodDecl>(f);
@@ -54,23 +55,34 @@ static void analyze_one_method(clang::FunctionDecl const *f, cls_info_t &cls_inf
     return; // no move or copy constructor
 
   auto name = m->getNameAsString();
+  const bool is_base_class = cls_info.ptr and
+    (clu::get_fully_qualified_name(cls) != cls_info.ptr->fully_qualified_name);
 
   // hdf5_format is an HDF5 serialization helper, never meant to be wrapped
   if (wd.concepts.HasHdf5 and name == "hdf5_format") return;
 
   // ---- constructors
   if (llvm::isa<clang::CXXConstructorDecl>(m)) {
-    const bool is_base_class = (cls != cls_info.ptr);
-    if (not is_base_class and check_convertibility(m, wd)) cls_info.constructors.push_back({m});
+    if (not is_base_class and check_convertibility(m, wd))
+      cls_info.constructors.push_back({.ptr = wd.module_info.intern(ir::FunctionDecl{*m}),
+                                       .parent_class = cls_info.ptr,
+                                       .is_inherited_method = false});
     return;
   }
   // ---- operators : keep only [] and ()
   if (name.starts_with("operator")) {
     if (name == "operator[]") {
-      // For setitem (non-const): skip return type check (test_return_type = false), only parameter types matter.
-      if (check_convertibility(m, wd, m->isConst())) (m->isConst() ? cls_info.getitems : cls_info.setitems).push_back({m});
+      if (check_convertibility(m, wd, m->isConst()))
+        (m->isConst() ? cls_info.getitems : cls_info.setitems).push_back(
+          {.ptr = wd.module_info.intern(ir::FunctionDecl{*m}),
+           .parent_class = cls_info.ptr,
+           .is_inherited_method = is_base_class});
     } else if (name == "operator()") {
-      if (check_convertibility(m, wd)) cls_info.methods["__call__"].push_back({m});
+      if (check_convertibility(m, wd))
+        cls_info.methods["__call__"].push_back(
+          {.ptr = wd.module_info.intern(ir::FunctionDecl{*m}),
+           .parent_class = cls_info.ptr,
+           .is_inherited_method = is_base_class});
     } else {
       analyze_operator(f, wd);
     }
@@ -96,28 +108,39 @@ static void analyze_one_method(clang::FunctionDecl const *f, cls_info_t &cls_inf
     else if (m->getReturnType()->isVoidType())
       clu::emit_error(m, "c2py: C2PY_PROPERTY_GET method must not return void");
     else if (check_convertibility(m, wd))
-      cls_info.properties[*prop_name].getter = {.ptr = m};
+      cls_info.properties[*prop_name].getter = {.ptr = wd.module_info.intern(ir::FunctionDecl{*m}),
+                                                .parent_class = cls_info.ptr,
+                                                .is_inherited_method = is_base_class};
     return;
   }
   if (auto prop_name = clu::get_annotation_value(m, "c2py_property_set")) {
-    if (check_convertibility(m, wd)) cls_info.properties[*prop_name].setters.push_back({.ptr = m});
+    if (check_convertibility(m, wd))
+      cls_info.properties[*prop_name].setters.push_back({.ptr = wd.module_info.intern(ir::FunctionDecl{*m}),
+                                                         .parent_class = cls_info.ptr,
+                                                         .is_inherited_method = is_base_class});
     return;
   }
 
   // wrap_no_arg_methods_as_properties: treat no-arg non-void methods as read-only properties.
   if (wd.config.wrap_no_arg_methods_as_properties and m->getNumParams() == 0 and not m->getReturnType()->isVoidType()) {
-    if (check_convertibility(m, wd)) cls_info.properties[get_python_name(m)].getter = {.ptr = m};
+    if (check_convertibility(m, wd))
+      cls_info.properties[get_python_name(m)].getter = {.ptr = wd.module_info.intern(ir::FunctionDecl{*m}),
+                                                        .parent_class = cls_info.ptr,
+                                                        .is_inherited_method = is_base_class};
     return;
   }
 
   // generic case
-  if (check_convertibility(m, wd)) cls_info.methods[get_python_name(m)].push_back({m});
+  if (check_convertibility(m, wd))
+    cls_info.methods[get_python_name(m)].push_back({.ptr = wd.module_info.intern(ir::FunctionDecl{*m}),
+                                                    .parent_class = cls_info.ptr,
+                                                    .is_inherited_method = is_base_class});
 }
 
 // ------------------------------
 
 // Scan cls and append its public methods (including explicit template specializations) and fields into cls_info.
-static void scan_class_elements(cls_info_t &cls_info, cls_ptr_t cls, wdata_t &wd) {
+static void scan_class_elements(cls_info_t &cls_info, clang::CXXRecordDecl const *cls, wdata_t &wd) {
 
   for (clang::Decl *decl : cls->decls()) { // all declarations in the class
     if (decl->getAccess() != clang::AS_public) continue;
@@ -140,7 +163,7 @@ static void scan_class_elements(cls_info_t &cls_info, cls_ptr_t cls, wdata_t &wd
         if (not wd.concepts.IsConvertiblePy2C.is_satisfied_by(ty)) clu::emit_error(f, "c2py: Can not be converted from python to C++");
         if (not wd.concepts.IsConvertibleC2Py.is_satisfied_by(ty)) clu::emit_error(f, "c2py: Can not be converted from C++ to python");
       }
-      cls_info.fields.push_back(f);
+      cls_info.fields.push_back(wd.module_info.intern(ir::FieldDecl{*f}));
     }
   }
 }
@@ -151,29 +174,30 @@ static void scan_class_elements(cls_info_t &cls_info, cls_ptr_t cls, wdata_t &wd
 /// base classes, deduplicate overloads, and verify default-constructibility.
 static void scan_class(wdata_t &wd, cls_info_t &cls_info) {
 
-  // h5
-  cls_info.has_hdf5 = wd.concepts.HasHdf5.is_satisfied_by(cls_info.ptr);
+  // Retrieve the clang declaration for concept checking and AST traversal.
+  auto *clang_cls = wd.clang_cls_by_fqn.at(cls_info.ptr->fully_qualified_name);
 
-  // Serialization
-  if (wd.concepts.HasSerializeLikeBoost.is_satisfied_by(cls_info.ptr))
+  cls_info.has_hdf5 = wd.concepts.HasHdf5.is_satisfied_by(clang_cls);
+
+  if (wd.concepts.HasSerializeLikeBoost.is_satisfied_by(clang_cls))
     cls_info.serialization = Serialization::Tuple;
   else if (cls_info.has_hdf5)
     cls_info.serialization = Serialization::H5;
 
   // Get the methods and fields of the class
-  scan_class_elements(cls_info, cls_info.ptr, wd);
+  scan_class_elements(cls_info, clang_cls, wd);
 
   // We loop on base classes which are not wrapped
   // and authorize 1 base class to be wrapped (Python C API limitation)
-  for (auto b : cls_info.ptr->bases()) {
+  for (auto b : clang_cls->bases()) {
     if (b.getAccessSpecifier() != clang::AccessSpecifier::AS_public) continue; // only public bases
     auto *c = b.getType()->getAsCXXRecordDecl();
     if (not wd.module_info.is_wrapped(b.getType())) {
       // We merge the element of the base into the class in progress.
       scan_class_elements(cls_info, c, wd);
     } else {
-      if (cls_info.base != nullptr) clu::emit_error(cls_info.ptr, "This class has more than one bases to wrap");
-      cls_info.base = c;
+      if (cls_info.base != nullptr) clu::emit_error(clang_cls, "This class has more than one bases to wrap");
+      cls_info.base = wd.module_info.intern(ir::RecordDecl{*c});
     }
   }
   // Deduplicate redeclarations, then drop const/non-const pairs keeping the non-const version.
@@ -184,8 +208,8 @@ static void scan_class(wdata_t &wd, cls_info_t &cls_info) {
 
   // Check that the class is default constructible if it has no wrapped constructors
   if (cls_info.constructors.empty() and not cls_info.synthetize_init_from_pydict()
-      and not wd.concepts.HasNonDeletedDefaultConstructor.is_satisfied_by(cls_info.ptr))
-    clu::emit_error(cls_info.ptr, "This class has no wrapped constructor and is not default constructible.");
+      and not wd.concepts.HasNonDeletedDefaultConstructor.is_satisfied_by(clang_cls))
+    clu::emit_error(clang_cls, "This class has no wrapped constructor and is not default constructible.");
 }
 
 // ------------------------------

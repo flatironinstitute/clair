@@ -1,6 +1,6 @@
 #pragma once
-#include "../wdata.hpp"
-#include "../../../utility/string_tools.hpp"
+#include "../clair-c2py/wdata.hpp"
+#include "../../utility/string_tools.hpp"
 
 #include <tuple>
 #include <vector>

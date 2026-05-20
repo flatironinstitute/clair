@@ -10,7 +10,7 @@
 #include "utility/stl_complement.hpp"
 
 #include "./ast_consumer.hpp"
-#include "./codegen/module.hpp"
+#include "../codegen/module.hpp"
 #include "./pp_include_callback.hpp"
 
 // ------------------------------

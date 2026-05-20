@@ -21,4 +21,4 @@ function(add_tool TOOL_NAME)
 endfunction()
 
 add_tool(annotate-fnt)
-add_tool(clair-c2py "ir/*.cpp")
+add_tool(clair-c2py "codegen/*.cpp" "ir/*.cpp")

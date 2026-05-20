@@ -5,13 +5,13 @@
 using namespace fmt::literals;
 #include <itertools/itertools.hpp>
 
-#include "clu/fullqualifiedname.hpp"
 #include "utility/logger.hpp"
 #include "./fnt.hpp"
 #include "./classes.hpp"
 #include "../c2py_version.hpp"
 
 using util::join;
+
 static const struct {
   util::logger mod = util::logger{"-- ", "\033[1;32mModule: \033[0m", 1};
   util::logger enu = util::logger{"-- ", "\033[1;32mEnum: \033[0m",   1};
@@ -63,7 +63,7 @@ str_t codegen_module(module_info_t const &m) {
 
     if (cls_info.base != nullptr)
       PyTypeReadyDecls << fmt::format(R"RAW(   c2py::wrap_pytype<{0}>.tp_base = &c2py::wrap_pytype<{1}>; )RAW", cls_alias,
-                                      clu::get_fully_qualified_name(cls_info.base));
+                                      cls_info.base->fully_qualified_name);
     PyTypeReadyDecls << fmt::format(R"RAW( if (PyType_Ready(&c2py::wrap_pytype<{}>) < 0) return NULL;)RAW", cls_alias);
 
     AddTypeObjectDecls << fmt::format(R"RAW(_add_type({0}, "{1}"); )RAW", cls_alias, cls_py_name);
@@ -81,11 +81,11 @@ str_t codegen_module(module_info_t const &m) {
 )RAW";
   }
 
-  for (auto const &[fpyname, overloads] : m.functions) //
+  for (auto const &[fpyname, overloads] : m.functions)
     codegen::write_dispatch(FunctionDecls, FunctionTable, FunctionDocs, fpyname, overloads, nullptr, false);
 
   std::string ModuleInitFunction =
-     (m.module_init ? fmt::format(" // Initialization of the module \n {}();", m.module_init->getQualifiedNameAsString()) : "");
+     m.module_init_fqn.empty() ? "" : fmt::format(" // Initialization of the module \n {}();", m.module_init_fqn);
 
   std::string r;
   try {
@@ -118,7 +118,7 @@ str_t codegen_wrap_info(module_info_t const &m) {
   std::stringstream wrap_info;
   auto full_module_name = m.package_name.empty() ? m.module_name : m.package_name + '.' + m.module_name;
   for (auto const &[cls_py_name, cls_info] : m.classes) {
-    auto cls_name = clu::get_fully_qualified_name(cls_info.ptr);
+    auto &cls_name = cls_info.ptr->fully_qualified_name;
     wrap_info << fmt::format(R"RAW( template <> constexpr bool c2py::is_wrapped<{0}> = true;)RAW", cls_name);
     wrap_info << fmt::format(R"RAW(template <> inline constexpr auto c2py::tp_name<{0}> = "{1}.{2}";)RAW", cls_name, full_module_name, cls_py_name);
   }

@@ -1,42 +1,34 @@
 #include "./wdata.hpp"
+#include "clu/fullqualifiedname.hpp"
+#include "utility/logger.hpp"
 
 #include <filesystem>
 #include <fstream>
-#include "llvm/ADT/DenseSet.h"
-#include "utility/logger.hpp"
+#include <unordered_map>
 
 // ------------------------------
 
-// Among all redeclarations of f, pick the best one:
-// 1. Prefer a redecl with default arguments (at most one exists per C++ rules)
-// 2. Otherwise prefer a redecl where all parameters are named
-// 3. Fall back to the most recent redecl
-static const clang::FunctionDecl *best_redecl(const clang::FunctionDecl *f) {
-  const clang::FunctionDecl *with_names = nullptr;
-  for (auto *redecl : f->redecls()) {
-    auto *r = llvm::dyn_cast<clang::FunctionDecl>(redecl);
-    if (not r) continue;
-    if (llvm::any_of(r->parameters(), [](auto *p) { return p->hasDefaultArg(); })) return r;
-    if (not with_names and llvm::all_of(r->parameters(), [](auto *p) { return !p->getName().empty(); })) with_names = r;
-  }
-  return with_names ? with_names : f->getMostRecentDecl();
-}
-
-// ------------------------------
-
+// Deduplicate by IR signature (qualified_name + param types).
+// When the same function appears multiple times (redeclarations), keep the one with defaults.
+// fnt_info_t is trivially copyable (all raw pointers/bools), so direct copy is used throughout.
 std::vector<fnt_info_t> make_unique_decls(std::vector<fnt_info_t> const &flist) {
-  llvm::DenseSet<const clang::FunctionDecl *> seen; // LLVM recommended replacement of std::set
+  std::unordered_map<std::string, size_t> seen; // sig -> index in result
   std::vector<fnt_info_t> res;
   seen.reserve(flist.size());
   res.reserve(flist.size());
 
-  for (const auto &f : flist) {
-    if (seen.insert(f.ptr->getMostRecentDecl()).second) {
-      auto *best = best_redecl(f.ptr);
-      res.push_back({.ptr = best, .rewrite = f.rewrite, .parent_class = f.parent_class});
+  for (auto const &f : flist) {
+    if (not f.ptr) continue;
+    auto sig        = f.ptr->qualified_name + "(" + f.ptr->param_types_str() + ")";
+    auto [it, inserted] = seen.emplace(sig, res.size());
+    if (inserted) {
+      res.push_back(f);
+    } else {
+      bool new_has = std::ranges::any_of(f.ptr->params, [](auto const &p) { return p.has_default; });
+      bool cur_has = std::ranges::any_of(res[it->second].ptr->params, [](auto const &p) { return p.has_default; });
+      if (new_has and not cur_has) res[it->second] = f;
     }
   }
-
   return res;
 }
 
@@ -59,11 +51,36 @@ static std::string extract_is_wrapped_type(std::string const &line) {
 
 // ------------------------------
 
+fnt_ptr_t module_info_t::intern(ir::FunctionDecl f) {
+  fnt_pool.push_back(std::make_unique<ir::FunctionDecl>(std::move(f)));
+  return fnt_pool.back().get();
+}
+
+cls_ptr_t module_info_t::intern(ir::RecordDecl f) {
+  rec_pool.push_back(std::make_unique<ir::RecordDecl>(std::move(f)));
+  return rec_pool.back().get();
+}
+
+field_ptr_t module_info_t::intern(ir::FieldDecl f) {
+  field_pool.push_back(std::make_unique<ir::FieldDecl>(std::move(f)));
+  return field_pool.back().get();
+}
+
+enum_ptr_t module_info_t::intern(ir::EnumDecl f) {
+  enum_pool.push_back(std::make_unique<ir::EnumDecl>(std::move(f)));
+  return enum_pool.back().get();
+}
+
+// ------------------------------
+
 void module_info_t::add_class(std::string_view name, clang::CXXRecordDecl const *cls) {
-  auto *key = cls->getCanonicalDecl();
-  if (classes_ptr_to_info.contains(key)) return; // already registered
-  classes.emplace_back(name, cls_info_t{.ptr = cls});
-  classes_ptr_to_info[key] = long(classes.size() - 1);
+  auto fqn = clu::get_fully_qualified_name(cls->getCanonicalDecl());
+  if (classes_fqn_to_info.contains(fqn)) return; // already registered
+  auto *raw = intern(ir::RecordDecl{*cls->getCanonicalDecl()});
+  long idx  = long(classes.size());
+  classes.emplace_back(name, cls_info_t{.ptr = raw});
+  classes_ptr_to_info[raw] = idx;
+  classes_fqn_to_info[fqn] = idx;
 }
 
 // ------------------------------
@@ -71,15 +88,23 @@ void module_info_t::add_class(std::string_view name, clang::CXXRecordDecl const 
 cls_ptr_t module_info_t::get_wrapped_cls(clang::QualType ty) const {
   clang::CXXRecordDecl const *cls = ty->getAsCXXRecordDecl();
   if (!cls) cls = ty->getPointeeCXXRecordDecl();
-  if (cls) cls = cls->getCanonicalDecl();
-  return (cls and classes_ptr_to_info.contains(cls)) ? cls : nullptr;
+  if (!cls) return nullptr;
+  auto fqn = clu::get_fully_qualified_name(cls->getCanonicalDecl());
+  if (auto it = classes_fqn_to_info.find(fqn); it != classes_fqn_to_info.end())
+    return classes[it->second].second.ptr;
+  return nullptr;
 }
 
 // ------------------------------
 
 cls_info_t *module_info_t::get_wrapped_cls_info(clang::QualType ty) {
-  auto cls = get_wrapped_cls(ty);
-  return cls ? &classes[classes_ptr_to_info.at(cls)].second : nullptr;
+  clang::CXXRecordDecl const *cls = ty->getAsCXXRecordDecl();
+  if (!cls) cls = ty->getPointeeCXXRecordDecl();
+  if (!cls) return nullptr;
+  auto fqn = clu::get_fully_qualified_name(cls->getCanonicalDecl());
+  if (auto it = classes_fqn_to_info.find(fqn); it != classes_fqn_to_info.end())
+    return &classes[it->second].second;
+  return nullptr;
 }
 
 // ------------------------------
@@ -103,7 +128,6 @@ wdata_t::wdata_t(clang::CompilerInstance *ci, configuration const &config) : ci{
 
   util::logger::set_log(module_info.sourcefile_full_stem + ".log");
 
-  // Validity of the regex is checked in the configuration constructor
   if (not config.reject_names.empty()) this->reject_names = llvm::Regex(config.reject_names);
 
   // Scan .wrap.hxx files in the source directory to build the type -> header table.

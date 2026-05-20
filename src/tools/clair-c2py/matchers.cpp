@@ -7,6 +7,7 @@
 #include <algorithm>
 #include "clu/misc.hpp"
 #include "clu/concept.hpp"
+#include "clu/fullqualifiedname.hpp"
 #include "clu/inject_bool_vartempl_specialization.hpp"
 #include "utility/logger.hpp"
 #include "utility/macros.hpp"
@@ -32,8 +33,9 @@ static clang::QualType cls_qual_type(clang::CXXRecordDecl const *cls) {
 static void add_enum(clang::EnumDecl const *enu, wdata_t *wdata) {
   if (!enu) return;
   if (should_reject(enu, wdata->reject_names, &logs.rejected)) return;
-  if (std::ranges::find(wdata->module_info.enums, enu) != wdata->module_info.enums.end()) return;
-  wdata->module_info.enums.push_back(enu);
+  auto fqn = enu->getQualifiedNameAsString();
+  if (std::ranges::any_of(wdata->module_info.enums, [&fqn](auto const &e) { return e->qualified_name == fqn; })) return;
+  wdata->module_info.enums.push_back(wdata->module_info.intern(ir::EnumDecl{*enu}));
 }
 
 // ------------------------------
@@ -84,6 +86,7 @@ template <> void matcher<mtch::ModuleClsWrap>::run(const MatchResult &Result) {
       }
     }
     wdata->module_info.add_class(d->getName().str(), cls);
+    wdata->clang_cls_by_fqn.emplace(clu::get_fully_qualified_name(cls->getCanonicalDecl()), cls->getCanonicalDecl());
     clu::inject_bool_vartempl_specialization(wdata->ci->getSema(), wdata->is_wrapped_vtd,
                                cls_qual_type(cls), true);
   }
@@ -144,8 +147,9 @@ static void register_class(clang::CXXRecordDecl const *cls, wdata_t *wdata) {
     }
   }
 
-  // Insert in the module class list
+  // Insert in the module class list; also register clang ptr for concept checking in scan_classes.
   wdata->module_info.add_class(get_python_name(cls), cls);
+  wdata->clang_cls_by_fqn.emplace(clu::get_fully_qualified_name(cls->getCanonicalDecl()), cls->getCanonicalDecl());
   // mark as wrapped in the AST
   // so that check_convertibility sees is_wrapped<cls> = true for subsequent checks.
   clu::inject_bool_vartempl_specialization(wdata->ci->getSema(), wdata->is_wrapped_vtd,
@@ -186,7 +190,10 @@ static cls_info_t *find_wrapped_cls_for_first_arg(clang::FunctionDecl const *f, 
     return nullptr;
   }
   auto *first_arg_type = as_CXXRecordDecl(f->getParamDecl(0)->getType());
-  if (auto it = M.classes_ptr_to_info.find(first_arg_type); it != M.classes_ptr_to_info.end()) return &M.classes[it->second].second;
+  if (first_arg_type) {
+    auto fqn = clu::get_fully_qualified_name(first_arg_type);
+    if (auto it = M.classes_fqn_to_info.find(fqn); it != M.classes_fqn_to_info.end()) return &M.classes[it->second].second;
+  }
   clu::emit_error(f->getParamDecl(0), "c2py: First argument is not a class being wrapped");
   return nullptr;
 }
@@ -262,13 +269,11 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
   // Its signature must be () -> void
   // it will be called by the Python module init function
   if (clu::has_annotation(f, "c2py_module_init")) {
-    if (M.module_init) {
+    if (not M.module_init_fqn.empty())
       clu::emit_error(f, "Only one function can be tagged c2py_module_init.");
-      clu::emit_error(M.module_init, "The previous one was here.");
-    }
     if (f->param_size() != 0) clu::emit_error(f, "A function tagged c2py_module_init must take no arguments");
     if (not f->getReturnType()->isVoidType()) clu::emit_error(f, "A function tagged c2py_module_init must return void");
-    M.module_init = f;
+    M.module_init_fqn = f->getQualifiedNameAsString();
   }
 
   // ----- Check convertibility
@@ -276,22 +281,25 @@ template <> void matcher<mtch::Fnt>::run(const MatchResult &Result) {
 
   // ---- property annotations on free functions
   if (auto prop_name = clu::get_annotation_value(f, "c2py_property_get")) {
-    if (auto *cli = find_wrapped_cls_for_first_arg(f, M)) cli->properties[*prop_name].getter = fnt_info_t{.ptr = f, .rewrite = false};
+    if (auto *cli = find_wrapped_cls_for_first_arg(f, M))
+      cli->properties[*prop_name].getter = fnt_info_t{.ptr = wdata->module_info.intern(ir::FunctionDecl{*f}), .rewrite = false};
     return;
   }
   if (auto prop_name = clu::get_annotation_value(f, "c2py_property_set")) {
-    if (auto *cli = find_wrapped_cls_for_first_arg(f, M)) cli->properties[*prop_name].setters.push_back(fnt_info_t{.ptr = f, .rewrite = false});
+    if (auto *cli = find_wrapped_cls_for_first_arg(f, M))
+      cli->properties[*prop_name].setters.push_back(fnt_info_t{.ptr = wdata->module_info.intern(ir::FunctionDecl{*f}), .rewrite = false});
     return;
   }
 
   // ---- wrap as method of the class of the first argument
   if (clu::has_annotation(f, "c2py_wrap_as_method")) {
-    if (auto *cli = find_wrapped_cls_for_first_arg(f, M)) cli->methods[get_python_name(f)].push_back(fnt_info_t{.ptr = f, .rewrite = false});
+    if (auto *cli = find_wrapped_cls_for_first_arg(f, M))
+      cli->methods[get_python_name(f)].push_back(fnt_info_t{.ptr = wdata->module_info.intern(ir::FunctionDecl{*f}), .rewrite = false});
     return;
   }
 
   // ---- generic free function
-  M.functions[get_python_name(f)].push_back(fnt_info_t{f});
+  M.functions[get_python_name(f)].push_back(fnt_info_t{.ptr = wdata->module_info.intern(ir::FunctionDecl{*f})});
 }
 
 // ------------------------------

@@ -1,6 +1,6 @@
 #pragma once
-#include "../../ir/types.hpp"
-#include "../wdata.hpp"
+#include "../ir/types.hpp"
+#include "../clair-c2py/wdata.hpp"
 
 // ========== IR-based helper functions to extract params of a function ===========
 

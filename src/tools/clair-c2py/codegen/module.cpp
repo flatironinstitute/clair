@@ -25,6 +25,22 @@ static constexpr char module_code_tpl[] = { //NOLINT
 #embed "templates/module.txt"
    , '\0'};
 #pragma clang diagnostic pop
+// =========== enum declarations (shared by .wrap.cxx and .wrap.hxx) ==============
+
+static std::string codegen_enum_decls(std::vector<clang::EnumDecl const *> const &enums) {
+  std::stringstream out;
+  for (auto const &enu : enums) {
+    auto qname = enu->getQualifiedNameAsString();
+    out << fmt::format(R"RAW( template <> constexpr bool c2py::is_wrapped<{0}> = true;)RAW", qname);
+    out << fmt::format(
+       R"RAW(
+       template <> const std::map<{0}, str_t> c2py::enum_to_string<{0}> = {{ {1} }};)RAW",
+       qname,
+       join(
+          enu->enumerators(), [&qname](auto &&val) { return fmt::format(R"RAW( {{ {0}::{1}, "{1}" }} )RAW", qname, val->getNameAsString()); }, ','));
+  }
+  return out.str();
+}
 
 // =========== module code generation ==============
 
@@ -34,17 +50,8 @@ str_t codegen_module(module_info_t const &m) {
 
   logs.mod(full_module_name);
 
-  std::stringstream EnumDecls;
-  for (auto const &enu : m.enums) {
-    auto qname = enu->getQualifiedNameAsString();
-    logs.enu(qname);
-    EnumDecls << fmt::format(
-       R"RAW( 
-       template <> const std::map<{0}, str_t> c2py::enum_to_string<{0}> = {{ {1} }};)RAW",
-       qname,
-       join(
-          enu->enumerators(), [&qname](auto &&val) { return fmt::format(R"RAW( {{ {0}::{1}, "{1}" }} )RAW", qname, val->getNameAsString()); }, ','));
-  }
+  for (auto const &enu : m.enums) logs.enu(enu->getQualifiedNameAsString());
+  std::string EnumDecls = codegen_enum_decls(m.enums);
 
   std::stringstream FunctionDecls, FunctionTable, FunctionDocs;
   std::stringstream ClassesDecls, PyTypeReadyDecls, AddTypeObjectDecls;
@@ -89,7 +96,7 @@ str_t codegen_module(module_info_t const &m) {
                     "modulename"_a         = m.module_name,      //
                     "moduledoc"_a          = m.documentation,    //
                     //"package_name"_a            = (m.package_name.empty() ? m.package_name : m.package_name + '.' ), //
-                    "EnumDecls"_a            = EnumDecls.str(),            //
+                    "EnumDecls"_a            = EnumDecls,                  //
                     "ClassesDecls"_a         = ClassesDecls.str(),         //
                     "FunctionDecls"_a        = FunctionDecls.str(),        //
                     "FunctionDocs"_a         = FunctionDocs.str(),         //
@@ -121,8 +128,9 @@ str_t codegen_wrap_info(module_info_t const &m) {
 // =========== hxx generation ==============
 
 str_t codegen_hxx(module_info_t const &m) {
-  auto wrap_info = codegen_wrap_info(m);
-  if (wrap_info.empty()) return {};
+  auto wrap_info  = codegen_wrap_info(m);
+  auto enum_decls = codegen_enum_decls(m.enums);
+  if (wrap_info.empty() and enum_decls.empty()) return {};
 
   std::stringstream hxx;
   hxx << "#include <c2py/c2py.hpp>\n\n";
@@ -132,6 +140,7 @@ str_t codegen_hxx(module_info_t const &m) {
     )RAW",
                      m.module_name);
   hxx << wrap_info;
+  hxx << enum_decls;
   hxx << "\n#endif";
 
   return hxx.str();

@@ -92,7 +92,7 @@ struct module_info_t {
   // Return a pointer to the cls_info_t for a wrapped type, or nullptr.
   cls_info_t *get_wrapped_cls_info(clang::QualType ty);
 
-  // Return true if the type corresponds to a wrapped class.
+  // Return true if the type corresponds to a wrapped class or a wrapped enum.
   bool is_wrapped(clang::QualType ty) const;
 };
 

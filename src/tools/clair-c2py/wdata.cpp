@@ -47,7 +47,7 @@ std::vector<fnt_info_t> make_unique_decls(std::vector<fnt_info_t> const &flist) 
 // Returns empty string on no match.
 static std::string extract_is_wrapped_type(std::string const &line) {
   static constexpr std::string_view prefix = "c2py::is_wrapped<";
-  auto start = line.find(prefix);
+  auto start                               = line.find(prefix);
   if (start == std::string::npos) return {};
   start += prefix.size();
   auto eq = line.find("= true", start);
@@ -84,7 +84,16 @@ cls_info_t *module_info_t::get_wrapped_cls_info(clang::QualType ty) {
 
 // ------------------------------
 
-bool module_info_t::is_wrapped(clang::QualType ty) const { return get_wrapped_cls(ty) != nullptr; }
+static bool is_wrapped_enum(clang::QualType ty, std::vector<clang::EnumDecl const *> const &enums) {
+  auto const *enu = ty.getNonReferenceType()->getAs<clang::EnumType>();
+  if (!enu) return false;
+  auto const *canonical = enu->getDecl()->getCanonicalDecl();
+  return llvm::any_of(enums, [canonical](auto *e) { return e->getCanonicalDecl() == canonical; });
+}
+
+// ------------------------------
+
+bool module_info_t::is_wrapped(clang::QualType ty) const { return get_wrapped_cls(ty) != nullptr or is_wrapped_enum(ty, enums); }
 
 // ------------------------------
 

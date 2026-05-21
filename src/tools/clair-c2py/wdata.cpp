@@ -84,16 +84,11 @@ cls_info_t *module_info_t::get_wrapped_cls_info(clang::QualType ty) {
 
 // ------------------------------
 
-static bool is_wrapped_enum(clang::QualType ty, std::vector<clang::EnumDecl const *> const &enums) {
+bool module_info_t::is_wrapped(clang::QualType ty) const {
+  if (get_wrapped_cls(ty) != nullptr) return true;
   auto const *enu = ty.getNonReferenceType()->getAs<clang::EnumType>();
-  if (!enu) return false;
-  auto const *canonical = enu->getDecl()->getCanonicalDecl();
-  return llvm::any_of(enums, [canonical](auto *e) { return e->getCanonicalDecl() == canonical; });
+  return enu and llvm::any_of(enums, [c = enu->getDecl()->getCanonicalDecl()](auto *e) { return e->getCanonicalDecl() == c; });
 }
-
-// ------------------------------
-
-bool module_info_t::is_wrapped(clang::QualType ty) const { return get_wrapped_cls(ty) != nullptr or is_wrapped_enum(ty, enums); }
 
 // ------------------------------
 

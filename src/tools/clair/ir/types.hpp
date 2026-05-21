@@ -4,12 +4,12 @@
 
 // Forward declarations
 namespace clang {
-    class ASTContext;
-    class CXXRecordDecl;
-    class EnumDecl;
-    class FieldDecl;
-    class FunctionDecl;
-    class QualType;
+  class ASTContext;
+  class CXXRecordDecl;
+  class EnumDecl;
+  class FieldDecl;
+  class FunctionDecl;
+  class QualType;
 } // namespce clang
 
 namespace ir {

@@ -1,5 +1,5 @@
 #include "./utils.hpp"
-#include "../../utility/string_tools.hpp"
+#include "utility/string_tools.hpp"
 
 #include <fmt/format.h>
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "../clair-c2py/wdata.hpp"
+#include "../c2py/wdata.hpp"
 
 str_t codegen_module(module_info_t const &m);
 

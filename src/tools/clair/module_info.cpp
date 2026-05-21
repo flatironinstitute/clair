@@ -1,5 +1,4 @@
 #include "module_info.hpp"
-#include "tools/ir/types.hpp"
 #include <algorithm>
 #include <unordered_map>
 

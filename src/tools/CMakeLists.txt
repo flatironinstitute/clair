@@ -1,9 +1,16 @@
 function(add_tool TOOL_NAME)
-  if(NOT IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${TOOL_NAME})
-    message(FATAL_ERROR "Tool directory '${TOOL_NAME}' does not exist.")
+  cmake_parse_arguments(PARSE_ARGV 1 ARG "" "DIR" "")
+  if(ARG_DIR)
+    set(TOOL_DIR "${ARG_DIR}")
+  else()
+    set(TOOL_DIR "${TOOL_NAME}")
   endif()
 
-  file(GLOB_RECURSE TOOL_SOURCES "${TOOL_NAME}/*.cpp" ${ARGN})
+  if(NOT IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${TOOL_DIR})
+    message(FATAL_ERROR "Tool directory '${TOOL_DIR}' does not exist.")
+  endif()
+
+  file(GLOB_RECURSE TOOL_SOURCES "${TOOL_DIR}/*.cpp" ${ARG_UNPARSED_ARGUMENTS})
 
   add_executable(${TOOL_NAME} ${TOOL_SOURCES})
   
@@ -21,4 +28,4 @@ function(add_tool TOOL_NAME)
 endfunction()
 
 add_tool(annotate-fnt)
-add_tool(clair-c2py "codegen/*.cpp" "ir/*.cpp" "module_info.cpp")
+add_subdirectory(clair)

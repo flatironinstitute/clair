@@ -8,7 +8,7 @@ using namespace fmt::literals;
 #include "utility/logger.hpp"
 #include "./fnt.hpp"
 #include "./classes.hpp"
-#include "../clair-c2py/c2py_version.hpp"
+#include "../c2py/c2py_version.hpp"
 
 using util::join;
 

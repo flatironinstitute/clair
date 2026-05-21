@@ -85,7 +85,7 @@ template <> void matcher<mtch::ModuleClsWrap>::run(const MatchResult &Result) {
         if (ctsd->isInvalidDecl()) clu::emit_error(d, "c2py: Error in instantiating the class on the right hand side of the alias");
       }
     }
-    wdata->module_info.add_class(d->getName().str(), cls);
+    wdata->add_class_to_module(d->getName(), cls);
     wdata->clang_cls_by_fqn.emplace(clu::get_fully_qualified_name(cls->getCanonicalDecl()), cls->getCanonicalDecl());
     clu::inject_bool_vartempl_specialization(wdata->ci->getSema(), wdata->is_wrapped_vtd,
                                cls_qual_type(cls), true);
@@ -148,7 +148,7 @@ static void register_class(clang::CXXRecordDecl const *cls, wdata_t *wdata) {
   }
 
   // Insert in the module class list; also register clang ptr for concept checking in scan_classes.
-  wdata->module_info.add_class(get_python_name(cls), cls);
+  wdata->add_class_to_module(get_python_name(cls), cls);
   wdata->clang_cls_by_fqn.emplace(clu::get_fully_qualified_name(cls->getCanonicalDecl()), cls->getCanonicalDecl());
   // mark as wrapped in the AST
   // so that check_convertibility sees is_wrapped<cls> = true for subsequent checks.

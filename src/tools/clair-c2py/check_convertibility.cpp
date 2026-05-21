@@ -126,7 +126,7 @@ bool check_convertibility(clang::FunctionDecl const *f, wdata_t const &wd, bool 
   for (auto i : itertools::range(f->getNumParams())) {
     auto *p = f->getParamDecl(i);
     auto ty = p->getType();
-    if ((not ty->isVoidType()) and (not wd.concepts.IsConvertiblePy2C.is_satisfied_by(ty)) and (not wd.module_info.is_wrapped(ty))) {
+    if ((not ty->isVoidType()) and (not wd.concepts.IsConvertiblePy2C.is_satisfied_by(ty)) and (not wd.is_wrapped_in_module(ty))) {
       clu::emit_error(p, "c2py: Can not convert this argument from python to C++");
       suggest_header(p, ty, wd);
       ok = false;
@@ -137,7 +137,7 @@ bool check_convertibility(clang::FunctionDecl const *f, wdata_t const &wd, bool 
     if (ty->isPointerType() and (ty->getPointeeType().getAsString() != "PyObject")) {
       clu::emit_error(f, "c2py: Can not convert a raw C++ pointer to python");
       ok = false;
-    } else if ((not ty->isVoidType()) and (not wd.concepts.IsConvertibleC2Py.is_satisfied_by(ty)) and (not wd.module_info.is_wrapped(ty))) {
+    } else if ((not ty->isVoidType()) and (not wd.concepts.IsConvertibleC2Py.is_satisfied_by(ty)) and (not wd.is_wrapped_in_module(ty))) {
       clu::emit_error(f, "c2py: Can not be converted from C++ to python");
       suggest_header(f, ty, wd);
       ok = false;

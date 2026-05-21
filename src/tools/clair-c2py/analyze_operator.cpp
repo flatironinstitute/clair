@@ -65,17 +65,15 @@ void analyze_operator(clang::FunctionDecl const *f, wdata_t &wd) {
 
   // Build the full argument type list for the lookup and the IR operator table.
   auto &ctx = f->getASTContext();
-  std::vector<clang::QualType> args; // used only for wrapped-class lookup
-  std::vector<ir::QualType> ir_args;
+  std::vector<ir::QualType> args;
   auto push_type = [&](clang::QualType t) {
-    args.push_back(t);
-    ir_args.push_back(ir::QualType(t, ctx));
+    args.emplace_back(t, ctx);
   };
   if (method) push_type(method->getThisType()->getPointeeType().getUnqualifiedType());
   for (unsigned i = 0; i < f->getNumParams(); ++i) push_type(f->getParamDecl(i)->getType().getNonReferenceType().getUnqualifiedType());
 
   // Associate with the class of the first argument; fall back to second if first is not wrapped
-  auto *cli = wd.module_info.get_wrapped_cls_info(args[0]);
-  if (not cli and args.size() > 1) cli = wd.module_info.get_wrapped_cls_info(args[1]);
-  if (cli) cli->operators[*op].push_back(std::move(ir_args));
+  auto *cli = wd.module_info.get_wrapped_cls_info(args[0].name);
+  if (not cli and args.size() > 1) cli = wd.module_info.get_wrapped_cls_info(args[1].name);
+  if (cli) cli->operators[*op].push_back(std::move(args));
 }

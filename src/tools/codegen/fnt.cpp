@@ -1,7 +1,6 @@
 #include <algorithm>
 #include "fnt.hpp"
 #include "./utils.hpp"
-#include "../clair-c2py/wdata.hpp"
 #include <fmt/core.h>
 #include <fmt/format.h>
 using namespace fmt::literals;

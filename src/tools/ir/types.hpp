@@ -1,10 +1,16 @@
 #pragma once
 #include "utility/string_tools.hpp"
-#include <clang/AST/ASTContext.h>
-#include <clang/AST/Decl.h>
-#include <clang/AST/DeclCXX.h>
-#include <clang/AST/Type.h>
 #include <vector>
+
+// Forward declarations
+namespace clang {
+    class ASTContext;
+    class CXXRecordDecl;
+    class EnumDecl;
+    class FieldDecl;
+    class FunctionDecl;
+    class QualType;
+} // namespce clang
 
 namespace ir {
 

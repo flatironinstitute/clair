@@ -1,36 +1,11 @@
 #include "./wdata.hpp"
 #include "clu/fullqualifiedname.hpp"
+#include "tools/ir/types.hpp"
 #include "utility/logger.hpp"
 
+#include <clang/AST/DeclCXX.h>
 #include <filesystem>
 #include <fstream>
-#include <unordered_map>
-
-// ------------------------------
-
-// Deduplicate by IR signature (qualified_name + param types).
-// When the same function appears multiple times (redeclarations), keep the one with defaults.
-// fnt_info_t is trivially copyable (all raw pointers/bools), so direct copy is used throughout.
-std::vector<fnt_info_t> make_unique_decls(std::vector<fnt_info_t> const &flist) {
-  std::unordered_map<std::string, size_t> seen; // sig -> index in result
-  std::vector<fnt_info_t> res;
-  seen.reserve(flist.size());
-  res.reserve(flist.size());
-
-  for (auto const &f : flist) {
-    if (not f.ptr) continue;
-    auto sig        = f.ptr->qualified_name + "(" + f.ptr->param_types_str() + ")";
-    auto [it, inserted] = seen.emplace(sig, res.size());
-    if (inserted) {
-      res.push_back(f);
-    } else {
-      bool new_has = std::ranges::any_of(f.ptr->params, [](auto const &p) { return p.has_default; });
-      bool cur_has = std::ranges::any_of(res[it->second].ptr->params, [](auto const &p) { return p.has_default; });
-      if (new_has and not cur_has) res[it->second] = f;
-    }
-  }
-  return res;
-}
 
 // ------------------------------
 
@@ -51,65 +26,17 @@ static std::string extract_is_wrapped_type(std::string const &line) {
 
 // ------------------------------
 
-fnt_ptr_t module_info_t::intern(ir::FunctionDecl f) {
-  fnt_pool.push_back(std::make_unique<ir::FunctionDecl>(std::move(f)));
-  return fnt_pool.back().get();
+void wdata_t::add_class_to_module(std::string_view name, clang::CXXRecordDecl const *cls) {
+  module_info.add_class(name, ir::RecordDecl{*cls});
 }
 
-cls_ptr_t module_info_t::intern(ir::RecordDecl f) {
-  rec_pool.push_back(std::make_unique<ir::RecordDecl>(std::move(f)));
-  return rec_pool.back().get();
-}
-
-field_ptr_t module_info_t::intern(ir::FieldDecl f) {
-  field_pool.push_back(std::make_unique<ir::FieldDecl>(std::move(f)));
-  return field_pool.back().get();
-}
-
-enum_ptr_t module_info_t::intern(ir::EnumDecl f) {
-  enum_pool.push_back(std::make_unique<ir::EnumDecl>(std::move(f)));
-  return enum_pool.back().get();
-}
-
-// ------------------------------
-
-void module_info_t::add_class(std::string_view name, clang::CXXRecordDecl const *cls) {
-  auto fqn = clu::get_fully_qualified_name(cls->getCanonicalDecl());
-  if (classes_fqn_to_info.contains(fqn)) return; // already registered
-  auto *raw = intern(ir::RecordDecl{*cls->getCanonicalDecl()});
-  long idx  = long(classes.size());
-  classes.emplace_back(name, cls_info_t{.ptr = raw});
-  classes_ptr_to_info[raw] = idx;
-  classes_fqn_to_info[fqn] = idx;
-}
-
-// ------------------------------
-
-cls_ptr_t module_info_t::get_wrapped_cls(clang::QualType ty) const {
+bool wdata_t::is_wrapped_in_module(clang::QualType ty) const {
   clang::CXXRecordDecl const *cls = ty->getAsCXXRecordDecl();
   if (!cls) cls = ty->getPointeeCXXRecordDecl();
-  if (!cls) return nullptr;
+  if (!cls) return false;
   auto fqn = clu::get_fully_qualified_name(cls->getCanonicalDecl());
-  if (auto it = classes_fqn_to_info.find(fqn); it != classes_fqn_to_info.end())
-    return classes[it->second].second.ptr;
-  return nullptr;
+  return module_info.is_wrapped(fqn);
 }
-
-// ------------------------------
-
-cls_info_t *module_info_t::get_wrapped_cls_info(clang::QualType ty) {
-  clang::CXXRecordDecl const *cls = ty->getAsCXXRecordDecl();
-  if (!cls) cls = ty->getPointeeCXXRecordDecl();
-  if (!cls) return nullptr;
-  auto fqn = clu::get_fully_qualified_name(cls->getCanonicalDecl());
-  if (auto it = classes_fqn_to_info.find(fqn); it != classes_fqn_to_info.end())
-    return &classes[it->second].second;
-  return nullptr;
-}
-
-// ------------------------------
-
-bool module_info_t::is_wrapped(clang::QualType ty) const { return get_wrapped_cls(ty) != nullptr; }
 
 // ------------------------------
 

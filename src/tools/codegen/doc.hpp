@@ -1,5 +1,5 @@
 #pragma once
-#include "../clair-c2py/wdata.hpp"
+#include "../module_info.hpp"
 #include "../../utility/string_tools.hpp"
 
 #include <tuple>

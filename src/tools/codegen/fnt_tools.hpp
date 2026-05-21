@@ -1,8 +1,8 @@
 #pragma once
-#include "../ir/types.hpp"
-#include "../clair-c2py/wdata.hpp"
+#include "../module_info.hpp"
 
 // ========== IR-based helper functions to extract params of a function ===========
+// NOTE: Usages can likely be replaced by direct calls to methods of ir::FunctionDecl
 
 // e.g. f(A a, B b = 2) --->   a,b
 str_t fnt_params(ir::FunctionDecl const &f);

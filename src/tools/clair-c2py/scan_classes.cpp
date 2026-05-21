@@ -159,7 +159,7 @@ static void scan_class_elements(cls_info_t &cls_info, clang::CXXRecordDecl const
     // -------- fields
     else if (auto *f = llvm::dyn_cast<clang::FieldDecl>(decl)) {
       auto ty = f->getType();
-      if (not wd.module_info.is_wrapped(ty)) {
+      if (not wd.is_wrapped_in_module(ty)) {
         if (not wd.concepts.IsConvertiblePy2C.is_satisfied_by(ty)) clu::emit_error(f, "c2py: Can not be converted from python to C++");
         if (not wd.concepts.IsConvertibleC2Py.is_satisfied_by(ty)) clu::emit_error(f, "c2py: Can not be converted from C++ to python");
       }
@@ -192,7 +192,7 @@ static void scan_class(wdata_t &wd, cls_info_t &cls_info) {
   for (auto b : clang_cls->bases()) {
     if (b.getAccessSpecifier() != clang::AccessSpecifier::AS_public) continue; // only public bases
     auto *c = b.getType()->getAsCXXRecordDecl();
-    if (not wd.module_info.is_wrapped(b.getType())) {
+    if (not wd.is_wrapped_in_module(b.getType())) {
       // We merge the element of the base into the class in progress.
       scan_class_elements(cls_info, c, wd);
     } else {

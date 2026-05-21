@@ -8,8 +8,8 @@
 #include "llvm/Support/Regex.h"
 #include "llvm/ADT/StringRef.h"
 
-#include "../../utility/logger.hpp"
-#include "../../utility/string_tools.hpp"
+#include "utility/logger.hpp"
+#include "utility/string_tools.hpp"
 
 namespace fs = std::filesystem;
 static const struct {

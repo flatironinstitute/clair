@@ -1,6 +1,6 @@
 #pragma once
 #include "../module_info.hpp"
-#include "../../utility/string_tools.hpp"
+#include "utility/string_tools.hpp"
 
 #include <tuple>
 #include <vector>

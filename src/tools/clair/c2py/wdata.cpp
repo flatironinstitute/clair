@@ -1,6 +1,5 @@
 #include "./wdata.hpp"
 #include "clu/fullqualifiedname.hpp"
-#include "tools/ir/types.hpp"
 #include "utility/logger.hpp"
 
 #include <clang/AST/DeclCXX.h>

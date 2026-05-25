@@ -5,7 +5,7 @@ set(IS_CLAIR_BUILD ON)
 FetchContent_Declare(
   c2py
   GIT_REPOSITORY  https://github.com/flatironinstitute/c2py
-  GIT_TAG         unstable
+  GIT_TAG         9278b31ce5835de96ac535cfed7261dcd34ef373 # pinned to specific commit to ignore new test cases for now
   EXCLUDE_FROM_ALL # exclude from all so that c2py is NOT installed.
 )
 FetchContent_MakeAvailable(c2py)

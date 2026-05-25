@@ -10,6 +10,12 @@ endif()
 message(STATUS "-------- LLVM / Clang detection -------------")
 include(clang_detection)
 
+# LLVM / Flang
+if("f2py" IN_LIST CLAIR_ENABLE_PROJECTS)
+  message(STATUS "-------- LLVM / Flang detection (for clair-f2py) -------------")
+  include(flang_detection)
+endif()
+
 # fmt
 if(NOT TARGET fmt)
   message(STATUS "-------- Fetch & Configure FMT -------------")

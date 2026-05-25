@@ -48,6 +48,9 @@ option(Build_Documentation "Build documentation" OFF)
 
 # Testing
 option(Build_Tests "Build tests" ON)
+
+# Projects
+set(CLAIR_ENABLE_PROJECTS "c2py" CACHE STRING "Semicolon-separated list of Clair projects to build (available: c2py;f2py)")
 if(Build_Tests)
   enable_testing()
 endif()

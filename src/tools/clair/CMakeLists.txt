@@ -1,10 +1,22 @@
-add_tool(clair-c2py DIR c2py
-  "codegen/*.cpp"
-  "ir/*.cpp"
-  "module_info.cpp"
-)
-# add_tool(clair-f2py DIR f2py
-#   "codegen/*.cpp"
-#   "ir/*.cpp"
-#   "module_info.cpp"
-# )
+if("c2py" IN_LIST CLAIR_ENABLE_PROJECTS)
+  add_tool(clair-c2py DIR c2py LLVM_LIBS clang_llvm
+    "codegen/*.cpp"
+    "ir/*.cpp"
+    "module_info.cpp"
+  )
+endif()
+
+if("f2py" IN_LIST CLAIR_ENABLE_PROJECTS)
+  add_tool(clair-f2py DIR f2py LLVM_LIBS flang_llvm
+    "codegen/*.cpp"
+    "ir/*.cpp"
+    "module_info.cpp"
+  )
+  # Flang itself is built with C++17; compile f2py/ sources with C++17 to match.
+  # Moreover, compilation breaks for C++XX > C++17.
+  file(GLOB F2PY_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/f2py/*.cpp")
+  set_source_files_properties(
+    ${F2PY_SOURCES}
+    PROPERTIES COMPILE_OPTIONS "$<$<CXX_COMPILER_ID:Clang>:-std=c++17>"
+  )
+endif()

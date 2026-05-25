@@ -1,4 +1,5 @@
 #include "../module_info.hpp"
+#include <memory>
 #include <optional>
 #include <string>
 #include <vector>
@@ -23,14 +24,17 @@ struct wdata_t {
   //   clu::concept_holder HasNonDeletedDefaultConstructor;
   // } concepts;
 
-  bool input_has_included_generated_cxx = false;
   std::vector<std::string> deps;
 
   // Table of fully-qualified type names -> .hxx filename, built by scanning the source directory.
   // Populated in the constructor; used in check_convertibility to suggest #include directives.
   // std::map<str_t, str_t> wrapped_type_to_header;
 
-  module_info_t module_info;
+  // A Fortran library (or file) potentially contains many modules.
+  // We want to generate one C++ wrapper file per module.
+  std::vector<std::unique_ptr<module_info_t>> modules;
+
+  module_info_t const *intern(module_info_t module_info);
 
   wdata_t(Fortran::frontend::CompilerInstance *ci /*, configuration const &config */);
 

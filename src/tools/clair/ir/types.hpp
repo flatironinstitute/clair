@@ -10,7 +10,11 @@ namespace clang {
   class FieldDecl;
   class FunctionDecl;
   class QualType;
-} // namespce clang
+} // namespace clang
+
+namespace Fortran::semantics {
+  class Symbol;
+} // namespace Fortran::semantics
 
 namespace ir {
 
@@ -34,6 +38,10 @@ namespace ir {
     // Fortran-specific: set when the dummy argument carries the VALUE attribute.
     // Affects the extern "C" signature: VALUE → pass by value, otherwise → pass by pointer.
     bool is_fortran_value = false;
+
+    ParamVarDecl() = default;
+    // Construct from a Fortran dummy-argument symbol.
+    ParamVarDecl(Fortran::semantics::Symbol const &, std::string const &module_name);
   };
 
   // Language-agnostic representation of a function or method declaration.
@@ -70,13 +78,23 @@ namespace ir {
 
     FunctionDecl() = default;
     explicit FunctionDecl(clang::FunctionDecl const &f);
+    // Construct from a Fortran module-level procedure (subroutine or function).
+    FunctionDecl(Fortran::semantics::Symbol const &, std::string const &module_name);
+    // Construct from a Fortran type-bound procedure (method).
+    // binding_sym carries the binding name and NOPASS attribute;
+    // actual_sym  carries the SubprogramDetails (return type, dummy args).
+    FunctionDecl(Fortran::semantics::Symbol const &binding_sym,
+                 Fortran::semantics::Symbol const &actual_sym,
+                 std::string const &module_name,
+                 std::string const parent_fqn,
+                 bool is_nopass);
 
-    // Helpers for codegen — pre-computed from params/targs
+    // Helpers for codegen — backend-independent, implemented in types.cpp.
     str_t param_names_str() const;          // "a,b"
     str_t param_types_str() const;          // "A,B"
     str_t params_with_types_str() const;    // "A a,B b"
     str_t params_with_defaults_str() const; // ' "a"_a = 2, "b"'
-    str_t targs_str() const;               // "int,double"
+    str_t targs_str() const;                // "int,double"
   };
 
   // Language-agnostic representation of a C++ class/struct.
@@ -90,6 +108,8 @@ namespace ir {
 
     RecordDecl() = default;
     explicit RecordDecl(clang::CXXRecordDecl const &r);
+    // Construct from a Fortran derived-type symbol.
+    explicit RecordDecl(Fortran::semantics::Symbol const &, std::string const &module_name);
 
     str_t const &getFQN() const { return fully_qualified_name; }
     bool synthetize_init_from_pydict() const { return is_aggregate && !has_bases; }
@@ -109,6 +129,8 @@ namespace ir {
 
     FieldDecl() = default;
     explicit FieldDecl(clang::FieldDecl const &d);
+    // Construct from a Fortran derived-type component symbol.
+    explicit FieldDecl(Fortran::semantics::Symbol const &, std::string const &module_name);
   };
 
   // Language-agnostic representation of an enum declaration.

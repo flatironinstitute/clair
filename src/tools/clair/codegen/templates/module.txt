@@ -19,6 +19,8 @@
 
 using c2py::operator""_a;
 
+{ForwardDecls}
+
 // ==================== enums =====================
 
 {EnumDecls}

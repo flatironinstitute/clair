@@ -1,6 +1,7 @@
 #include "./module.hpp"
 #include <fmt/core.h>
 #include <fmt/format.h>
+#include <set>
 #include <sstream>
 using namespace fmt::literals;
 #include <itertools/itertools.hpp>
@@ -26,9 +27,61 @@ static constexpr char module_code_tpl[] = { //NOLINT
    , '\0'};
 #pragma clang diagnostic pop
 
+// =========== forward declaration generation ==============
+
+// Split "ns1::ns2::Name" → {"ns1::ns2", "Name"}.  No namespace → first element is empty.
+static std::pair<str_t, str_t> split_ns(str_t const &fqn) {
+  auto pos = fqn.rfind("::");
+  if (pos == str_t::npos) return {"", fqn};
+  return {fqn.substr(0, pos), fqn.substr(pos + 2)};
+}
+
+// Collect forward declarations for all classes and free functions and emit them
+// grouped by namespace:
+//   namespace mymod {
+//     struct point_t;
+//     void greet(const char *);
+//     float add(float, float);
+//   }
+static str_t gen_forward_decls(module_info_t const &m) {
+  std::map<str_t, std::vector<str_t>> ns_decls;
+
+  // Struct forward declarations
+  for (auto const &[pyname, cls_info] : m.classes) {
+    auto [ns, name] = split_ns(cls_info.ptr->fully_qualified_name);
+    ns_decls[ns].push_back("struct " + name + ";");
+  }
+
+  // Free function forward declarations (one per unique C++ signature)
+  std::set<str_t> seen;
+  for (auto const &[pyname, overloads] : m.functions) {
+    for (auto const &fi : overloads) {
+      if (!fi.ptr) continue;
+      auto const &fd  = *fi.ptr;
+      auto sig        = fd.qualified_name + "(" + fd.param_types_str() + ")";
+      if (!seen.insert(sig).second) continue; // skip duplicate
+      auto [ns, name] = split_ns(fd.qualified_name);
+      ns_decls[ns].push_back(fd.return_type.name + " " + name + "(" + fd.param_types_str() + ");");
+    }
+  }
+
+  // Emit grouped by namespace
+  std::stringstream out;
+  for (auto const &[ns, decls] : ns_decls) {
+    if (ns.empty()) {
+      for (auto const &d : decls) out << d << "\n";
+    } else {
+      out << "namespace " << ns << " {\n";
+      for (auto const &d : decls) out << "  " << d << "\n";
+      out << "}\n";
+    }
+  }
+  return out.str();
+}
+
 // =========== module code generation ==============
 
-str_t codegen_module(module_info_t const &m) {
+str_t codegen_module(module_info_t const &m, bool add_forward_decls) {
 
   auto full_module_name = m.package_name.empty() ? m.module_name : m.package_name + '.' + m.module_name;
 
@@ -44,6 +97,9 @@ str_t codegen_module(module_info_t const &m) {
        qname,
        join(enu->enumerators, [&qname](auto const &val) { return fmt::format(R"RAW( {{ {0}::{1}, "{1}" }} )RAW", qname, val); }, ','));
   }
+
+  std::stringstream ForwardDecls;
+  if (add_forward_decls) ForwardDecls << gen_forward_decls(m);
 
   std::stringstream FunctionDecls, FunctionTable, FunctionDocs;
   std::stringstream ClassesDecls, PyTypeReadyDecls, AddTypeObjectDecls;
@@ -88,6 +144,7 @@ str_t codegen_module(module_info_t const &m) {
                     "modulename"_a         = m.module_name,      //
                     "moduledoc"_a          = m.documentation,    //
                     //"package_name"_a            = (m.package_name.empty() ? m.package_name : m.package_name + '.' ), //
+                    "ForwardDecls"_a         = ForwardDecls.str(),          //
                     "EnumDecls"_a            = EnumDecls.str(),            //
                     "ClassesDecls"_a         = ClassesDecls.str(),         //
                     "FunctionDecls"_a        = FunctionDecls.str(),        //

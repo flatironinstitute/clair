@@ -43,7 +43,7 @@ void custom_action::executeAction() {
   // Codegen
   util::logger log = util::logger{"-- ", "", 1};
   for (auto const &mi : wdata->modules) {
-    auto code     = codegen_module(*mi);
+    auto code     = codegen_module(*mi, /*add_forward_decls=*/true);
     auto code_hxx = codegen_hxx(*mi);
 
     auto outfilename     = mi->sourcefile_full_stem + ".wrap.cxx";

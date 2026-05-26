@@ -4,6 +4,7 @@
 #include "flang/Semantics/scope.h"
 #include "flang/Semantics/symbol.h"
 #include "flang/Semantics/type.h"
+#include "clu/fortran.hpp"
 
 namespace sema = Fortran::semantics;
 
@@ -20,7 +21,7 @@ static void process_subprogram(sema::Symbol const &sym,
 
   if (sub.isFunction()) {
     auto const *t       = sub.result().GetType();
-    fd.return_type.name = t ? t->AsFortran() : "void";
+    fd.return_type.name = t ? clu::fortran_type_to_cpp(t->AsFortran(), module_name) : "void";
   } else {
     fd.return_type.name = "void";
   }
@@ -30,7 +31,7 @@ static void process_subprogram(sema::Symbol const &sym,
     ir::ParamVarDecl p;
     p.name = arg->name().ToString();
     if (auto const *t = arg->GetType())
-      p.type.name = t->AsFortran();
+      p.type.name = clu::fortran_type_to_cpp(t->AsFortran(), module_name);
     fd.params.push_back(std::move(p));
   }
 
@@ -63,7 +64,7 @@ static void process_derived_type(sema::Symbol const &sym,
       ir::FieldDecl fd;
       fd.name = compName.ToString();
       if (auto const *t = it->second.get().GetType())
-        fd.type.name = t->AsFortran();
+        fd.type.name = clu::fortran_type_to_cpp(t->AsFortran(), module_name);
       info->fields.push_back(mi.intern(std::move(fd)));
     }
 
@@ -87,7 +88,7 @@ static void process_derived_type(sema::Symbol const &sym,
 
       if (sub.isFunction()) {
         auto const *t       = sub.result().GetType();
-        fd.return_type.name = t ? t->AsFortran() : "void";
+        fd.return_type.name = t ? clu::fortran_type_to_cpp(t->AsFortran(), module_name) : "void";
       } else {
         fd.return_type.name = "void";
       }
@@ -99,7 +100,7 @@ static void process_derived_type(sema::Symbol const &sym,
         ir::ParamVarDecl p;
         p.name = arg->name().ToString();
         if (auto const *t = arg->GetType())
-          p.type.name = t->AsFortran();
+          p.type.name = clu::fortran_type_to_cpp(t->AsFortran(), module_name);
         fd.params.push_back(std::move(p));
       }
 

@@ -31,6 +31,9 @@ namespace ir {
     QualType type;     // fully qualified parameter type
     bool has_default = false;
     str_t default_val; // textual default value (e.g. "2", "A{}", "ns::val")
+    // Fortran-specific: set when the dummy argument carries the VALUE attribute.
+    // Affects the extern "C" signature: VALUE → pass by value, otherwise → pass by pointer.
+    bool is_fortran_value = false;
   };
 
   // Language-agnostic representation of a function or method declaration.
@@ -51,6 +54,11 @@ namespace ir {
     bool rewrite = true; // use lambda wrapper (vs. direct pointer cast)
 
     str_t parent_class_fqn; // FQN of class where this method is DEFINED (empty for free fns)
+
+    // When non-empty, the actual external symbol name (extern "C" linkage).
+    // Set by the Fortran traversal to the Flang-mangled name, e.g. "_QMmymodPfoo".
+    // Empty for C++ functions — they use standard C++ name mangling via qualified_name.
+    str_t linkage_name;
 
     // Documentation extracted from C++ source comments at traversal time
     str_t doc_brief;

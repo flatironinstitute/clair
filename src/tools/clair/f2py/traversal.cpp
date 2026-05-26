@@ -1,10 +1,11 @@
 #include "traversal.hpp"
 
+#include <algorithm>
 #include "flang/Semantics/attr.h"
 #include "flang/Semantics/scope.h"
 #include "flang/Semantics/symbol.h"
 #include "flang/Semantics/type.h"
-#include "clu/fortran.hpp"
+#include "tools/clair/codegen/utils.hpp"
 
 namespace sema = Fortran::semantics;
 
@@ -18,10 +19,27 @@ static void process_subprogram(sema::Symbol const &sym,
   ir::FunctionDecl fd;
   fd.simple_name    = sym.name().ToString();
   fd.qualified_name = module_name + "::" + fd.simple_name;
+  // Determine the external symbol name:
+  //  • BIND(C, NAME='foo') → 'foo' exactly
+  //  • BIND(C)             → lowercase procedure name (Fortran standard §18.10.2)
+  //  • no BIND(C)          → Flang-mangled "_QM{mod}P{proc}"
+  if (sym.attrs().test(sema::Attr::BIND_C)) {
+    auto const *bname = sub.bindName();
+    if (bname && !bname->empty()) {
+      fd.linkage_name = *bname;
+    } else {
+      std::string lower = fd.simple_name;
+      std::transform(lower.begin(), lower.end(), lower.begin(),
+          [](unsigned char c){ return static_cast<char>(std::tolower(c)); });
+      fd.linkage_name = std::move(lower);
+    }
+  } else {
+    fd.linkage_name = codegen::flang_procedure_name(module_name, fd.simple_name);
+  }
 
   if (sub.isFunction()) {
     auto const *t       = sub.result().GetType();
-    fd.return_type.name = t ? clu::fortran_type_to_cpp(t->AsFortran(), module_name) : "void";
+    fd.return_type.name = t ? codegen::fortran_type_to_cpp(t->AsFortran(), module_name) : "void";
   } else {
     fd.return_type.name = "void";
   }
@@ -29,9 +47,10 @@ static void process_subprogram(sema::Symbol const &sym,
   for (sema::Symbol *arg : sub.dummyArgs()) {
     if (!arg) continue; // alternate-return indicator
     ir::ParamVarDecl p;
-    p.name = arg->name().ToString();
+    p.name             = arg->name().ToString();
+    p.is_fortran_value = arg->attrs().test(sema::Attr::VALUE);
     if (auto const *t = arg->GetType())
-      p.type.name = clu::fortran_type_to_cpp(t->AsFortran(), module_name);
+      p.type.name = codegen::fortran_type_to_cpp(t->AsFortran(), module_name);
     fd.params.push_back(std::move(p));
   }
 
@@ -64,7 +83,7 @@ static void process_derived_type(sema::Symbol const &sym,
       ir::FieldDecl fd;
       fd.name = compName.ToString();
       if (auto const *t = it->second.get().GetType())
-        fd.type.name = clu::fortran_type_to_cpp(t->AsFortran(), module_name);
+        fd.type.name = codegen::fortran_type_to_cpp(t->AsFortran(), module_name);
       info->fields.push_back(mi.intern(std::move(fd)));
     }
 
@@ -88,7 +107,7 @@ static void process_derived_type(sema::Symbol const &sym,
 
       if (sub.isFunction()) {
         auto const *t       = sub.result().GetType();
-        fd.return_type.name = t ? clu::fortran_type_to_cpp(t->AsFortran(), module_name) : "void";
+        fd.return_type.name = t ? codegen::fortran_type_to_cpp(t->AsFortran(), module_name) : "void";
       } else {
         fd.return_type.name = "void";
       }
@@ -100,7 +119,7 @@ static void process_derived_type(sema::Symbol const &sym,
         ir::ParamVarDecl p;
         p.name = arg->name().ToString();
         if (auto const *t = arg->GetType())
-          p.type.name = clu::fortran_type_to_cpp(t->AsFortran(), module_name);
+          p.type.name = codegen::fortran_type_to_cpp(t->AsFortran(), module_name);
         fd.params.push_back(std::move(p));
       }
 

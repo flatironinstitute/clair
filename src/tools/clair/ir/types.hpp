@@ -68,6 +68,12 @@ namespace ir {
     // Empty for C++ functions — they use standard C++ name mangling via qualified_name.
     str_t linkage_name;
 
+    // True when the Fortran passed-object dummy argument is declared CLASS(T) (polymorphic).
+    // Flang compiles CLASS(T) arguments with a descriptor/box ABI: the actual procedure
+    // receives a pointer to a box whose first field is the base-address pointer to the data.
+    // When false (TYPE(T) or NOPASS), a plain T* is passed directly.
+    bool self_is_polymorphic = false;
+
     // Documentation extracted from C++ source comments at traversal time
     str_t doc_brief;
     str_t doc_details;

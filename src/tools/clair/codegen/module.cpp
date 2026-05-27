@@ -1,5 +1,5 @@
 #include "./module.hpp"
-#include "./utils.hpp"
+#include "./forward_decls.hpp"
 #include <fmt/core.h>
 #include <fmt/format.h>
 #include <sstream>

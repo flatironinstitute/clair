@@ -16,9 +16,36 @@ namespace ir {
 
 ParamVarDecl::ParamVarDecl(sema::Symbol const &arg, std::string const &module_name)
     : is_fortran_value(arg.attrs().test(sema::Attr::VALUE)) {
-  name             = arg.name().ToString();
+  name = arg.name().ToString();
   if (auto const *t = arg.GetType())
     type.name = codegen::fortran_type_to_cpp(t->AsFortran(), module_name);
+}
+
+// ---------------------------------------------------------------------------
+// FunctionDecl — Helper 
+// ---------------------------------------------------------------------------
+
+static std::string get_linkage_name(sema::Symbol const &actual_sym,
+                                    std::string const &module_name,
+                                    sema::SubprogramDetails const &subprogram_details) {
+  // Determine the external symbol name using the actual (not binding) procedure name —
+  // mirrors the module-level procedure constructor.
+  //   • BIND(C, NAME='foo') → 'foo' exactly
+  //   • BIND(C)             → lowercase actual procedure name
+  //   • no BIND(C)          → Flang-mangled "_QM{mod}P{actual_proc}"
+  if (actual_sym.attrs().test(sema::Attr::BIND_C)) {
+    auto const *bname = subprogram_details.bindName();
+    if (bname && !bname->empty()) {
+      return *bname;
+    } else {\
+      std::string lower = actual_sym.name().ToString();
+      std::transform(lower.begin(), lower.end(), lower.begin(),
+          [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+      return lower;
+    }
+  }
+
+  return codegen::flang_procedure_name(module_name, actual_sym.name().ToString());
 }
 
 // ---------------------------------------------------------------------------
@@ -30,24 +57,7 @@ FunctionDecl::FunctionDecl(sema::Symbol const &sym, std::string const &module_na
 
   simple_name    = sym.name().ToString();
   qualified_name = module_name + "::" + simple_name;
-
-  // Determine the external symbol name:
-  //  • BIND(C, NAME='foo') → 'foo' exactly
-  //  • BIND(C)             → lowercase procedure name (Fortran standard §18.10.2)
-  //  • no BIND(C)          → Flang-mangled "_QM{mod}P{proc}"
-  if (sym.attrs().test(sema::Attr::BIND_C)) {
-    auto const *bname = sub.bindName();
-    if (bname && !bname->empty()) {
-      linkage_name = *bname;
-    } else {
-      std::string lower = simple_name;
-      std::transform(lower.begin(), lower.end(), lower.begin(),
-          [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
-      linkage_name = std::move(lower);
-    }
-  } else {
-    linkage_name = codegen::flang_procedure_name(module_name, simple_name);
-  }
+  linkage_name   = get_linkage_name(sym, module_name, sub);
 
   if (sub.isFunction()) {
     auto const *t    = sub.result().GetType();
@@ -76,7 +86,8 @@ FunctionDecl::FunctionDecl(sema::Symbol const &binding_sym,
 
   simple_name      = binding_sym.name().ToString();
   qualified_name   = module_name + "::" + actual_sym.name().ToString();
-  
+  linkage_name     = get_linkage_name(actual_sym, module_name, sub);
+
   if (sub.isFunction()) {
     auto const *t    = sub.result().GetType();
     return_type.name = t ? codegen::fortran_type_to_cpp(t->AsFortran(), module_name) : "void";
@@ -87,7 +98,14 @@ FunctionDecl::FunctionDecl(sema::Symbol const &binding_sym,
   bool skip_pass = !is_nopass_; // first dummy arg is the passed-object (self)
   for (sema::Symbol *arg : sub.dummyArgs()) {
     if (!arg) continue;
-    if (skip_pass) { skip_pass = false; continue; }
+    if (skip_pass) {
+      skip_pass = false;
+      // CLASS(T) / CLASS(*) dummy arguments are compiled by Flang with a descriptor/box ABI.
+      // TYPE(T) dummy arguments are passed as a plain pointer.
+      if (auto const *t = arg->GetType())
+        self_is_polymorphic = t->IsPolymorphic();
+      continue;
+    }
     params.emplace_back(*arg, module_name);
   }
 }

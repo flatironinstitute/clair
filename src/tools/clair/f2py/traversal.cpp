@@ -1,5 +1,5 @@
 #include "traversal.hpp"
-
+#include "decl_utils.hpp"
 #include "flang/Semantics/attr.h"
 #include "flang/Semantics/scope.h"
 #include "flang/Semantics/symbol.h"
@@ -24,7 +24,7 @@ static void process_derived_type(sema::Symbol const &sym,
                                   module_info_t &mi) {
   ir::RecordDecl rec{sym, module_name};
 
-  mi.add_class(rec.fully_qualified_name, rec);
+  mi.add_class(get_python_name_cls(sym), rec);
   cls_info_t *info = mi.get_wrapped_cls_info(rec.fully_qualified_name);
   if (!info) return;
 

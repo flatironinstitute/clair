@@ -3,9 +3,6 @@
 #include <algorithm>
 #include <cctype>
 #include <fmt/format.h>
-#include <map>
-#include <set>
-#include <sstream>
 #include <string>
 #include <string_view>
 #include "utility/string_tools.hpp"
@@ -58,13 +55,6 @@ static bool starts_with_ci(std::string_view s, std::string_view prefix) {
     if (std::toupper(static_cast<unsigned char>(s[i])) != std::toupper(static_cast<unsigned char>(prefix[i])))
       return false;
   return true;
-}
-
-// Split "ns1::ns2::Name" → {"ns1::ns2", "Name"}.  No namespace → first element is empty.
-static std::pair<str_t, str_t> split_ns(str_t const &fqn) {
-  auto pos = fqn.rfind("::");
-  if (pos == str_t::npos) return {"", fqn};
-  return {fqn.substr(0, pos), fqn.substr(pos + 2)};
 }
 
 // ===========================================================================
@@ -122,74 +112,6 @@ std::string flang_procedure_name(std::string_view module_name, std::string_view 
   result += 'P';
   for (unsigned char c : proc_name) result += static_cast<char>(std::tolower(c));
   return result;
-}
-
-// ===========================================================================
-// gen_forward_decls  (Fortran / f2py only — assumes linkage_name is set)
-// ===========================================================================
-
-std::string gen_forward_decls(module_info_t const &m) {
-  std::vector<str_t>                  extern_c_lines;
-  std::map<str_t, std::vector<str_t>> ns_decls;
-
-  // Struct forward declarations
-  for (auto const &[pyname, cls_info] : m.classes) {
-    auto [ns, name] = split_ns(cls_info.ptr->fully_qualified_name);
-    ns_decls[ns].push_back("struct " + name + ";");
-  }
-
-  // Free function declarations: extern "C" Flang symbol + inline namespace wrapper
-  std::set<str_t> seen;
-  for (auto const &[pyname, overloads] : m.functions) {
-    for (auto const &fi : overloads) {
-      if (!fi.ptr) continue;
-      auto const &fd  = *fi.ptr;
-      auto sig = fd.qualified_name + "(" + fd.param_types_str() + ")";
-      if (!seen.insert(sig).second) continue;
-      auto [ns, name] = split_ns(fd.qualified_name);
-
-      // Build parameter strings
-      str_t ext_params, wrap_params, call_args;
-      for (std::size_t i = 0; i < fd.params.size(); ++i) {
-        auto const &p = fd.params[i];
-        str_t sep   = (i > 0 ? ", " : "");
-        str_t pname = "_p" + std::to_string(i);
-        // Pointer types (e.g. "const char *") already carry indirection — don't add *.
-        bool add_ptr = !p.is_fortran_value && p.type.name.find('*') == str_t::npos;
-        ext_params  += sep + (add_ptr ? p.type.name + " *" : p.type.name);
-        wrap_params += sep + p.type.name + " " + pname;
-        call_args   += sep + (add_ptr ? "&" + pname : pname);
-      }
-
-      extern_c_lines.push_back(fd.return_type.name + " " + fd.linkage_name + "(" + ext_params + ");");
-
-      bool void_ret = (fd.return_type.name == "void");
-      str_t wrapper = "inline " + fd.return_type.name + " " + name + "(" + wrap_params + ") { ";
-      if (!void_ret) wrapper += "return ";
-      // Always use :: to avoid calling the wrapper recursively when the extern "C"
-      // name matches the wrapper name (BIND(C) without an explicit NAME=).
-      wrapper += "::" + fd.linkage_name + "(" + call_args + "); }";
-      ns_decls[ns].push_back(std::move(wrapper));
-    }
-  }
-
-  // Emit
-  std::stringstream out;
-  if (!extern_c_lines.empty()) {
-    out << "extern \"C\" {\n";
-    for (auto const &l : extern_c_lines) out << "  " << l << "\n";
-    out << "}\n";
-  }
-  for (auto const &[ns, decls] : ns_decls) {
-    if (ns.empty()) {
-      for (auto const &d : decls) out << d << "\n";
-    } else {
-      out << "namespace " << ns << " {\n";
-      for (auto const &d : decls) out << "  " << d << "\n";
-      out << "}\n";
-    }
-  }
-  return out.str();
 }
 
 } // namespace codegen

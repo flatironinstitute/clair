@@ -4,7 +4,7 @@
 #include "flang/Semantics/attr.h"
 #include "flang/Semantics/symbol.h"
 #include "flang/Semantics/type.h"
-#include "tools/clair/codegen/utils.hpp"
+#include "flu/interop.hpp"
 
 namespace sema = Fortran::semantics;
 
@@ -18,7 +18,7 @@ ParamVarDecl::ParamVarDecl(sema::Symbol const &arg, std::string const &module_na
     : is_fortran_value(arg.attrs().test(sema::Attr::VALUE)) {
   name = arg.name().ToString();
   if (auto const *t = arg.GetType())
-    type.name = codegen::fortran_type_to_cpp(t->AsFortran(), module_name);
+    type.name = flu::type_to_cpp(*t, module_name);
 }
 
 // ---------------------------------------------------------------------------
@@ -45,7 +45,7 @@ static std::string get_linkage_name(sema::Symbol const &actual_sym,
     }
   }
 
-  return codegen::flang_procedure_name(module_name, actual_sym.name().ToString());
+  return flu::procedure_name(module_name, actual_sym.name().ToString());
 }
 
 // ---------------------------------------------------------------------------
@@ -61,7 +61,7 @@ FunctionDecl::FunctionDecl(sema::Symbol const &sym, std::string const &module_na
 
   if (sub.isFunction()) {
     auto const *t    = sub.result().GetType();
-    return_type.name = t ? codegen::fortran_type_to_cpp(t->AsFortran(), module_name) : "void";
+    return_type.name = t ? flu::type_to_cpp(*t, module_name) : "void";
   } else {
     return_type.name = "void";
   }
@@ -90,7 +90,7 @@ FunctionDecl::FunctionDecl(sema::Symbol const &binding_sym,
 
   if (sub.isFunction()) {
     auto const *t    = sub.result().GetType();
-    return_type.name = t ? codegen::fortran_type_to_cpp(t->AsFortran(), module_name) : "void";
+    return_type.name = t ? flu::type_to_cpp(*t, module_name) : "void";
   } else {
     return_type.name = "void";
   }
@@ -126,7 +126,7 @@ RecordDecl::RecordDecl(sema::Symbol const &sym, std::string const &module_name) 
 FieldDecl::FieldDecl(sema::Symbol const &component, std::string const &module_name) {
   name = component.name().ToString();
   if (auto const *t = component.GetType())
-    type.name = codegen::fortran_type_to_cpp(t->AsFortran(), module_name);
+    type.name = flu::type_to_cpp(*t, module_name);
 }
 
 } // namespace ir

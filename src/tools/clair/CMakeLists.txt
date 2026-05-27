@@ -14,6 +14,7 @@ if("f2py" IN_LIST CLAIR_ENABLE_PROJECTS)
     "ir/types_flang.cpp"
     "module_info.cpp"
   )
+  target_link_libraries(clair-f2py PRIVATE clair::flu)
   # Flang itself is built with C++17; compile f2py/ sources with C++17 to match.
   # Moreover, compilation breaks for C++XX > C++17.
   # ir/types_flang.cpp also includes Flang headers and needs the same treatment.

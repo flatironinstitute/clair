@@ -80,4 +80,7 @@ endif()
 # ========= Build all components ==========
 
 add_subdirectory(clu)
+if("f2py" IN_LIST CLAIR_ENABLE_PROJECTS)
+  add_subdirectory(flu)
+endif()
 add_subdirectory(tools)

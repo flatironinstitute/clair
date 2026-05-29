@@ -1,6 +1,7 @@
 #include "module_info.hpp"
 #include <algorithm>
 #include <unordered_map>
+#include <llvm/ADT/STLExtras.h>
 
 // ------------------------------
 
@@ -80,6 +81,9 @@ cls_info_t *module_info_t::get_wrapped_cls_info(std::string_view fqn) {
 
 // ------------------------------
 
-bool module_info_t::is_wrapped(std::string_view fqn) const { return get_wrapped_cls(fqn) != nullptr; }
+bool module_info_t::is_wrapped(std::string_view fqn) const {
+  if (get_wrapped_cls(fqn) != nullptr) return true;
+  return llvm::any_of(enums, [&fqn](auto const *e) { return e->qualified_name == fqn; });
+}
 
 // ------------------------------

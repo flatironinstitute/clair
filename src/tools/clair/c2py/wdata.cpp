@@ -32,9 +32,14 @@ void wdata_t::add_class_to_module(std::string_view name, clang::CXXRecordDecl co
 bool wdata_t::is_wrapped_in_module(clang::QualType ty) const {
   clang::CXXRecordDecl const *cls = ty->getAsCXXRecordDecl();
   if (!cls) cls = ty->getPointeeCXXRecordDecl();
-  if (!cls) return false;
-  auto fqn = clu::get_fully_qualified_name(cls->getCanonicalDecl());
-  return module_info.is_wrapped(fqn);
+
+  str_t fqn;
+  if (cls)
+    fqn = clu::get_fully_qualified_name(cls->getCanonicalDecl());
+  else if (auto const *enu = ty.getNonReferenceType()->getAs<clang::EnumType>())
+    fqn = enu->getDecl()->getQualifiedNameAsString();
+
+  return not fqn.empty() and module_info.is_wrapped(fqn);
 }
 
 // ------------------------------

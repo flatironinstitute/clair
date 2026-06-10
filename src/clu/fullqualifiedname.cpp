@@ -22,6 +22,15 @@ namespace clu {
 
     if (t.isNull()) return ""; // abort
 
+    // For a namespace-scope typedef of a builtin (e.g. std::uint64_t), prefer the typedef
+    // spelling: the canonical builtin name is platform dependent (unsigned long long vs
+    // unsigned long). Member typedefs keep the builtin print -- their qualified name can
+    // lose the template arguments.
+    if (auto *td = t->getAs<clang::TypedefType>(); td and t->getAs<clang::BuiltinType>()) {
+      auto *dc = td->getDecl()->getDeclContext();
+      if (dc->isNamespace() or dc->isTranslationUnit()) return clang::TypeName::getFullyQualifiedName(t, ctx, policy);
+    }
+
     // if the type is a built in, just get its name, resolving all aliases.
     // cv-qualifiers live on the QualType wrapper, not on BuiltinType itself, so prepend them explicitly.
     if (auto *bu = t->getAs<clang::BuiltinType>()) { return (t.isConstQualified() ? "const " : "") + str_t{bu->getName(policy)}; }
@@ -131,7 +140,8 @@ namespace clu {
   str_t get_fully_qualified_name(clang::TypeDecl const *t, bool canonical) {
 #if LLVM_VERSION_MAJOR >= 22
     if (auto *td = llvm::dyn_cast<clang::TagDecl>(t))
-      return get_fully_qualified_name(t->getASTContext().getTagType(clang::ElaboratedTypeKeyword::None, std::nullopt, td, false), t->getASTContext(), canonical);
+      return get_fully_qualified_name(t->getASTContext().getTagType(clang::ElaboratedTypeKeyword::None, std::nullopt, td, false), t->getASTContext(),
+                                      canonical);
 #endif
     return get_fully_qualified_name(clang::QualType{t->getTypeForDecl(), 0}, t->getASTContext(), canonical);
   }

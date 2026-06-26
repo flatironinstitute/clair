@@ -42,6 +42,8 @@ To fix such errors, you can exclude the problematic function using the customiza
 
 
 
+.. _function_templates:
+
 Template Functions
 ------------------
 
@@ -81,5 +83,4 @@ Coroutines, generators
 
 
 * Coroutines are supported and can be wrapped, including generators.
-   (Example to be added.)
 

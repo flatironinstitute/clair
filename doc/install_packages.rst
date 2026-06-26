@@ -17,7 +17,7 @@ They are built from source from the GitHub parcollet/ccq repository.
 
 .. note::
 
-  TO BE UPDATED: the packages with tools are not yet available on the `parcollet/ccq` tap.
+  The packages with tools are not yet available on the `parcollet/ccq` tap.
 
 Uninstalling
 ............

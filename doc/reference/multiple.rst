@@ -78,7 +78,6 @@ In your ``CMakeLists.txt``, ensure module A is compiled before module B:
 .. code-block:: cmake
 
    # Add both modules
-   # FIXME 
    add_clair_module(module_a)
    add_clair_module(module_b)
 

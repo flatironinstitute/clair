@@ -49,7 +49,7 @@ rst_epilog = """
 version = version,
 )
 
-copyright = '2024, The Simons Foundation, author: O. Parcollet'
+copyright = '2024 - 2026, The Simons Foundation, author: O. Parcollet'
 
 templates_path = ['@CMAKE_CURRENT_SOURCE_DIR@/_templates']
 

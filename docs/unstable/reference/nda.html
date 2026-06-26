@@ -59,6 +59,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../install_src.html#set-environment-variables">Set environment variables</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../install_packages.html">Packages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../install_packages.html#os-x-brew">OS X (brew)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../install_packages.html#uninstalling">Uninstalling</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/index.html">Getting Started</a><ul>
@@ -84,6 +91,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../gallery/index.html">Gallery</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../gallery/functions.html">Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../gallery/class1.html">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/class_templates/class_templates.html">Class templates</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Reference documentation</a><ul class="current">
@@ -177,8 +185,24 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../issues.html">Reporting issues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Change Logs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../about.html">About clair/c2py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../changelog.html#version-0-9-0">Version 0.9.0</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#general">General</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#operators">operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#codegen">codegen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#c2py">c2py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#clu">clu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#doc">doc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#cmake">cmake</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About clair/c2py</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../about.html#authors">Authors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../about.html#source-code">Source code</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -208,15 +232,11 @@
              
   <section id="triqs-nda">
 <h1>TRIQS/nda<a class="headerlink" href="#triqs-nda" title="Link to this heading"></a></h1>
-<p>The <a class="reference external" href="https://github.com/TRIQS/nda">nda</a> library
-set up to work with <cite>clair/c2py</cite> automatically.
+<p>The <a class="reference external" href="https://github.com/TRIQS/nda">nda</a> library is
+set up to work with <code class="docutils literal notranslate"><span class="pre">clair/c2py</span></code> automatically.
 <code class="docutils literal notranslate"><span class="pre">nda</span></code> provides N-dimensional arrays and views for C++20.
 They are converted to/from <a class="reference external" href="https://numpy.org/">numpy</a> arrays in Python.
 Here is an example:</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>TBW: discuss the ownership of array/view with python</p>
-</div>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">nda_example1.cpp</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span>
@@ -261,7 +281,7 @@ Here is an example:</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, The Simons Foundation, author: O. Parcollet.</p>
+    <p>&#169; Copyright 2024 - 2026, The Simons Foundation, author: O. Parcollet.</p>
   </div>
 
    

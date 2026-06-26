@@ -59,6 +59,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../install_src.html#set-environment-variables">Set environment variables</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../install_packages.html">Packages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../install_packages.html#os-x-brew">OS X (brew)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../install_packages.html#uninstalling">Uninstalling</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/index.html">Getting Started</a><ul>
@@ -84,6 +91,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../gallery/index.html">Gallery</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../gallery/functions.html">Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../gallery/class1.html">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/class_templates/class_templates.html">Class templates</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Reference documentation</a><ul class="current">
@@ -177,8 +185,24 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../issues.html">Reporting issues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Change Logs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../about.html">About clair/c2py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../changelog.html#version-0-9-0">Version 0.9.0</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#general">General</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#operators">operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#codegen">codegen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#c2py">c2py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#clu">clu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#doc">doc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#cmake">cmake</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About clair/c2py</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../about.html#authors">Authors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../about.html#source-code">Source code</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -263,16 +287,16 @@ the wrapped class <code class="docutils literal notranslate"><span class="pre">A
 </section>
 <section id="cmake-configuration">
 <h3>CMake configuration<a class="headerlink" href="#cmake-configuration" title="Link to this heading"></a></h3>
-<p>In your <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code>, ensure module A is compiled before module B:</p>
-<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="c"># Add both modules</span>
-<span class="c"># FIXME</span>
-<span class="nb">add_clair_module</span><span class="p">(</span><span class="s">module_a</span><span class="p">)</span>
-<span class="nb">add_clair_module</span><span class="p">(</span><span class="s">module_b</span><span class="p">)</span>
+<p>In your <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code>, build both modules with <code class="docutils literal notranslate"><span class="pre">c2py_add_module</span></code> and tell module B that
+module A’s bindings must be generated first via <code class="docutils literal notranslate"><span class="pre">DEPENDS_ON_BINDINGS</span></code>:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">c2py_add_module</span><span class="p">(</span><span class="s">module_a</span><span class="p">)</span>
 
-<span class="c"># Module B depends on module A&#39;s .wrap.hxx file</span>
-<span class="nb">add_dependencies</span><span class="p">(</span><span class="s">module_b</span><span class="w"> </span><span class="s">module_a</span><span class="p">)</span>
+<span class="c"># module_b includes module_a&#39;s .wrap.hxx, so module_a&#39;s bindings are generated first</span>
+<span class="nb">c2py_add_module</span><span class="p">(</span><span class="s">module_b</span><span class="w"> </span><span class="s">DEPENDS_ON_BINDINGS</span><span class="w"> </span><span class="s">module_a</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>The ordering only matters when <code class="docutils literal notranslate"><span class="pre">Update_Python_Bindings</span></code> is <code class="docutils literal notranslate"><span class="pre">ON</span></code>; with checked-in <code class="docutils literal notranslate"><span class="pre">.wrap</span></code>
+files there is no generation step to order.</p>
 </section>
 <section id="usage-in-python">
 <h3>Usage in Python<a class="headerlink" href="#usage-in-python" title="Link to this heading"></a></h3>
@@ -303,7 +327,7 @@ the wrapped class <code class="docutils literal notranslate"><span class="pre">A
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, The Simons Foundation, author: O. Parcollet.</p>
+    <p>&#169; Copyright 2024 - 2026, The Simons Foundation, author: O. Parcollet.</p>
   </div>
 
    

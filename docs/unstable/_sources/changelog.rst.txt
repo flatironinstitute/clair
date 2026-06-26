@@ -1,4 +1,4 @@
 .. _changelog:
 
-Change Logs
-***********
+.. include:: ChangeLog.md
+   :parser: myst_parser.sphinx_

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Change Logs &mdash; clair - Automatic Python/C++ bindings  documentation</title>
+  <title>Changelog &mdash; clair - Automatic Python/C++ bindings  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b20cc3f5" />
       <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=417d15d8" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=8f9e6779" />
@@ -59,6 +59,13 @@
 <li class="toctree-l3"><a class="reference internal" href="install_src.html#set-environment-variables">Set environment variables</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="install_packages.html">Packages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install_packages.html#os-x-brew">OS X (brew)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="install_packages.html#uninstalling">Uninstalling</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started/index.html">Getting Started</a><ul>
@@ -84,6 +91,7 @@
 <li class="toctree-l1"><a class="reference internal" href="gallery/index.html">Gallery</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="gallery/functions.html">Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gallery/class1.html">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/class_templates/class_templates.html">Class templates</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="reference/index.html">Reference documentation</a><ul>
@@ -177,8 +185,24 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="issues.html">Reporting issues</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Change Logs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="about.html">About clair/c2py</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-9-0">Version 0.9.0</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#general">General</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#operators">operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#codegen">codegen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#c2py">c2py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#clu">clu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#doc">doc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cmake">cmake</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About clair/c2py</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="about.html#authors">Authors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="about.html#source-code">Source code</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -195,7 +219,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Change Logs</li>
+      <li class="breadcrumb-item active">Changelog</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/changelog.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -205,8 +229,99 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="change-logs">
-<span id="changelog"></span><h1>Change Logs<a class="headerlink" href="#change-logs" title="Link to this heading"></a></h1>
+  <section id="changelog">
+<span id="changelog"></span><span id="id1"></span><h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading"></a></h1>
+<section id="version-0-9-0">
+<h2>Version 0.9.0<a class="headerlink" href="#version-0-9-0" title="Link to this heading"></a></h2>
+<p>clair/c2py 0.9.0 is a major release that matures clair into a standalone Clang tool for
+automatic C++ → Python bindings generation, the result of a long development effort since
+the initial 0.1 series. The headline changes are:</p>
+<ul class="simple">
+<li><p><strong>Standalone Clang tool</strong>: <code class="docutils literal notranslate"><span class="pre">clair-c2py</span></code> is now a standalone Clang LibTooling tool rather
+than a compiler plugin, which simplifies deployment and CMake integration.</p></li>
+<li><p><strong>TOML configuration</strong>: each module is configured through an optional <code class="docutils literal notranslate"><span class="pre">&lt;module&gt;.toml</span></code>
+file (<code class="docutils literal notranslate"><span class="pre">package_name</span></code>, <code class="docutils literal notranslate"><span class="pre">documentation</span></code>, <code class="docutils literal notranslate"><span class="pre">namespaces</span></code>, <code class="docutils literal notranslate"><span class="pre">match_names</span></code>, <code class="docutils literal notranslate"><span class="pre">reject_names</span></code>,
+<code class="docutils literal notranslate"><span class="pre">match_files</span></code>, <code class="docutils literal notranslate"><span class="pre">wrap_no_arg_methods_as_properties</span></code>, <code class="docutils literal notranslate"><span class="pre">exclude_system_headers</span></code>); use
+<code class="docutils literal notranslate"><span class="pre">--gen-default-config</span></code> / <code class="docutils literal notranslate"><span class="pre">--update-config</span></code> to create and refresh it.</p></li>
+<li><p><strong>Automatic documentation</strong>: C++ Doxygen / <code class="docutils literal notranslate"><span class="pre">///</span></code> comments are transcribed into
+NumPy-style Python docstrings, including dispatch documentation for overloaded functions.</p></li>
+<li><p><strong>Wider C++ coverage</strong>: class and method renaming, properties, reference return values, a
+broad set of operators, enums (including nested and cross-module), and function / class
+templates with parameter packs.</p></li>
+<li><p><strong>Cross-module bindings</strong>: namespace support, generated <code class="docutils literal notranslate"><span class="pre">&lt;module&gt;.wrap.hxx</span></code> companion
+headers, and <code class="docutils literal notranslate"><span class="pre">c2py_module</span></code> declarations spread across header files.</p></li>
+<li><p><strong>Diagnostics &amp; logging</strong>: <code class="docutils literal notranslate"><span class="pre">CLAIR_VERBOSE</span></code> logging with a per-module log file,
+<code class="docutils literal notranslate"><span class="pre">CLAIR_SKIP_CLANG_FORMAT</span></code>, and converter-header suggestions in convertibility errors.</p></li>
+<li><p>The minimum required LLVM/Clang version is now <strong>20</strong> (tested through LLVM 22).</p></li>
+<li><p>Fixes several issues.</p></li>
+</ul>
+<p>We thank all contributors: Thomas Hahn, Olivier Parcollet, Nils Wentzell</p>
+<p>Find below an itemized list of changes in this release.</p>
+<section id="general">
+<h3>General<a class="headerlink" href="#general" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">clair-c2py</span></code> is now a standalone Clang tool instead of a compiler plugin.</p></li>
+<li><p>Add a per-module TOML configuration with validation, plus the <code class="docutils literal notranslate"><span class="pre">--gen-default-config</span></code> and <code class="docutils literal notranslate"><span class="pre">--update-config</span></code> options to create and refresh it.</p></li>
+<li><p>Add the <code class="docutils literal notranslate"><span class="pre">exclude_system_headers</span></code> configuration option.</p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">--generate-depfile</span></code> to emit a CMake-style depfile of the headers the generated bindings depend on.</p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">CLAIR_VERBOSE</span></code> logging with a per-module log file, and <code class="docutils literal notranslate"><span class="pre">CLAIR_SKIP_CLANG_FORMAT</span></code> to skip the clang-format pass.</p></li>
+<li><p>Suggest the relevant converter headers in convertibility error messages.</p></li>
+<li><p>Support class and method renaming (#11).</p></li>
+<li><p>Support properties through <code class="docutils literal notranslate"><span class="pre">C2PY_PROPERTY_GET</span></code> / <code class="docutils literal notranslate"><span class="pre">C2PY_PROPERTY_SET</span></code> and wrapping no-argument methods as properties.</p></li>
+<li><p>Support returning references, including references to members (of members) at any depth (#14).</p></li>
+<li><p>Wrap enums, including nested enums under namespace filtering (#17) and cross-module enum use.</p></li>
+<li><p>Wrap function and class templates through explicit instantiations in the <code class="docutils literal notranslate"><span class="pre">c2py_module</span></code> namespace, including template parameter packs (#19) and template members with default arguments (#22).</p></li>
+<li><p>Allow <code class="docutils literal notranslate"><span class="pre">c2py_module</span></code> declarations in included files.</p></li>
+<li><p>Allow friend functions to be wrapped (#21).</p></li>
+<li><p>Allow <code class="docutils literal notranslate"><span class="pre">PyObject*</span></code> as a function return type.</p></li>
+<li><p>Improve handling of default arguments, including unqualified (#15) and unresolved types.</p></li>
+<li><p>Improve the <code class="docutils literal notranslate"><span class="pre">--version</span></code> output and document all options in the usage text.</p></li>
+<li><p>Bump the minimum required LLVM/Clang version to 20 and add compatibility through LLVM 22.</p></li>
+<li><p>Make clair fetchable from GitHub for dependent repositories (#25).</p></li>
+</ul>
+</section>
+<section id="operators">
+<h3>operators<a class="headerlink" href="#operators" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Wrap operators: function call, subscript (<code class="docutils literal notranslate"><span class="pre">operator[]</span></code>), <code class="docutils literal notranslate"><span class="pre">operator&lt;&lt;</span></code>, unary minus, left shift, and in-place operators (#20).</p></li>
+<li><p>Add a return-type check for <code class="docutils literal notranslate"><span class="pre">operator&lt;&lt;</span></code> in <code class="docutils literal notranslate"><span class="pre">analyze_operator</span></code>.</p></li>
+</ul>
+</section>
+<section id="codegen">
+<h3>codegen<a class="headerlink" href="#codegen" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">C2PY_DEPRECATED_PARAMETER_NAME</span></code> annotation support.</p></li>
+</ul>
+</section>
+<section id="c2py">
+<h3>c2py<a class="headerlink" href="#c2py" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Skip generating the <code class="docutils literal notranslate"><span class="pre">.wrap.hxx</span></code> file when there is no wrap information to emit.</p></li>
+</ul>
+</section>
+<section id="clu">
+<h3>clu<a class="headerlink" href="#clu" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Cache the result of concept evaluation.</p></li>
+</ul>
+</section>
+<section id="doc">
+<h3>doc<a class="headerlink" href="#doc" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Transcribe C++ comments into NumPy-style Python docstrings for functions and classes, preserving parameter order and handling multiple overloads.</p></li>
+<li><p>Restructure and expand the documentation (getting started, CMake integration, code annotations, TOML options, function/class template examples).</p></li>
+</ul>
+</section>
+<section id="cmake">
+<h3>cmake<a class="headerlink" href="#cmake" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Overhaul the CMake files and project structure.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">GNUInstallDirs</span></code> more consistently (#3).</p></li>
+<li><p>On macOS, link against the libc++ provided by the LLVM installation.</p></li>
+<li><p>Add a <code class="docutils literal notranslate"><span class="pre">Findsanitizer</span></code> module.</p></li>
+</ul>
+</section>
+</section>
 </section>
 
 
@@ -220,7 +335,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, The Simons Foundation, author: O. Parcollet.</p>
+    <p>&#169; Copyright 2024 - 2026, The Simons Foundation, author: O. Parcollet.</p>
   </div>
 
    

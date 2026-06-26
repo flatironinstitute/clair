@@ -7,7 +7,7 @@ Classes
 Default Behavior & Customization
 --------------------------------
 
-#. Every classes defined in the C++ source files is wrapped, subject to the customization options (see :ref:`options <customize>`).
+#. Every class defined in the C++ source files is wrapped, subject to the customization options (see :ref:`options <customize>`).
 
 #. Only public elements (methods, fields) are exposed to Python.
 

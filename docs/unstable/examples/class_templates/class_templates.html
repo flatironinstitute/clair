@@ -21,7 +21,9 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="../../about.html" />
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Reference documentation" href="../../reference/index.html" />
+    <link rel="prev" title="Classes" href="../../gallery/class1.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -46,7 +48,7 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul>
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../install_src.html">Compiling from source</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../install_src.html#clair">clair</a></li>
@@ -55,6 +57,13 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../install_src.html#set-environment-variables">Set environment variables</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../install_packages.html">Packages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../install_packages.html#os-x-brew">OS X (brew)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../install_packages.html#uninstalling">Uninstalling</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -79,9 +88,10 @@
 <li class="toctree-l2"><a class="reference internal" href="../../getting_started/index.html#what-is-a-clang-tool">What is a Clang tool?</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../gallery/index.html">Gallery</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="../../gallery/index.html">Gallery</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../gallery/functions.html">Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../gallery/class1.html">Classes</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Class templates</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">Reference documentation</a><ul>
@@ -175,8 +185,24 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../issues.html">Reporting issues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Change Logs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../about.html">About clair/c2py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../changelog.html#version-0-9-0">Version 0.9.0</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#general">General</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#operators">operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#codegen">codegen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#c2py">c2py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#clu">clu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#doc">doc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#cmake">cmake</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../about.html">About clair/c2py</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../about.html#authors">Authors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../about.html#source-code">Source code</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -193,6 +219,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../gallery/index.html">Gallery</a></li>
       <li class="breadcrumb-item active">Class templates</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../_sources/examples/class_templates/class_templates.rst.txt" rel="nofollow"> View page source</a>
@@ -206,7 +233,7 @@
   <section id="class-templates">
 <span id="id1"></span><h1>Class templates<a class="headerlink" href="#class-templates" title="Link to this heading"></a></h1>
 <p>Here we demonstrate how to generate Python bindings class templates.</p>
-<p>In contrast to <span class="xref std std-ref">function_templates</span>, class templates need to be instantiated in the special
+<p>In contrast to <a class="reference internal" href="../../reference/functions.html#function-templates"><span class="std std-ref">Template Functions</span></a>, class templates need to be instantiated in the special
 <code class="docutils literal notranslate"><span class="pre">c2py_module</span></code> namespace with a <code class="docutils literal notranslate"><span class="pre">using</span></code> declaration.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;c2py/c2py.hpp&quot;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span>
@@ -251,12 +278,15 @@ clang++<span class="w"> </span>class_template.cpp<span class="w"> </span>-std<sp
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../../gallery/class1.html" class="btn btn-neutral float-left" title="Classes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../reference/index.html" class="btn btn-neutral float-right" title="Reference documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, The Simons Foundation, author: O. Parcollet.</p>
+    <p>&#169; Copyright 2024 - 2026, The Simons Foundation, author: O. Parcollet.</p>
   </div>
 
    

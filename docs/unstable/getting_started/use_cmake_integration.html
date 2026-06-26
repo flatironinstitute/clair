@@ -59,6 +59,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../install_src.html#set-environment-variables">Set environment variables</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../install_packages.html">Packages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../install_packages.html#os-x-brew">OS X (brew)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../install_packages.html#uninstalling">Uninstalling</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Getting Started</a><ul class="current">
@@ -84,6 +91,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../gallery/index.html">Gallery</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../gallery/functions.html">Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../gallery/class1.html">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/class_templates/class_templates.html">Class templates</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference documentation</a><ul>
@@ -177,8 +185,24 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../issues.html">Reporting issues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Change Logs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../about.html">About clair/c2py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../changelog.html#version-0-9-0">Version 0.9.0</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#general">General</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#operators">operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#codegen">codegen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#c2py">c2py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#clu">clu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#doc">doc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#cmake">cmake</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About clair/c2py</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../about.html#authors">Authors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../about.html#source-code">Source code</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -220,60 +244,55 @@ $<span class="w"> </span>make<span class="w"> </span>-j<span class="w"> </span><
 </section>
 <section id="cmake-configuration">
 <h2>CMake Configuration<a class="headerlink" href="#cmake-configuration" title="Link to this heading"></a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> used for our <a class="reference internal" href="index.html#getting-started"><span class="std std-ref">Getting Started</span></a> example looks as follows:</p>
+<p>The recommended way to build a module is the <code class="docutils literal notranslate"><span class="pre">c2py_add_module</span></code> macro provided by <strong>c2py</strong>: it declares
+the Python extension module, links it against <strong>c2py</strong>, and – when <code class="docutils literal notranslate"><span class="pre">Update_Python_Bindings</span></code> is <code class="docutils literal notranslate"><span class="pre">ON</span></code> –
+(re)generates the bindings with <code class="docutils literal notranslate"><span class="pre">clair-c2py</span></code>. The <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> for our <a class="reference internal" href="index.html#getting-started"><span class="std std-ref">Getting Started</span></a>
+example looks as follows:</p>
 <div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.20</span><span class="w"> </span><span class="s">FATAL_ERROR</span><span class="p">)</span>
-<span class="linenos"> 2</span><span class="nb">project</span><span class="p">(</span><span class="s">getting-started-example</span><span class="w"> </span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.2.0</span><span class="w"> </span><span class="s">LANGUAGES</span><span class="w"> </span><span class="s">C</span><span class="w"> </span><span class="s">CXX</span><span class="p">)</span>
+<span class="linenos"> 2</span><span class="nb">project</span><span class="p">(</span><span class="s">getting-started-example</span><span class="w"> </span><span class="s">LANGUAGES</span><span class="w"> </span><span class="s">C</span><span class="w"> </span><span class="s">CXX</span><span class="p">)</span>
 <span class="linenos"> 3</span><span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_CXX_STANDARD</span><span class="w"> </span><span class="s">20</span><span class="p">)</span>
 <span class="linenos"> 4</span><span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_EXPORT_COMPILE_COMMANDS</span><span class="w"> </span><span class="s">ON</span><span class="p">)</span>
-<span class="linenos"> 5</span><span class="nb">include</span><span class="p">(</span><span class="s">FetchContent</span><span class="p">)</span>
-<span class="linenos"> 6</span>
-<span class="linenos"> 7</span><span class="c"># Locate Python and NumPy components</span>
-<span class="linenos"> 8</span><span class="nb">find_package</span><span class="p">(</span><span class="s">Python</span><span class="w"> </span><span class="s">COMPONENTS</span><span class="w"> </span><span class="s">Interpreter</span><span class="w"> </span><span class="s">Development</span><span class="w"> </span><span class="s">NumPy</span><span class="p">)</span>
-<span class="linenos"> 9</span>
-<span class="linenos">10</span><span class="c"># Fetch the c2py library</span>
-<span class="linenos">11</span><span class="nb">FetchContent_Declare</span><span class="p">(</span><span class="s">c2py</span>
-<span class="linenos">12</span><span class="w">  </span><span class="s">GIT_REPOSITORY</span><span class="w"> </span><span class="s">https://github.com/flatironinstitute/c2py</span>
-<span class="linenos">13</span><span class="w">  </span><span class="s">GIT_TAG</span><span class="w"> </span><span class="s">unstable</span>
-<span class="linenos">14</span><span class="w">  </span><span class="s">EXCLUDE_FROM_ALL</span>
-<span class="linenos">15</span><span class="p">)</span>
-<span class="linenos">16</span><span class="nb">FetchContent_MakeAvailable</span><span class="p">(</span><span class="s">c2py</span><span class="p">)</span>
-<span class="linenos">17</span><span class="nb">include</span><span class="p">(</span><span class="o">${</span><span class="nv">c2py_SOURCE_DIR</span><span class="o">}</span><span class="s">/share/cmake/clair_c2py_generate_bindings.cmake</span><span class="p">)</span><span class="w">  </span>
+<span class="linenos"> 5</span>
+<span class="linenos"> 6</span><span class="c"># This example ships without generated bindings, so regenerate them with clair-c2py.</span>
+<span class="linenos"> 7</span><span class="nb">set</span><span class="p">(</span><span class="s">Update_Python_Bindings</span><span class="w"> </span><span class="s">ON</span><span class="w"> </span><span class="s">CACHE</span><span class="w"> </span><span class="s">BOOL</span><span class="w"> </span><span class="s2">&quot;Regenerate bindings via clair-c2py&quot;</span><span class="p">)</span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span><span class="nb">include</span><span class="p">(</span><span class="s">FetchContent</span><span class="p">)</span>
+<span class="linenos">10</span>
+<span class="linenos">11</span><span class="c"># Fetch c2py; this also makes the c2py_add_module macro available.</span>
+<span class="linenos">12</span><span class="nb">FetchContent_Declare</span><span class="p">(</span><span class="s">c2py</span>
+<span class="linenos">13</span><span class="w">  </span><span class="s">GIT_REPOSITORY</span><span class="w"> </span><span class="s">https://github.com/flatironinstitute/c2py</span>
+<span class="linenos">14</span><span class="w">  </span><span class="s">GIT_TAG</span><span class="w"> </span><span class="s">unstable</span>
+<span class="linenos">15</span><span class="w">  </span><span class="s">EXCLUDE_FROM_ALL</span>
+<span class="linenos">16</span><span class="p">)</span>
+<span class="linenos">17</span><span class="nb">FetchContent_MakeAvailable</span><span class="p">(</span><span class="s">c2py</span><span class="p">)</span>
 <span class="linenos">18</span>
-<span class="linenos">19</span><span class="c"># Build the Python C++ extension module</span>
-<span class="linenos">20</span><span class="nb">Python_add_library</span><span class="p">(</span><span class="s">getting_started</span><span class="w"> </span><span class="s">MODULE</span><span class="w"> </span><span class="s">getting_started.cpp</span><span class="p">)</span>
-<span class="linenos">21</span><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">getting_started</span><span class="w"> </span><span class="s">PRIVATE</span><span class="w"> </span><span class="s">c2py::c2py</span><span class="p">)</span>
-<span class="linenos">22</span>
-<span class="linenos">23</span><span class="c"># -----------------------------------------------</span>
-<span class="linenos">24</span><span class="c"># Optionally regenerate bindings with clair-c2py</span>
-<span class="linenos">25</span><span class="c"># -----------------------------------------------</span>
-<span class="linenos">26</span>
-<span class="linenos">27</span><span class="nb">option</span><span class="p">(</span><span class="s">Update_Python_Bindings</span><span class="w"> </span><span class="s2">&quot;Use clair python bindings generators&quot;</span><span class="w"> </span><span class="s">ON</span><span class="p">)</span>
-<span class="linenos">28</span>
-<span class="linenos">29</span><span class="nb">if</span><span class="w"> </span><span class="p">(</span><span class="s">Update_Python_Bindings</span><span class="p">)</span>
-<span class="linenos">30</span><span class="w">  </span><span class="nb">clair_c2py_generate_bindings</span><span class="p">(</span><span class="s">getting_started</span><span class="p">)</span>
-<span class="linenos">31</span><span class="nb">endif</span><span class="p">()</span>
+<span class="linenos">19</span><span class="c"># Build the getting_started Python module and (re)generate its bindings.</span>
+<span class="linenos">20</span><span class="nb">c2py_add_module</span><span class="p">(</span><span class="s">getting_started</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Let’s take a closer look at the <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> file:</p>
 <ul class="simple">
-<li><p><strong>[Lines 1-5]</strong> Standard CMake project configuration where we require <code class="docutils literal notranslate"><span class="pre">c++20</span></code> support and tell CMake to generate a
-<code class="docutils literal notranslate"><span class="pre">compile_commands.json</span></code> database file.</p></li>
-<li><p><strong>[Lines 8]</strong> Since we want to build a Python C++ extension, we need to find Python/Numpy on the system.</p></li>
-<li><p><strong>[Lines 11-17]</strong> We fetch <strong>c2py</strong> from GitHub and make it available for the current project rather than relying on a system
-installation. This ensures that both, <strong>c2py</strong> and the extension module, iare built with consistent compiler options and linked
-against the same Python interpreter. As <strong>c2py</strong> compiles quickly, it does not add significant overhead to the build process.</p></li>
-<li><p><strong>[Lines 20–21]</strong> We use the <code class="docutils literal notranslate"><span class="pre">Python_add_library</span></code> command to declare our <code class="docutils literal notranslate"><span class="pre">getting_started</span></code> extension module. The command is
-part of <a class="reference external" href="https://cmake.org/cmake/help/latest/module/FindPython.html#commands">CMake</a>.</p></li>
-<li><p><strong>[Line 27-end]</strong> Here we introduce the user option <code class="docutils literal notranslate"><span class="pre">Update_Python_Bindings</span></code> and, if it is set to <code class="docutils literal notranslate"><span class="pre">ON</span></code>, we call the
-<code class="docutils literal notranslate"><span class="pre">clair_c2py_generate_bindings</span></code> macro provided by <strong>c2py</strong>. The macro finds the <code class="docutils literal notranslate"><span class="pre">clair-c2py</span></code> executable and makes sure to
-(re)generate the bindings before the module is compiled.</p></li>
+<li><p><strong>[Lines 1-4]</strong> Standard CMake project configuration: we require <code class="docutils literal notranslate"><span class="pre">c++20</span></code> support and tell CMake to
+generate a <code class="docutils literal notranslate"><span class="pre">compile_commands.json</span></code> database (<code class="docutils literal notranslate"><span class="pre">clair-c2py</span></code> relies on it to parse the code).</p></li>
+<li><p><strong>[Line 7]</strong> This example ships without generated bindings, so we default <code class="docutils literal notranslate"><span class="pre">Update_Python_Bindings</span></code> to
+<code class="docutils literal notranslate"><span class="pre">ON</span></code> to (re)generate them; see the <em>General Workflow</em> below.</p></li>
+<li><p><strong>[Lines 9-17]</strong> We fetch <strong>c2py</strong> from GitHub and make it available for the current project rather than
+relying on a system installation. This ensures that <strong>c2py</strong> and the extension module are built with
+consistent compiler options and linked against the same Python interpreter, and it makes the
+<code class="docutils literal notranslate"><span class="pre">c2py_add_module</span></code> macro available. As <strong>c2py</strong> compiles quickly, it does not add significant overhead.
+(If <strong>c2py</strong> is already installed, <code class="docutils literal notranslate"><span class="pre">find_package(c2py)</span></code> makes the macro available just as well.)</p></li>
+<li><p><strong>[Line 20]</strong> <code class="docutils literal notranslate"><span class="pre">c2py_add_module</span></code> declares the <code class="docutils literal notranslate"><span class="pre">getting_started</span></code> extension module, links it against
+<strong>c2py</strong>, and – when <code class="docutils literal notranslate"><span class="pre">Update_Python_Bindings</span></code> is <code class="docutils literal notranslate"><span class="pre">ON</span></code> – finds <code class="docutils literal notranslate"><span class="pre">clair-c2py</span></code> and (re)generates the
+bindings before the module is compiled. It also accepts optional arguments such as <code class="docutils literal notranslate"><span class="pre">LINK_LIBRARIES</span></code>
+for extra dependencies and <code class="docutils literal notranslate"><span class="pre">DEPENDS_ON_BINDINGS</span></code> to order generation across modules
+(see <a class="reference internal" href="../reference/multiple.html#multiple-modules"><span class="std std-ref">Across multiple modules</span></a>).</p></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <ul class="simple">
 <li><p>The bindings are only (re)generated if the option <code class="docutils literal notranslate"><span class="pre">Update_Python_Bindings</span></code> is set to <code class="docutils literal notranslate"><span class="pre">ON</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">clair-c2py</span></code> automatically uses the compilation database generated by CMake.</p></li>
-<li><p>Even if CMake uses an out-of-source build, the tools acts <strong>in the source directory</strong>, where it generates the binding files.</p></li>
+<li><p>Even if CMake uses an out-of-source build, the tool acts <strong>in the source directory</strong>, where it generates the binding files.</p></li>
 </ul>
 </div>
 </section>
@@ -314,7 +333,7 @@ directory).</p></li>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, The Simons Foundation, author: O. Parcollet.</p>
+    <p>&#169; Copyright 2024 - 2026, The Simons Foundation, author: O. Parcollet.</p>
   </div>
 
    

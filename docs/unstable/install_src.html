@@ -22,7 +22,7 @@
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Getting Started" href="getting_started/index.html" />
+    <link rel="next" title="Packages" href="install_packages.html" />
     <link rel="prev" title="Installation" href="install.html" /> 
 </head>
 
@@ -59,6 +59,13 @@
 <li class="toctree-l3"><a class="reference internal" href="#set-environment-variables">Set environment variables</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="install_packages.html">Packages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install_packages.html#os-x-brew">OS X (brew)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="install_packages.html#uninstalling">Uninstalling</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started/index.html">Getting Started</a><ul>
@@ -84,6 +91,7 @@
 <li class="toctree-l1"><a class="reference internal" href="gallery/index.html">Gallery</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="gallery/functions.html">Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gallery/class1.html">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/class_templates/class_templates.html">Class templates</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="reference/index.html">Reference documentation</a><ul>
@@ -177,8 +185,24 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="issues.html">Reporting issues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html">Change Logs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="about.html">About clair/c2py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-9-0">Version 0.9.0</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#general">General</a></li>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#operators">operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#codegen">codegen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#c2py">c2py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#clu">clu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#doc">doc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#cmake">cmake</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About clair/c2py</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="about.html#authors">Authors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="about.html#source-code">Source code</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -211,7 +235,7 @@
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>It is usually not necessary to install c2py, as it is fetched by an application using it as a dependency during its own compilation process,
-cf <span class="xref std std-ref">cmake</span>.</p>
+cf <a class="reference internal" href="getting_started/use_cmake_integration.html#use-cmake-integration"><span class="std std-ref">Use CMake integration [Recommended]</span></a>.</p>
 </div>
 <section id="clair">
 <h2>clair<a class="headerlink" href="#clair" title="Link to this heading"></a></h2>
@@ -222,7 +246,7 @@ cf <span class="xref std std-ref">cmake</span>.</p>
 </div>
 </li>
 <li><p>[Optional] If you want a particular version, check it out, e.g. (use <cite>git tag</cite> to see the available versions):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span>v0.1
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span>v0.9.0
 </pre></div>
 </div>
 </li>
@@ -255,7 +279,7 @@ $<span class="w"> </span>make<span class="w"> </span>-j<span class="w"> </span><
 </div>
 </li>
 <li><p>[Optional] If you want a particular version, check it out, e.g. (use <cite>git tag</cite> to see the available versions):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span>v0.1
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span>v0.9.0
 </pre></div>
 </div>
 </li>
@@ -301,10 +325,6 @@ $<span class="w"> </span>make<span class="w"> </span>-j<span class="w"> </span><
 $<span class="w"> </span><span class="nb">source</span><span class="w"> </span>path_to_c2py_install_dir/share/c2py/c2pyvars.sh
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>TO BE REVIEWED. WE JUST NEED THE PATH ?</p>
-</div>
 </section>
 </section>
 
@@ -313,13 +333,13 @@ $<span class="w"> </span><span class="nb">source</span><span class="w"> </span>p
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="install.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="getting_started/index.html" class="btn btn-neutral float-right" title="Getting Started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="install_packages.html" class="btn btn-neutral float-right" title="Packages" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, The Simons Foundation, author: O. Parcollet.</p>
+    <p>&#169; Copyright 2024 - 2026, The Simons Foundation, author: O. Parcollet.</p>
   </div>
 
    

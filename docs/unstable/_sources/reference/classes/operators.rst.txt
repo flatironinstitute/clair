@@ -42,7 +42,7 @@ The Python usage:
 Arithmetic Operators
 ====================
 
-Arithmetic operators (+, -, *, /, etc.) are automatically wrapped.
+Arithmetic operators (``+``, ``-``, ``*``, ``/``, etc.) are automatically wrapped.
 
 .. literalinclude:: ../../examples/classes/operators.cpp
    :language: cpp

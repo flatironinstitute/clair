@@ -7,7 +7,7 @@ clair/c2py
 
    This is the homepage of clair/c2py |PROJECT_VERSION|.
    
-   For changes, see the :ref:`changelog page <ChangeLog>`.
+   For changes, see the :ref:`changelog page <changelog>`.
       
       .. image:: _static/logo_github.png
          :width: 75%
@@ -16,6 +16,7 @@ clair/c2py
 
 
 clair-c2py is a Clang tool that automatically generates Python bindings for C++ code.
+It is paired with **c2py**, a lightweight C++20 runtime library that the generated bindings rely on.
 Its main characteristics are:  
 
 * **Automatic**: discovers functions, classes in C++ source and generates the Python bindings.
@@ -34,20 +35,13 @@ Its main characteristics are:
 *NB: this project is an evolution of the* `TRIQS/cpp2py <https://github.com/TRIQS/cpp2py>`_ *tool, used in the TRIQS library
 since 2014. It is fully backward compatible.*
 
-.. warning::
-    
-    This project is in beta stage. Documentation in progress.
-
-    
 .. toctree::
    :maxdepth: 2
    :hidden:
 
    install
    getting_started/index
-   cmake
    gallery/index
-   compiling_examples
    reference/index
    notebook
    issues

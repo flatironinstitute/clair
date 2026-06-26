@@ -59,6 +59,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../install_src.html#set-environment-variables">Set environment variables</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../install_packages.html">Packages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../install_packages.html#os-x-brew">OS X (brew)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../install_packages.html#uninstalling">Uninstalling</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/index.html">Getting Started</a><ul>
@@ -84,6 +91,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../gallery/index.html">Gallery</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../gallery/functions.html">Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../gallery/class1.html">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/class_templates/class_templates.html">Class templates</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Reference documentation</a><ul class="current">
@@ -177,8 +185,24 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../issues.html">Reporting issues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Change Logs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../about.html">About clair/c2py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../changelog.html#version-0-9-0">Version 0.9.0</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#general">General</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#operators">operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#codegen">codegen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#c2py">c2py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#clu">clu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#doc">doc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#cmake">cmake</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About clair/c2py</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../about.html#authors">Authors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../about.html#source-code">Source code</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -245,7 +269,7 @@ fail.cpp:5:8: <span class="ansi2html-red">error</span>: c2py: Cannot convert thi
 <p>To fix such errors, you can exclude the problematic function using the customization options (see <a class="reference internal" href="customize.html#customize"><span class="std std-ref">Customization</span></a>).</p>
 </section>
 <section id="template-functions">
-<h2>Template Functions<a class="headerlink" href="#template-functions" title="Link to this heading"></a></h2>
+<span id="function-templates"></span><h2>Template Functions<a class="headerlink" href="#template-functions" title="Link to this heading"></a></h2>
 <p>For generic (template) functions, <code class="docutils literal notranslate"><span class="pre">clair-c2py</span></code> only generates bindings for their <strong>explicit instantiations</strong>, subject to the same customization rules as regular functions.</p>
 <p>In the following example, we define a function template <code class="docutils literal notranslate"><span class="pre">add</span></code> that adds two values of the same type and explicitly instantiate it for three simple types. Dynamic dispatch in Python works exactly as it does for regular functions.</p>
 <div class="literal-block-wrapper docutils container" id="id2">
@@ -277,11 +301,7 @@ fail.cpp:5:8: <span class="ansi2html-red">error</span>: c2py: Cannot convert thi
 <section id="coroutines-generators">
 <h2>Coroutines, generators<a class="headerlink" href="#coroutines-generators" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><dl class="simple">
-<dt>Coroutines are supported and can be wrapped, including generators.</dt><dd><p>(Example to be added.)</p>
-</dd>
-</dl>
-</li>
+<li><p>Coroutines are supported and can be wrapped, including generators.</p></li>
 </ul>
 </section>
 </section>
@@ -297,7 +317,7 @@ fail.cpp:5:8: <span class="ansi2html-red">error</span>: c2py: Cannot convert thi
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, The Simons Foundation, author: O. Parcollet.</p>
+    <p>&#169; Copyright 2024 - 2026, The Simons Foundation, author: O. Parcollet.</p>
   </div>
 
    

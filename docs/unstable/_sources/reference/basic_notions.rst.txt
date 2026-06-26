@@ -5,7 +5,7 @@ Basic notions
 *************
 
 .. seealso::
-    For an overview of the workflow and Clang tool concept, see :ref:`workflow`.
+    For an overview of the workflow and Clang tool concept, see :ref:`getting_started`.
 
 Type conversion
 ---------------

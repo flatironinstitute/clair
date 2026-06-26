@@ -9,3 +9,4 @@ Gallery
 
     functions
     class1
+    ../examples/class_templates/class_templates

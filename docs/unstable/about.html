@@ -22,7 +22,7 @@
     <link rel="author" title="About these documents" href="#" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Change Logs" href="changelog.html" /> 
+    <link rel="prev" title="Changelog" href="changelog.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -58,6 +58,13 @@
 <li class="toctree-l3"><a class="reference internal" href="install_src.html#set-environment-variables">Set environment variables</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="install_packages.html">Packages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install_packages.html#os-x-brew">OS X (brew)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="install_packages.html#uninstalling">Uninstalling</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started/index.html">Getting Started</a><ul>
@@ -83,6 +90,7 @@
 <li class="toctree-l1"><a class="reference internal" href="gallery/index.html">Gallery</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="gallery/functions.html">Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gallery/class1.html">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/class_templates/class_templates.html">Class templates</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="reference/index.html">Reference documentation</a><ul>
@@ -176,8 +184,24 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="issues.html">Reporting issues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html">Change Logs</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">About clair/c2py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-9-0">Version 0.9.0</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#general">General</a></li>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#operators">operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#codegen">codegen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#c2py">c2py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#clu">clu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#doc">doc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#cmake">cmake</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">About clair/c2py</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#authors">Authors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#source-code">Source code</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -206,19 +230,36 @@
              
   <section id="about-clair-c2py">
 <span id="about"></span><h1>About clair/c2py<a class="headerlink" href="#about-clair-c2py" title="Link to this heading"></a></h1>
+<p>clair/c2py is a C++-to-Python bindings generator developed at the Center for Computational
+Quantum Science of the <a class="reference external" href="https://www.flatironinstitute.org">Flatiron Institute</a>, Simons Foundation.</p>
+<p>It is an evolution of the <a class="reference external" href="https://github.com/TRIQS/cpp2py">TRIQS/cpp2py</a> tool, which has been
+used in the <a class="reference external" href="https://triqs.github.io">TRIQS</a> project since 2014, and is fully backward compatible with it.</p>
+<section id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Link to this heading"></a></h2>
+<p>clair/c2py is written and maintained by O. Parcollet, N. Wentzell, and T. Hahn.</p>
+</section>
+<section id="source-code">
+<h2>Source code<a class="headerlink" href="#source-code" title="Link to this heading"></a></h2>
+<p>The source is hosted on GitHub:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/flatironinstitute/clair">clair</a> — the Clang tooling that generates the bindings.</p></li>
+<li><p><a class="reference external" href="https://github.com/flatironinstitute/c2py">c2py</a> — the C++20 runtime support library.</p></li>
+</ul>
+<p>To report a problem, see <a class="reference internal" href="issues.html#issues"><span class="std std-ref">Reporting issues</span></a>.</p>
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="changelog.html" class="btn btn-neutral float-left" title="Change Logs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="changelog.html" class="btn btn-neutral float-left" title="Changelog" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, The Simons Foundation, author: O. Parcollet.</p>
+    <p>&#169; Copyright 2024 - 2026, The Simons Foundation, author: O. Parcollet.</p>
   </div>
 
    

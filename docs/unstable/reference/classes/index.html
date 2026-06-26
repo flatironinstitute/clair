@@ -59,6 +59,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../../install_src.html#set-environment-variables">Set environment variables</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../install_packages.html">Packages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../install_packages.html#os-x-brew">OS X (brew)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../install_packages.html#uninstalling">Uninstalling</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started/index.html">Getting Started</a><ul>
@@ -84,6 +91,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../gallery/index.html">Gallery</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../gallery/functions.html">Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../gallery/class1.html">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/class_templates/class_templates.html">Class templates</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Reference documentation</a><ul class="current">
@@ -177,8 +185,24 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../issues.html">Reporting issues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Change Logs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../about.html">About clair/c2py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../changelog.html#version-0-9-0">Version 0.9.0</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#general">General</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#operators">operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#codegen">codegen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#c2py">c2py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#clu">clu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#doc">doc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#cmake">cmake</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../about.html">About clair/c2py</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../about.html#authors">Authors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../about.html#source-code">Source code</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -211,7 +235,7 @@
 <section id="default-behavior-customization">
 <h2>Default Behavior &amp; Customization<a class="headerlink" href="#default-behavior-customization" title="Link to this heading"></a></h2>
 <ol class="arabic simple">
-<li><p>Every classes defined in the C++ source files is wrapped, subject to the customization options (see <a class="reference internal" href="../customize.html#customize"><span class="std std-ref">options</span></a>).</p></li>
+<li><p>Every class defined in the C++ source files is wrapped, subject to the customization options (see <a class="reference internal" href="../customize.html#customize"><span class="std std-ref">options</span></a>).</p></li>
 <li><p>Only public elements (methods, fields) are exposed to Python.</p></li>
 <li><p>The name of the class in Python is transformed into <strong>CamelCase</strong>, e.g.
 <code class="docutils literal notranslate"><span class="pre">my_class</span></code> in C++ becomes <code class="docutils literal notranslate"><span class="pre">MyClass</span></code> in Python.
@@ -241,7 +265,7 @@ Use the <code class="docutils literal notranslate"><span class="pre">C2PY_RENAME
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, The Simons Foundation, author: O. Parcollet.</p>
+    <p>&#169; Copyright 2024 - 2026, The Simons Foundation, author: O. Parcollet.</p>
   </div>
 
    

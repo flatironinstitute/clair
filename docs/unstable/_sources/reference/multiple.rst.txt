@@ -73,17 +73,18 @@ the wrapped class ``A`` from module A:
 CMake configuration
 -------------------
 
-In your ``CMakeLists.txt``, ensure module A is compiled before module B:
+In your ``CMakeLists.txt``, build both modules with ``c2py_add_module`` and tell module B that
+module A's bindings must be generated first via ``DEPENDS_ON_BINDINGS``:
 
 .. code-block:: cmake
 
-   # Add both modules
-   # FIXME 
-   add_clair_module(module_a)
-   add_clair_module(module_b)
+   c2py_add_module(module_a)
 
-   # Module B depends on module A's .wrap.hxx file
-   add_dependencies(module_b module_a)
+   # module_b includes module_a's .wrap.hxx, so module_a's bindings are generated first
+   c2py_add_module(module_b DEPENDS_ON_BINDINGS module_a)
+
+The ordering only matters when ``Update_Python_Bindings`` is ``ON``; with checked-in ``.wrap``
+files there is no generation step to order.
 
 Usage in Python
 ---------------

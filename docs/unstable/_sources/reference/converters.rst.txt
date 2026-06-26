@@ -38,9 +38,9 @@ The following types are convertible
      -
 
    * - std::vector<T>
-     - list
+     - numpy array / list
      - yes
-     - if T is convertible
+     - numpy array if T has a numpy dtype, else list (if T is convertible)
 
    * - std::tuple<T...> 
      - tuple
@@ -53,19 +53,24 @@ The following types are convertible
      - if T1, T2 are convertible
 
    * - std::function<R(T...)>   
-     - lambda
+     - Callable
      - yes
      - if R, T... are convertible
 
    * - std::variant<T...>
-     - tuple
+     - T... (first match)
      - yes
-     - if T... are convertible
+     - converts to/from the first matching alternative
 
    * - std::map<K, V> 
      - dict
      - yes
      - if K, V are convertible
+
+   * - std::set<K>
+     - set
+     - yes
+     - if K is convertible
 
 
    * - std::array<T, N>
@@ -74,7 +79,7 @@ The following types are convertible
      - if T is convertible
 
    * - std::optional<T>
-     - Convertion of T or None
+     - Conversion of T or None
      - yes
      - If T is convertible
 
@@ -83,7 +88,7 @@ The following types are convertible
      - Python -> C++ only
      -
 
-Note that convertibility is composable: :code:`std::vector<T>` is convertible is :code:`T` is, 
+Note that convertibility is composable: :code:`std::vector<T>` is convertible if :code:`T` is, 
 so :code:`std::vector<std::tuple<T, U , W>>` is if :code:`T,U,W` are.
 
 Custom converters for user-defined types

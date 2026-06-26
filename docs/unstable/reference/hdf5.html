@@ -59,6 +59,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../install_src.html#set-environment-variables">Set environment variables</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../install_packages.html">Packages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../install_packages.html#os-x-brew">OS X (brew)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../install_packages.html#uninstalling">Uninstalling</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/index.html">Getting Started</a><ul>
@@ -84,6 +91,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../gallery/index.html">Gallery</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../gallery/functions.html">Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../gallery/class1.html">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/class_templates/class_templates.html">Class templates</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Reference documentation</a><ul class="current">
@@ -177,8 +185,24 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../issues.html">Reporting issues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Change Logs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../about.html">About clair/c2py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../changelog.html#version-0-9-0">Version 0.9.0</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#general">General</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#operators">operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#codegen">codegen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#c2py">c2py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#clu">clu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#doc">doc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#cmake">cmake</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About clair/c2py</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../about.html#authors">Authors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../about.html#source-code">Source code</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -208,8 +232,8 @@
              
   <section id="hdf5-triqs-h5-integration">
 <span id="class-hdf5"></span><h1>HDF5 (TRIQS/h5 Integration)<a class="headerlink" href="#hdf5-triqs-h5-integration" title="Link to this heading"></a></h1>
-<p>clair/c2py provides seamless integration with the TRIQS/h5 library, enabling automatic serialization and deserialization of C++ classes to HDF5 files from Python.</p>
-<p>If your C++ class implements HDF5 support via TRIQS/h5, clair will automatically expose corresponding Python methods for saving and loading objects.</p>
+<p>clair/c2py integrates with the TRIQS/h5 library, enabling serialization and deserialization of C++ classes to HDF5 files from Python.</p>
+<p>If your C++ class implements HDF5 support via TRIQS/h5 (the <code class="docutils literal notranslate"><span class="pre">h5_write</span></code> / <code class="docutils literal notranslate"><span class="pre">h5_read</span></code> friend functions), clair automatically makes the wrapped objects usable with the TRIQS/h5 <code class="docutils literal notranslate"><span class="pre">HDFArchive</span></code>.</p>
 <p><strong>C++ Example:</strong></p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// HDF5 serialization</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c2py/c2py.hpp&gt;</span>
@@ -235,24 +259,25 @@
 </pre></div>
 </div>
 <p><strong>Python Usage:</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mymodule</span> <span class="kn">import</span> <span class="n">Matrix</span>
-<span class="kn">import</span> <span class="nn">h5py</span>
+<p>The wrapped type can be stored in and retrieved from a TRIQS/h5 <code class="docutils literal notranslate"><span class="pre">HDFArchive</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">h5</span> <span class="kn">import</span> <span class="n">HDFArchive</span>
+<span class="kn">from</span> <span class="nn">hdf5</span> <span class="kn">import</span> <span class="n">Matrix</span>          <span class="c1"># module &#39;hdf5&#39;, class mylib::matrix -&gt; Matrix</span>
 
 <span class="n">m</span> <span class="o">=</span> <span class="n">Matrix</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-<span class="c1"># Save to HDF5</span>
-<span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;data.h5&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="n">m</span><span class="o">.</span><span class="n">save_to_hdf5</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;matrix&#39;</span><span class="p">)</span>
 
-<span class="c1"># Load from HDF5</span>
-<span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;data.h5&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="n">m2</span> <span class="o">=</span> <span class="n">Matrix</span><span class="o">.</span><span class="n">load_from_hdf5</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;matrix&#39;</span><span class="p">)</span>
+<span class="c1"># Write to an HDF5 archive</span>
+<span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="s2">&quot;data.h5&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ar</span><span class="p">:</span>
+    <span class="n">ar</span><span class="p">[</span><span class="s2">&quot;matrix&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span>
+
+<span class="c1"># Read it back</span>
+<span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="s2">&quot;data.h5&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ar</span><span class="p">:</span>
+    <span class="n">m2</span> <span class="o">=</span> <span class="n">ar</span><span class="p">[</span><span class="s2">&quot;matrix&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
 <p><strong>Notes:</strong></p>
 <ul class="simple">
-<li><p>The HDF5 interface relies on the TRIQS/h5 C++ library for serialization logic.</p></li>
-<li><p>Python bindings automatically mirror the C++ API, making it easy to persist and restore objects.</p></li>
-<li><p>You can use any HDF5-compatible Python library (e.g., h5py) for file management.</p></li>
+<li><p>The HDF5 interface relies on the TRIQS/h5 C++ library for the serialization logic (the <code class="docutils literal notranslate"><span class="pre">h5_write</span></code> / <code class="docutils literal notranslate"><span class="pre">h5_read</span></code> friends shown above).</p></li>
+<li><p>For each class with HDF5 support, clair generates a <code class="docutils literal notranslate"><span class="pre">__write_hdf5__</span></code> method and registers the type with the <code class="docutils literal notranslate"><span class="pre">h5.formats</span></code> registry, so it works transparently with the TRIQS/h5 <code class="docutils literal notranslate"><span class="pre">HDFArchive</span></code>.</p></li>
 </ul>
 </section>
 
@@ -267,7 +292,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, The Simons Foundation, author: O. Parcollet.</p>
+    <p>&#169; Copyright 2024 - 2026, The Simons Foundation, author: O. Parcollet.</p>
   </div>
 
    

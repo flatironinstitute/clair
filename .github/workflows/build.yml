@@ -119,10 +119,18 @@ jobs:
         path: ${{ env.CCACHE_DIR }}
         key: ccache-${{ matrix.os }}-${{ matrix.cc }}-${{ github.run_id }}
 
-    - name: Deploy documentation to website
+    - name: Deploy unstable documentation to website
       if: matrix.doc == 'ON' && github.ref == 'refs/heads/unstable'
       uses: JamesIves/github-pages-deploy-action@v4
       with:
         folder: build/doc/html
         branch: github.io
         target-folder: docs/unstable
+
+    - name: Deploy release documentation to website
+      if: matrix.doc == 'ON' && startsWith(github.ref, 'refs/heads/') && endsWith(github.ref, '.x')
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        folder: build/doc/html
+        branch: github.io
+        target-folder: docs/${{ github.ref_name }}

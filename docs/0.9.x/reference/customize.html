@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customization &mdash; clair - Automatic Python/C++ bindings  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b20cc3f5" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=417d15d8" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=8f9e6779" />
+
+  
+  
+        <script src="../_static/jquery.js?v=8dae8fb0"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/clipboard.min.js?v=66b4909c"></script>
+        <script src="../_static/copybutton.js?v=71494f10"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Using annotations in the C++ sources" href="customize/code_annotations.html" />
+    <link rel="prev" title="Basic notions" href="basic_notions.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7E588A" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            clair - Automatic Python/C++ bindings
+          </a>
+              <div class="version">
+                0.9.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../install_src.html">Compiling from source</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../install_src.html#clair">clair</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../install_src.html#c2py">c2py</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../install_src.html#cmake-options">CMake options</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../install_src.html#set-environment-variables">Set environment variables</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../install_packages.html">Packages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../install_packages.html#os-x-brew">OS X (brew)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../install_packages.html#uninstalling">Uninstalling</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/index.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started/index.html#c-code">C++ Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started/index.html#generate-python-bindings-and-compile-the-module">Generate Python Bindings and Compile the Module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started/use_clair_c2py_manually.html">Use clair-c2py manually</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../getting_started/use_clair_c2py_manually.html#generate-python-bindings">Generate Python Bindings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../getting_started/use_clair_c2py_manually.html#compile-the-module">Compile the Module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started/use_cmake_integration.html">Use CMake integration [Recommended]</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../getting_started/use_cmake_integration.html#generate-python-bindings-and-compile-the-module">Generate Python Bindings and Compile the Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../getting_started/use_cmake_integration.html#cmake-configuration">CMake Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../getting_started/use_cmake_integration.html#general-workflow">General Workflow</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started/index.html#use-the-python-module">Use the Python Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started/index.html#what-is-a-clang-tool">What is a Clang tool?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../gallery/index.html">Gallery</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../gallery/functions.html">Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gallery/class1.html">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/class_templates/class_templates.html">Class templates</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Reference documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="basic_notions.html">Basic notions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="basic_notions.html#type-conversion">Type conversion</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="basic_notions.html#principle">Principle</a></li>
+<li class="toctree-l4"><a class="reference internal" href="basic_notions.html#convertible-types">Convertible types</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="basic_notions.html#dynamical-dispatch">Dynamical dispatch</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Customization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="customize/code_annotations.html">Using annotations in the C++ sources</a></li>
+<li class="toctree-l3"><a class="reference internal" href="customize/toml.html">Using a TOML configuration file</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="customize/toml.html#generating-a-template-toml-file">Generating a template TOML file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="customize/toml.html#toml-configuration-options">TOML Configuration Options</a></li>
+<li class="toctree-l4"><a class="reference internal" href="customize/toml.html#example">Example</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="customize/toml.html#filtering-by-namespace">Filtering by namespace</a></li>
+<li class="toctree-l5"><a class="reference internal" href="customize/toml.html#filtering-by-name">Filtering by name</a></li>
+<li class="toctree-l5"><a class="reference internal" href="customize/toml.html#filter-by-file-name">Filter by file name</a></li>
+<li class="toctree-l5"><a class="reference internal" href="customize/toml.html#wrap-no-argument-methods-as-properties">Wrap no argument methods as properties</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html">Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="functions.html#default-behavior-customization">Default Behavior &amp; Customization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="functions.html#template-functions">Template Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="functions.html#coroutines-generators">Coroutines, generators</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="classes/index.html">Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="classes/index.html#default-behavior-customization">Default Behavior &amp; Customization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="classes/constructors.html">Constructors</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="classes/constructors.html#user-defined-constructors">User-defined constructors</a></li>
+<li class="toctree-l5"><a class="reference internal" href="classes/constructors.html#synthesized-aggregate-constructor">Synthesized aggregate constructor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="classes/methods.html">Methods</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="classes/methods.html#instance-methods">Instance Methods</a></li>
+<li class="toctree-l5"><a class="reference internal" href="classes/methods.html#const-methods">Const Methods</a></li>
+<li class="toctree-l5"><a class="reference internal" href="classes/methods.html#static-methods">Static Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="classes/operators.html">Operators</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="classes/operators.html#operator">Operator()</a></li>
+<li class="toctree-l5"><a class="reference internal" href="classes/operators.html#id1">Operator[]</a></li>
+<li class="toctree-l5"><a class="reference internal" href="classes/operators.html#arithmetic-operators">Arithmetic Operators</a></li>
+<li class="toctree-l5"><a class="reference internal" href="classes/operators.html#comparison-operators">Comparison Operators</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="classes/iterable.html">Iterable Objects</a></li>
+<li class="toctree-l4"><a class="reference internal" href="classes/string_representation.html">String Representation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="enums.html">Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple.html">Across multiple modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="multiple.html#example-two-communicating-modules">Example: Two communicating modules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="multiple.html#module-a-defining-a-class">Module A: Defining a class</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multiple.html#module-b">Module B</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multiple.html#cmake-configuration">CMake configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multiple.html#usage-in-python">Usage in Python</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="converters.html">Converters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="converters.html#default-converters">Default converters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="converters.html#custom-converters-for-user-defined-types">Custom converters for user-defined types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="converters.html#set-up-for-third-party-libraries">Set up for third party libraries</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="c2py.html">c2py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hdf5.html">HDF5 (TRIQS/h5 Integration)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nda.html">TRIQS/nda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="env_vars.html">Environment Variables</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="env_vars.html#clair-verbose">CLAIR_VERBOSE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="env_vars.html#clair-skip-clang-format">CLAIR_SKIP_CLANG_FORMAT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="env_vars.html#clicolor-force-llvm-force-color">CLICOLOR_FORCE / LLVM_FORCE_COLOR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="env_vars.html#sdkroot-macos-only">SDKROOT <em>(macOS only)</em></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../notebook.html">Notebook integration</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../issues.html">Reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../changelog.html#version-0-9-0">Version 0.9.0</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#general">General</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#operators">operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#codegen">codegen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#c2py">c2py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#clu">clu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#doc">doc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#cmake">cmake</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About clair/c2py</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../about.html#authors">Authors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../about.html#source-code">Source code</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7E588A" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">clair - Automatic Python/C++ bindings</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Reference documentation</a></li>
+      <li class="breadcrumb-item active">Customization</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/reference/customize.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="customization">
+<span id="customize"></span><h1>Customization<a class="headerlink" href="#customization" title="Link to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">clair-c2py</span></code> is an automatic tool.
+It wraps functions, classes and enums that it discovers
+in the C++ source files, except those declared in system headers i.e. the standard library and more generally
+anything the compiler includes via <code class="docutils literal notranslate"><span class="pre">-isystem</span></code> options.</p>
+<p>This default behavior of the bindings generation can be <strong>customized</strong> in two ways:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="customize/code_annotations.html">Using annotations in the C++ sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="customize/toml.html">Using a TOML configuration file</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="customize/toml.html#generating-a-template-toml-file">Generating a template TOML file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="customize/toml.html#toml-configuration-options">TOML Configuration Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="customize/toml.html#example">Example</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="basic_notions.html" class="btn btn-neutral float-left" title="Basic notions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="customize/code_annotations.html" class="btn btn-neutral float-right" title="Using annotations in the C++ sources" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024 - 2026, The Simons Foundation, author: O. Parcollet.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

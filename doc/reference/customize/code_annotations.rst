@@ -29,8 +29,14 @@ which are ignored by the C++ compiler, but picked up by ``clair`` during its ana
         :ref:`Example <example_wrap_as_method>`
     * - ``C2PY_MODULE_INIT``
       - Mark a function to be called when the module is imported.
-      
+
         :ref:`Example <example_module_init>`
+    * - ``C2PY_PROPERTY_GET(name)``
+      - Expose a no-argument, non-void method as the getter of the Python property ``name``.
+    * - ``C2PY_PROPERTY_SET(name)``
+      - Expose a method as the setter of the Python property ``name``.
+    * - ``C2PY_DEPRECATED_PARAMETER_NAME(old:new, ...)``
+      - Keep accepting deprecated parameter names, mapping each ``old`` name to its current ``new`` name.
 
 .. note::
     These annotations overrule any options in the TOML file (Cf :ref:`toml_options`).

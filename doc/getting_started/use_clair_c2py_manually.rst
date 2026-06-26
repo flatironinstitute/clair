@@ -33,8 +33,11 @@ See :ref:`generate_python_bindings_and_compile` for some more background informa
    * Here, we assume that ``c2py`` is installed and that ``c2py_flags`` is available in the system path.
      The command ``c2py_flags -i`` provides all necessary include paths for Python.
 
-   * In a CMake project, we typically rely on ``compile_commands.json`` in conjunction with automatic detection of Python and 
+   * In a CMake project, we typically rely on ``compile_commands.json`` in conjunction with automatic detection of Python and
      **c2py** targets (see :ref:`use_cmake_integration` for more details).
+
+   * To use an existing ``compile_commands.json`` instead of passing flags after ``--``, point ``clair-c2py`` at its
+     directory with ``-p DIR`` (e.g. ``clair-c2py module.cpp -p build``).
 
 Compile the Module
 ..................

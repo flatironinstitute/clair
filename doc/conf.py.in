@@ -7,7 +7,9 @@ sys.path.insert(0, "@CMAKE_CURRENT_SOURCE_DIR@/sphinxext")
 sys.path.insert(0, "@CMAKE_CURRENT_SOURCE_DIR@/sphinxext/numpydoc")
 
 # exclude these folders from scanning by sphinx
-exclude_patterns = ['_templates']
+# ChangeLog.md is pulled into changelog.rst via `.. include::`, so it must not
+# also be collected as a standalone document (myst_parser registers .md as a source suffix).
+exclude_patterns = ['_templates', 'ChangeLog.md']
 
 # Suppress toctree warnings for intentionally orphaned pages
 suppress_warnings = ['toc.not_readable', 'toc.excluded']
@@ -21,6 +23,7 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.autosummary',
               'sphinx.ext.githubpages',
               'sphinx_copybutton',
+              'myst_parser',
               #'nbsphinx',
               ]
 

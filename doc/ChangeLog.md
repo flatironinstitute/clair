@@ -38,7 +38,7 @@ Find below an itemized list of changes in this release.
 * Add `CLAIR_VERBOSE` logging with a per-module log file, and `CLAIR_SKIP_CLANG_FORMAT` to skip the clang-format pass.
 * Suggest the relevant converter headers in convertibility error messages.
 * Support class and method renaming (#11).
-* Support properties through `C2PY_PROPERTY` and wrapping no-argument methods as properties.
+* Support properties through `C2PY_PROPERTY_GET` / `C2PY_PROPERTY_SET` and wrapping no-argument methods as properties.
 * Support returning references, including references to members (of members) at any depth (#14).
 * Wrap enums, including nested enums under namespace filtering (#17) and cross-module enum use.
 * Wrap function and class templates through explicit instantiations in the `c2py_module` namespace, including template parameter packs (#19) and template members with default arguments (#22).

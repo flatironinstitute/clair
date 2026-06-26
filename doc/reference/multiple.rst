@@ -77,11 +77,16 @@ In your ``CMakeLists.txt``, ensure module A is compiled before module B:
 
 .. code-block:: cmake
 
-   # Add both modules
-   add_clair_module(module_a)
-   add_clair_module(module_b)
+   # Build both modules (see the CMake integration page for the full per-module setup)
+   Python_add_library(module_a MODULE module_a.cpp)
+   target_link_libraries(module_a PRIVATE c2py::c2py)
+   clair_c2py_generate_bindings(module_a)
 
-   # Module B depends on module A's .wrap.hxx file
+   Python_add_library(module_b MODULE module_b.cpp)
+   target_link_libraries(module_b PRIVATE c2py::c2py)
+   clair_c2py_generate_bindings(module_b)
+
+   # Module B uses module A's .wrap.hxx, so generate A's bindings first
    add_dependencies(module_b module_a)
 
 Usage in Python

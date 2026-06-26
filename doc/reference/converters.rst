@@ -74,7 +74,7 @@ The following types are convertible
      - if T is convertible
 
    * - std::optional<T>
-     - Convertion of T or None
+     - Conversion of T or None
      - yes
      - If T is convertible
 
@@ -83,7 +83,7 @@ The following types are convertible
      - Python -> C++ only
      -
 
-Note that convertibility is composable: :code:`std::vector<T>` is convertible is :code:`T` is, 
+Note that convertibility is composable: :code:`std::vector<T>` is convertible if :code:`T` is, 
 so :code:`std::vector<std::tuple<T, U , W>>` is if :code:`T,U,W` are.
 
 Custom converters for user-defined types

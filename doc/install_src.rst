@@ -20,7 +20,7 @@ clair
 
 #. [Optional] If you want a particular version, check it out, e.g. (use `git tag` to see the available versions)::
 
-     $ git checkout v0.9
+     $ git checkout v0.9.0
 
 #. Call cmake, including any additional custom CMake options, see below::
 
@@ -49,7 +49,7 @@ To install ``c2py``, follow the same procedure as for ``clair``, replacing ``cla
 
 #. [Optional] If you want a particular version, check it out, e.g. (use `git tag` to see the available versions)::
 
-     $ git checkout v0.9
+     $ git checkout v0.9.0
 
 #. Call cmake, including any additional custom CMake options, see below::
 

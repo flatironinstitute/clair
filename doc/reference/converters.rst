@@ -38,9 +38,9 @@ The following types are convertible
      -
 
    * - std::vector<T>
-     - list
+     - numpy array / list
      - yes
-     - if T is convertible
+     - numpy array if T has a numpy dtype, else list (if T is convertible)
 
    * - std::tuple<T...> 
      - tuple
@@ -53,19 +53,24 @@ The following types are convertible
      - if T1, T2 are convertible
 
    * - std::function<R(T...)>   
-     - lambda
+     - Callable
      - yes
      - if R, T... are convertible
 
    * - std::variant<T...>
-     - tuple
+     - T... (first match)
      - yes
-     - if T... are convertible
+     - converts to/from the first matching alternative
 
    * - std::map<K, V> 
      - dict
      - yes
      - if K, V are convertible
+
+   * - std::set<K>
+     - set
+     - yes
+     - if K is convertible
 
 
    * - std::array<T, N>

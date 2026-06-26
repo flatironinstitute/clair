@@ -1,3 +1,6 @@
+# Override c2py's Update_Python_Bindings default (OFF) -- the getting_started example needs ON.
+set(Update_Python_Bindings ON)
+
 # Generate the sphinx config file
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in ${CMAKE_CURRENT_BINARY_DIR}/conf.py @ONLY)
 

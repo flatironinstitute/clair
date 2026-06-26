@@ -32,7 +32,7 @@ from IPython.utils import py3compat
 from IPython.utils.io import capture_output
 from IPython.paths import get_ipython_cache_dir
 
-__version__ = '0.3.0'
+__version__ = '0.9.0'
 
 #from compiler import compile, print_out
 from .compiler import compile, print_out

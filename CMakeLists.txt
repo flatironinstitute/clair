@@ -3,7 +3,7 @@ cmake_policy(VERSION ${CMAKE_VERSION})
 
 # ############
 # Define Project
-project(clair VERSION 0.3.0 LANGUAGES C CXX)
+project(clair VERSION 0.9.0 LANGUAGES C CXX)
 get_directory_property(IS_SUBPROJECT PARENT_DIRECTORY)
 
 if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")

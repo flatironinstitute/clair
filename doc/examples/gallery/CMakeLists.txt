@@ -1,3 +1,3 @@
 # Gallery examples
-add_clair_module(function_w_stl)
-add_clair_module(class1)
+c2py_add_module(function_w_stl)
+c2py_add_module(class1)

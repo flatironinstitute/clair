@@ -15,29 +15,13 @@ To generate the Python bindings and compile the module with CMake, we simply run
    $ cmake ..
    $ make -j 8
 
-Recommended setup
-.................
-
-The simplest ``CMakeLists.txt`` uses the ``c2py_add_module`` macro provided by **c2py**. It declares
-the Python extension module, links it against **c2py**, and -- when ``Update_Python_Bindings`` is ``ON`` --
-regenerates the bindings with ``clair-c2py``:
-
-.. code-block:: cmake
-
-   find_package(c2py REQUIRED)   # or fetch c2py via FetchContent
-
-   c2py_add_module(getting_started)
-
-The macro also accepts optional arguments such as ``LINK_LIBRARIES`` for extra dependencies and
-``DEPENDS_ON_BINDINGS`` to order binding generation across modules (see :ref:`multiple_modules`).
-
-The section below shows the same steps written out explicitly, to illustrate what ``c2py_add_module``
-does under the hood.
-
 CMake Configuration
 ...................
 
-The ``CMakeLists.txt`` used for our :ref:`getting_started` example looks as follows:
+The recommended way to build a module is the ``c2py_add_module`` macro provided by **c2py**: it declares
+the Python extension module, links it against **c2py**, and -- when ``Update_Python_Bindings`` is ``ON`` --
+(re)generates the bindings with ``clair-c2py``. The ``CMakeLists.txt`` for our :ref:`getting_started`
+example looks as follows:
 
 .. literalinclude:: ../examples/getting_started/CMakeLists.txt
    :language: cmake
@@ -45,21 +29,23 @@ The ``CMakeLists.txt`` used for our :ref:`getting_started` example looks as foll
 
 Let's take a closer look at the ``CMakeLists.txt`` file:
 
-* **[Lines 1-5]** Standard CMake project configuration where we require ``c++20`` support and tell CMake to generate a
-  ``compile_commands.json`` database file.
+* **[Lines 1-4]** Standard CMake project configuration: we require ``c++20`` support and tell CMake to
+  generate a ``compile_commands.json`` database (``clair-c2py`` relies on it to parse the code).
 
-* **[Lines 8]** Since we want to build a Python C++ extension, we need to find Python/Numpy on the system.
+* **[Line 7]** This example ships without generated bindings, so we default ``Update_Python_Bindings`` to
+  ``ON`` to (re)generate them; see the *General Workflow* below.
 
-* **[Lines 11-17]** We fetch **c2py** from GitHub and make it available for the current project rather than relying on a system 
-  installation. This ensures that both, **c2py** and the extension module, are built with consistent compiler options and linked 
-  against the same Python interpreter. As **c2py** compiles quickly, it does not add significant overhead to the build process.
+* **[Lines 9-17]** We fetch **c2py** from GitHub and make it available for the current project rather than
+  relying on a system installation. This ensures that **c2py** and the extension module are built with
+  consistent compiler options and linked against the same Python interpreter, and it makes the
+  ``c2py_add_module`` macro available. As **c2py** compiles quickly, it does not add significant overhead.
+  (If **c2py** is already installed, ``find_package(c2py)`` makes the macro available just as well.)
 
-* **[Lines 20–21]** We use the ``Python_add_library`` command to declare our ``getting_started`` extension module. The command is
-  part of `CMake <https://cmake.org/cmake/help/latest/module/FindPython.html#commands>`_.
-
-* **[Line 27-end]** Here we introduce the user option ``Update_Python_Bindings`` and, if it is set to ``ON``, we call the 
-  ``clair_c2py_generate_bindings`` macro provided by **c2py**. The macro finds the ``clair-c2py`` executable and makes sure to 
-  (re)generate the bindings before the module is compiled.
+* **[Line 20]** ``c2py_add_module`` declares the ``getting_started`` extension module, links it against
+  **c2py**, and -- when ``Update_Python_Bindings`` is ``ON`` -- finds ``clair-c2py`` and (re)generates the
+  bindings before the module is compiled. It also accepts optional arguments such as ``LINK_LIBRARIES``
+  for extra dependencies and ``DEPENDS_ON_BINDINGS`` to order generation across modules
+  (see :ref:`multiple_modules`).
 
 .. note::
 
@@ -70,13 +56,13 @@ Let's take a closer look at the ``CMakeLists.txt`` file:
 General Workflow
 ................
 
-The above ``CMakeLists.txt`` file is designed to be used in two different modes, depending on the value of the 
+The above ``CMakeLists.txt`` file is designed to be used in two different modes, depending on the value of the
 ``Update_Python_Bindings`` option:
 
 * **Developer Mode** (``Update_Python_Bindings == ON``)[default]:
 
    * The bindings are automatically regenerated using ``clair-c2py`` when the C++ code or the options TOML file are modified.
-   * At the end, the regenerated bindings should be committed along with the rest of the source (they are produced in the **source** 
+   * At the end, the regenerated bindings should be committed along with the rest of the source (they are produced in the **source**
      directory).
    * Any C++20-compliant compiler can be used to compile the module, even though ``clair-c2py`` itself relies on Clang and its libraries.
 

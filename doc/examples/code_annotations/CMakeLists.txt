@@ -1,2 +1,2 @@
-add_clair_module(c2py_rename)
+c2py_add_module(c2py_rename)
 

@@ -16,27 +16,19 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(c2py)
 
-include(${c2py_SOURCE_DIR}/share/cmake/clair_c2py_generate_bindings.cmake)  
-#include(clair_c2py_generate_bindings.cmake)  
+# FetchContent_MakeAvailable(c2py) above also provides the c2py_add_module macro.
 
-# Macro to build a Python C++ extension module with c2py bindings
-macro(add_clair_module module_name)
-  Python_add_library(${module_name} MODULE ${module_name}.cpp)
-  target_link_libraries(${module_name} PRIVATE c2py::c2py)
-  clair_c2py_generate_bindings(${module_name})
-endmacro()
-
-# Build the Python C++ extension module
+# Build the Python C++ extension modules
 add_subdirectory(gallery)
 add_subdirectory(getting_started)
 add_subdirectory(code_annotations)
 #add_subdirectory(nda)
 
-add_clair_module(fun1)
-add_clair_module(function_template)
-add_clair_module(my_enums)
+c2py_add_module(fun1)
+c2py_add_module(function_template)
+c2py_add_module(my_enums)
 add_subdirectory(classes)
 
 # kept for error message generation in the doc
-# add_clair_module(fail)
+# c2py_add_module(fail)
 

@@ -1,3 +1,3 @@
 # Gallery examples
-add_clair_module(constructor_basic)
-add_clair_module(constructor_aggregate)
+c2py_add_module(constructor_basic)
+c2py_add_module(constructor_aggregate)

@@ -24,3 +24,4 @@ clair/c2py is made of two components:
    :maxdepth: 2
 
    install_src
+   install_packages

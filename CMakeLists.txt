@@ -58,6 +58,9 @@ endif()
 # Build static libraries by default
 option(BUILD_SHARED_LIBS "Enable compilation of shared libraries" OFF)
 
+# Build a Debian package; also selects the dist-packages Python install layout
+option(BUILD_DEBIAN_PACKAGE "Build a deb package" OFF)
+
 # Export the list of compile-commands into compile_commands.json
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -109,7 +112,14 @@ include(GNUInstallDirs)
 # Python
 message(STATUS "-------- Python detection -------------")
 find_package(Python COMPONENTS Interpreter Development NumPy)
-string(REGEX REPLACE "/.*/lib" "lib" PYTHON_LIB_DEST_ROOT ${Python_SITEARCH})
+# Python module install location, consistent with the rest of the TRIQS stack
+# (BUILD_DEBIAN_PACKAGE may be set by the parent project). Not derived from
+# Python_SITEARCH, which points at dist-packages on Debian (see TRIQS/triqs#1022).
+if(BUILD_DEBIAN_PACKAGE)
+  set(PYTHON_LIB_DEST_ROOT lib/python${Python_VERSION_MAJOR}/dist-packages)
+else()
+  set(PYTHON_LIB_DEST_ROOT lib/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages)
+endif()
 set(PYTHON_LIB_DEST_ROOT ${PYTHON_LIB_DEST_ROOT} CACHE PATH "Python library destination")
 
 # #############
@@ -137,7 +147,6 @@ add_subdirectory(share)
 # #############
 # Debian Package
 
-option(BUILD_DEBIAN_PACKAGE "Build a deb package" OFF)
 if(BUILD_DEBIAN_PACKAGE AND NOT IS_SUBPROJECT)
   if(NOT CMAKE_INSTALL_PREFIX STREQUAL "/usr")
     message(FATAL_ERROR "CMAKE_INSTALL_PREFIX must be /usr for packaging")

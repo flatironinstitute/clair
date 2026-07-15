@@ -1,5 +1,5 @@
-configure_file(clair-config.cmake.in ${PROJECT_NAME}-config.cmake @ONLY)
-configure_file(clair-config-version.cmake.in ${PROJECT_NAME}-config-version.cmake @ONLY)
+configure_file(clair-config.cmake.in clair-config.cmake @ONLY)
+configure_file(clair-config-version.cmake.in clair-config-version.cmake @ONLY)
 install(
   FILES
     ${CMAKE_CURRENT_BINARY_DIR}/clair-config.cmake

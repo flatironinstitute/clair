@@ -1,33 +1,34 @@
+# This file allows other CMake Projects to find us
+# We provide general project information
+# and reestablish the exported CMake Targets
+
 # Multiple inclusion guard
-if(NOT @PROJECT_NAME@_FOUND)
-set(@PROJECT_NAME@_FOUND TRUE)
-set_property(GLOBAL PROPERTY @PROJECT_NAME@_FOUND TRUE)
+if(NOT clair_FOUND)
+set(clair_FOUND TRUE)
+set_property(GLOBAL PROPERTY clair_FOUND TRUE)
 
 # version
-set(@PROJECT_NAME@_VERSION @PROJECT_VERSION@ CACHE STRING "@PROJECT_NAME@ version")
-set(@PROJECT_NAME@_GIT_HASH @PROJECT_GIT_HASH@ CACHE STRING "@PROJECT_NAME@ git hash")
+set(clair_VERSION @PROJECT_VERSION@ CACHE STRING "clair version")
+set(clair_GIT_HASH @PROJECT_GIT_HASH@ CACHE STRING "clair git hash")
 set(CLAIR_LLVM_VERSION @CMAKE_CXX_COMPILER_VERSION@)
 
 # Root of the installation
-set(@PROJECT_NAME@_ROOT @CMAKE_INSTALL_PREFIX@ CACHE STRING "@PROJECT_NAME@ root directory")
+set(clair_ROOT @CMAKE_INSTALL_PREFIX@ CACHE STRING "clair root directory")
 
-# Include the exported targets of this project
-include(@CMAKE_INSTALL_FULL_LIBDIR@/cmake/@PROJECT_NAME@/@PROJECT_NAME@-targets.cmake)
-
-if (NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "@CMAKE_CXX_COMPILER_ID@")
- MESSAGE(FATAL_ERROR "Clair plugins are only usable with clang")
-endif()
-
-if (NOT ${CMAKE_CXX_COMPILER_VERSION} STREQUAL "@CMAKE_CXX_COMPILER_VERSION@")
-   MESSAGE(FATAL_ERROR "LLVM version mismatch")
-endif()
-
-message(STATUS "Found @PROJECT_NAME@-config.cmake with version @PROJECT_VERSION@, hash = @PROJECT_GIT_HASH@, root = @CMAKE_INSTALL_PREFIX@")
-
- # Mac specific
- if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+# Mac specific
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set(CMAKE_INSTALL_NAME_DIR "@CMAKE_INSTALL_FULL_LIBDIR@")
   set(CMAKE_MACOSX_RPATH 1) # new for cmake 3.x
- endif()
+endif()
+
+if(NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "@CMAKE_CXX_COMPILER_ID@")
+  message(FATAL_ERROR "Clair plugins are only usable with clang")
+endif()
+
+if(NOT ${CMAKE_CXX_COMPILER_VERSION} STREQUAL "@CMAKE_CXX_COMPILER_VERSION@")
+  message(FATAL_ERROR "LLVM version mismatch")
+endif()
+
+message(STATUS "Found clair-config.cmake with version @PROJECT_VERSION@, hash = @PROJECT_GIT_HASH@, root = @CMAKE_INSTALL_PREFIX@")
 
 endif()

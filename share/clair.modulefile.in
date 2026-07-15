@@ -1,11 +1,11 @@
 #%Module1.0
 #
-# To be installed as ${MODULEPATH}/cpp2py/@CPP2PY_VERSION@
+# To be installed as ${MODULEPATH}/clair/@PROJECT_VERSION@
 
-set     name        cpp2py
-set     version     @CPP2PY_VERSION@
+set     name        clair
+set     version     @PROJECT_VERSION@
 set     root        @CMAKE_INSTALL_PREFIX@
-set     git_hash    @CPP2PY_GIT_HASH@
+set     git_hash    @PROJECT_GIT_HASH@
 
 set     url         "https://github.com/flatironinstitute/clair"
 set     description "Clair (Clang Introspection and Reflection) tools. A set of clang tools developed for Flatiron/CCQ"
@@ -20,12 +20,12 @@ proc ModulesHelp { } {
     puts stderr "Git hash:    $git_hash"
 }
 
-# Only one version of cpp2py can be loaded at a time
+# Only one version of clair can be loaded at a time
 conflict $name
 
-setenv          CPP2PY_ROOT         $root
-setenv          CPP2PY_VERSION      $version
-setenv          CPP2PY_GIT_HASH     $git_hash
+setenv          CLAIR_ROOT         $root
+setenv          CLAIR_VERSION      $version
+setenv          CLAIR_GIT_HASH     $git_hash
 
 prepend-path    PATH                @CMAKE_INSTALL_FULL_BINDIR@
 prepend-path    CPLUS_INCLUDE_PATH  @CMAKE_INSTALL_FULL_INCLUDEDIR@

@@ -5,8 +5,8 @@ if(NOT IS_SUBPROJECT
   AND NOT CMAKE_INSTALL_PREFIX STREQUAL "/usr/local"
 )
 
-  configure_file(clair.modulefile.in ${PROJECT_NAME}.modulefile @ONLY)
-  configure_file(clairvars.sh.in ${PROJECT_NAME}vars.sh @ONLY)
+  configure_file(clair.modulefile.in clair.modulefile @ONLY)
+  configure_file(clairvars.sh.in clairvars.sh @ONLY)
 
   install(
     FILES
@@ -14,11 +14,11 @@ if(NOT IS_SUBPROJECT
       ${CMAKE_CURRENT_BINARY_DIR}/clairvars.sh
     DESTINATION share/clair
   )
- 
+
   message(STATUS "*********************************************************************************")
   message(STATUS "* Custom install Location. Use:                                                  ")
   message(STATUS "*                                                                                ")
-  message(STATUS "*   source ${CMAKE_INSTALL_PREFIX}/share/clair/${PROJECT_NAME}vars.sh  ")
+  message(STATUS "*   source ${CMAKE_INSTALL_PREFIX}/share/clair/clairvars.sh  ")
   message(STATUS "*                                                                                ")
   message(STATUS "* to set up the environment variables                                            ")
   if(DEFINED ENV{MODULEPATH})

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.22 FATAL_ERROR)
 cmake_policy(VERSION ${CMAKE_VERSION})
 
 # ############
@@ -23,7 +23,7 @@ message(STATUS "clair Git hash: ${PROJECT_GIT_HASH}")
 # Assert that install directory is provided and is absolute path.
 if(NOT IS_SUBPROJECT)
   if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT OR (NOT IS_ABSOLUTE ${CMAKE_INSTALL_PREFIX}))
-    message(FATAL_ERROR "CMAKE_INSTALL_PREFIX must be specified and must be an absolute path.\n There is no default.\n Current value : ${CMAKE_INSTALL_PREFIX}\n.  e.g. ... -DCMAKE_INSTALL_PREFIX=$HOME/clair_install")
+    message(FATAL_ERROR "No install prefix given (or invalid)")
   endif()
   message(STATUS "-------- CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX} --------")
 endif()
@@ -67,6 +67,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Disable compiler extensions
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# No C++20 modules used. Disable module scanning (default ON for C++20+ with Ninja):
+# it injects transient @<obj>.modmap flags into compile_commands.json that break clair-c2py
+# binding generation when it replays those commands. No-op on CMake < 3.28.
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
+
 # Provide additional debugging information for Debug builds
 add_compile_options($<$<CONFIG:Debug>:-ggdb3>)
 
@@ -83,8 +88,8 @@ target_compile_options(clair_warnings
     -Wno-unknown-warning-option
     -Wshadow
     -Wno-gcc-compat
-    -Wno-c++20-extensions
-    -Wno-c++20-compat
+    -Wno-c++26-extensions
+    -Wno-c++26-compat
 )
 
 # ---------------------------------

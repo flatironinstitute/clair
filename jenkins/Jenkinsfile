@@ -1,6 +1,6 @@
 def projectName = "clair" /* set to app/repo name */
 
-/* which platform to build documentation on (app4triqs builds/deploys docs via GitHub Actions, not Jenkins) */
+/* which platform to build documentation on (clair builds/deploys docs via GitHub Actions, not Jenkins) */
 def documentationPlatform = ""
 /* Platforms that regenerate the Python bindings via clair-c2py.
    All others use the default (OFF) from c2py. */
@@ -14,7 +14,7 @@ properties([
   pipelineTriggers(keepInstall ? [
     upstream(
       threshold: 'SUCCESS',
-      upstreamProjects: '/CCQ/TRIQS/cpp2py/master,/CCQ/TRIQS/h5/unstable'
+      upstreamProjects: '/CCQ/c2py/unstable'
     ), githubPush()
   ] : [githubPush()])
 ])
@@ -92,7 +92,12 @@ def runBuild = { String platform, String prefix, List<String> envs ->
         make -j\$PARALLEL || make -j1 VERBOSE=1
       """
       catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
-        sh "make test CTEST_OUTPUT_ON_FAILURE=1"
+        try {
+          sh "ctest --output-on-failure -j\$PARALLEL"
+        } catch (exc) {
+          archiveArtifacts(artifacts: 'Testing/Temporary/LastTest.log')
+          throw exc
+        }
       }
       sh "make install"
     }

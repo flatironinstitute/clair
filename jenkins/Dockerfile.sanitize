@@ -1,9 +1,7 @@
-FROM ubuntu:24.04
-ARG LLVM=20
+FROM ubuntu:26.04
+ENV LLVM=21
 
-RUN apt-get update && apt-get install -y lsb-release wget software-properties-common && \
-      #wget -O /tmp/llvm.sh https://apt.llvm.org/llvm.sh && chmod +x /tmp/llvm.sh && /tmp/llvm.sh ${LLVM} && \
-      DEBIAN_FRONTEND=noninteractive apt-get install -y \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
       clang-${LLVM} \
       cmake \
       g++ \
@@ -15,6 +13,7 @@ RUN apt-get update && apt-get install -y lsb-release wget software-properties-co
       libboost-dev \
       libclang-${LLVM}-dev \
       libomp-${LLVM}-dev \
+      libzstd-dev \
       libfftw3-dev \
       libgfortran5 \
       libgmp-dev \
@@ -31,10 +30,9 @@ RUN apt-get update && apt-get install -y lsb-release wget software-properties-co
       python3-mpi4py \
       python3-numpy \
       python3-pip \
-      python3-scipy \
-      libzstd-dev
+      python3-scipy
 
-ENV PYTHON_VERSION=3.12 \
+ENV PYTHON_VERSION=3.14 \
   CC=clang-${LLVM} CXX=clang++-${LLVM} \
   ASAN_SYMBOLIZER_PATH=/usr/lib/llvm-${LLVM}/bin/llvm-symbolizer \
   ASAN_OPTIONS=symbolize=1:detect_leaks=0:alloc_dealloc_mismatch=0 \

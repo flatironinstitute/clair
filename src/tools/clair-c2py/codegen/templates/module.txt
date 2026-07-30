@@ -61,7 +61,6 @@ extern "C" __attribute__((visibility("default"))) PyObject *PyInit_{modulename}(
 
   PyObject *m;
 
-  if (PyType_Ready(&c2py::wrap_pytype<c2py::py_range>) < 0) return NULL;
   {PyTypeReadyDecls}
 
   m = PyModule_Create(&module_def);
@@ -69,7 +68,7 @@ extern "C" __attribute__((visibility("default"))) PyObject *PyInit_{modulename}(
 
   auto &conv_table = *c2py::conv_table_sptr.get();
 
-  conv_table[std::type_index(typeid(c2py::py_range)).name()] = &c2py::wrap_pytype<c2py::py_range>;
+  if (not c2py::register_internal_types(conv_table)) return NULL;
 #define _add_type(T, N) c2py::add_type_object_to_main<T>(N, m, conv_table)
   {AddTypeObjectDecls}
 #undef _add_type

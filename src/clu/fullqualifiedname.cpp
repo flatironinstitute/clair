@@ -1,6 +1,5 @@
 #include "fullqualifiedname.hpp"
 #include "misc.hpp"
-#include <regex>
 
 #include <clang/AST/QualTypeNames.h>
 #include <clang/AST/DeclTemplate.h>
@@ -105,10 +104,9 @@ namespace clu {
 
     // clean the std::__1 and similar compiler dependent garbage in the std library ...
     auto clean_libc_mess = [](str_t s) {
-      static const std::regex reg1{"std::__1::"};
-      static const std::regex reg2{"std::__cxx11::"};
-      s = std::regex_replace(s, reg1, "std::");
-      s = std::regex_replace(s, reg2, "std::");
+      for (std::string_view inline_ns : {"std::__1::", "std::__cxx11::"})
+        for (auto pos = s.find(inline_ns); pos != str_t::npos; pos = s.find(inline_ns, pos))
+          s.replace(pos, inline_ns.size(), "std::");
       return s;
     };
 

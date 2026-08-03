@@ -11,7 +11,6 @@
 #include "utility/streams.hpp"
 #include "utility/string_tools.hpp"
 #include <algorithm>
-#include <regex>
 #include <set>
 
 using namespace fmt::literals;

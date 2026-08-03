@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
-#include <regex>
+#include <string_view>
+#include <vector>
 #include <sstream>
 #include <locale> // std::locale, std::toupper
 

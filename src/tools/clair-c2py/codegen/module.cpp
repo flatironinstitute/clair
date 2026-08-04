@@ -32,9 +32,11 @@ static std::string codegen_enum_decls(std::vector<clang::EnumDecl const *> const
   for (auto const &enu : enums) {
     auto qname = enu->getQualifiedNameAsString();
     out << fmt::format(R"RAW( template <> constexpr bool c2py::is_wrapped<{0}> = true;)RAW", qname);
+    // std::string, not str_t : the latter is not a c2py name, it only resolves through a global scope
+    // alias that serialization/as_tuple.hpp happens to leak.
     out << fmt::format(
        R"RAW(
-       template <> const std::map<{0}, str_t> c2py::enum_to_string<{0}> = {{ {1} }};)RAW",
+       template <> const std::map<{0}, std::string> c2py::enum_to_string<{0}> = {{ {1} }};)RAW",
        qname,
        join(
           enu->enumerators(), [&qname](auto &&val) { return fmt::format(R"RAW( {{ {0}::{1}, "{1}" }} )RAW", qname, val->getNameAsString()); }, ','));

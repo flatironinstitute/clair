@@ -146,9 +146,14 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
       return (m and m->isStatic());
     });
 
-    // add in the table
-    table << fmt::format(R"RAW( {{"{}", (PyCFunction)c2py::pyfkw<_c2py_fun_{}>, METH_VARARGS | METH_KEYWORDS {}, _c2py_doc_{}.c_str()}}, )RAW", //
-                         pyname, fun_id, (is_static ? "| METH_STATIC" : ""), fun_id);
+    // add in the table — PMDF macro lives in c2py/user_api.hpp
+    // DIFF STABILITY: one row per line, with the indentation written here rather than by
+    // clang-format. The tables are wrapped in clang-format off/on by the caller, because
+    // clang-format would otherwise bin-pack these short rows into a column grid (and, if
+    // forced one-per-line with a trailing comment, align the comments). In both cases the
+    // padding depends on the other rows, so adding one function would reflow the whole
+    // table. Emitting the final text verbatim makes it a pure one-line insertion.
+    table << fmt::format(R"RAW(   PMDF("{}", {}{}),)RAW", pyname, fun_id, (is_static ? ", METH_STATIC" : "")) << '\n';
   }
 }
 // ===================================================================

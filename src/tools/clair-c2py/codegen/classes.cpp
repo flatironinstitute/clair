@@ -317,28 +317,32 @@ str_t codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const
       codegen::write_dispatch(MethodDecls, MethodTable, MethodDocs, fpyname, overloads, cls, true, cls_alias);
 
     // ----- hdf5 : __write_hdf5__
-    if (cls_info.has_hdf5) MethodTable << fmt::format(R"RAW( {{"__write_hdf5__", c2py::tpxx_write_h5<{0}>, METH_VARARGS, "  "}}, )RAW", cls_alias);
+    // NB. one row per line, indentation written here: cf. the DIFF STABILITY note in write_dispatch.
+    if (cls_info.has_hdf5)
+      MethodTable << fmt::format(R"RAW(   {{"__write_hdf5__", c2py::tpxx_write_h5<{0}>, METH_VARARGS, "  "}},)RAW", cls_alias) << '\n';
 
     // ----- Serialization
 
     if (cls_info.serialization != Serialization::None) {
       static auto ser_opt_vec = std::vector<str_t>{"", "tuple", "h5", "repr"};
       auto set_opt            = ser_opt_vec[int(cls_info.serialization)];
-      MethodTable << fmt::format(R"RAW({{"__getstate__", c2py::getstate_{0}<{1}>, METH_NOARGS, ""}},)RAW", set_opt, cls_alias);
-      MethodTable << fmt::format(R"RAW({{"__setstate__", c2py::setstate_{0}<{1}>, METH_O, ""}},)RAW", set_opt, cls_alias);
+      MethodTable << fmt::format(R"RAW(   {{"__getstate__", c2py::getstate_{0}<{1}>, METH_NOARGS, ""}},)RAW", set_opt, cls_alias) << '\n';
+      MethodTable << fmt::format(R"RAW(   {{"__setstate__", c2py::setstate_{0}<{1}>, METH_O, ""}},)RAW", set_opt, cls_alias) << '\n';
     }
     // ----- assemble the code
 
     code << MethodDecls.str();
     code << MethodDocs.str();
 
+    // The rows are pre-indented, one per line; clang-format off keeps them verbatim (cf. write_dispatch).
     code << fmt::format(R"RAW(
 
       // ----- Method table ----
-      template <> PyMethodDef c2py::tp_methods<{0}>[] = {{
-           {1}
-           {{nullptr, nullptr, 0, nullptr}} // Sentinel
-      }};
+// clang-format off
+template <> PyMethodDef c2py::tp_methods<{0}>[] = {{
+{1}   {{nullptr, nullptr, 0, nullptr}} // Sentinel
+}};
+// clang-format on
 
      )RAW",
                         cls_alias, MethodTable.str());

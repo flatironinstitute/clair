@@ -50,7 +50,6 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
                              std::vector<fnt_info_t> const &flist, clang::CXXRecordDecl const *parent_class, bool enforce_method,
                              std::string const &cls_alias) {
 
-  static long fun_counter = 0;
   // no // if (flist.empty()) return; // can happen, some function are moved to properties
 
   // ---- write the dispatcher ----
@@ -60,10 +59,16 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
   else
     logs.fun(fmt::format("{}", pyname));
 
+  // Stable id derived from a key unique per logical entity:
+  //   method      : <parent_class_FQN>::<pyname>
+  //   free function: <pyname>
+  // Inserting/removing any other function leaves this hash unchanged.
+  auto fun_id = id_hash(parent_class ? clu::get_fully_qualified_name(parent_class) + "::" + pyname : pyname);
+
   code << '\n'
        << fmt::format(R"RAW( // {}
                              static auto const _c2py_fun_{} = c2py::dispatcher_f_kw_t{{ )RAW",
-                      pyname, fun_counter);
+                      pyname, fun_id);
 
   // Use cls_alias if provided, otherwise fall back to computing the FQN of parent_class.
   auto parent_cls_name = (not cls_alias.empty()) ? cls_alias : (parent_class ? clu::get_fully_qualified_name(parent_class) : str_t{});
@@ -119,7 +124,7 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
   // ORDERING INVARIANT: _c2py_doc_* must be emitted to the 'doc' stream (which the caller
   // flushes BEFORE the method/function table).
   auto [fdoc, param_types, return_types] = pydoc(flist);
-  doc << '\n' << fmt::format(R"RAW( static const auto _c2py_doc_{0} = _c2py_fun_{0}.doc(R"DOC({1})DOC")RAW", fun_counter, fdoc);
+  doc << '\n' << fmt::format(R"RAW( static const auto _c2py_doc_{0} = _c2py_fun_{0}.doc(R"DOC({1})DOC")RAW", fun_id, fdoc);
   if (not param_types.empty() or not return_types.empty()) {
     auto join_f = [](auto const &vec) { return fmt::format("{{{}}}", codegen::cpp_to_py_types(vec)); };
     doc << (param_types.empty() ? ", {}" : fmt::format(", {{{}}}", util::join(param_types, join_f, ", ")))
@@ -132,7 +137,7 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
   if (pyname == "__call__")
     code << '\n'
          << fmt::format(R"RAW(  template <> inline constexpr ternaryfunc c2py::tp_call<{0}> = c2py::pyfkw<_c2py_fun_{1}>;  )RAW", parent_cls_name,
-                        fun_counter)
+                        fun_id)
          << '\n';
   else { // generic case
     // is one of the methods static ?
@@ -143,18 +148,17 @@ void codegen::write_dispatch(std::ostream &code, std::ostream &table, std::ostre
 
     // add in the table
     table << fmt::format(R"RAW( {{"{}", (PyCFunction)c2py::pyfkw<_c2py_fun_{}>, METH_VARARGS | METH_KEYWORDS {}, _c2py_doc_{}.c_str()}}, )RAW", //
-                         pyname, fun_counter, (is_static ? "| METH_STATIC" : ""), fun_counter);
+                         pyname, fun_id, (is_static ? "| METH_STATIC" : ""), fun_id);
   }
-
-  fun_counter++;
 }
 // ===================================================================
 
 void codegen::write_dispatch_constructors(std::ostream &code, std::string const &cls_cpp_name, std::string const &cls_log_name,
                                           std::vector<fnt_info_t> const &flist) {
 
-  static long counter = 0;
-  code << fmt::format(R"RAW( static const auto _c2py_init_{} = c2py::dispatcher_c_kw_t {{ )RAW", counter) << '\n';
+  // One constructor dispatcher per class: hash of the class FQN.
+  auto init_id = id_hash(cls_cpp_name);
+  code << fmt::format(R"RAW( static const auto _c2py_init_{} = c2py::dispatcher_c_kw_t {{ )RAW", init_id) << '\n';
 
   logs.meth("__init__");
 
@@ -188,18 +192,16 @@ void codegen::write_dispatch_constructors(std::ostream &code, std::string const 
   code << ";\n";
 
   code << fmt::format(R"RAW( template <> constexpr initproc c2py::tp_init<{}> = c2py::pyfkw_constructor<_c2py_init_{}>;)RAW", //
-                      cls_cpp_name, counter);
+                      cls_cpp_name, init_id);
 
   // doc string for dispatched constructors
   auto [doc, param_types, return_types] = pydoc(flist);
   code << '\n'
-       << fmt::format(R"RAW(template <> const std::string c2py::tp_ctor_doc<{0}> = _c2py_init_{1}.doc(R"DOC({2})DOC")RAW", cls_cpp_name, counter,
+       << fmt::format(R"RAW(template <> const std::string c2py::tp_ctor_doc<{0}> = _c2py_init_{1}.doc(R"DOC({2})DOC")RAW", cls_cpp_name, init_id,
                       doc);
   if (not param_types.empty()) {
     auto join_f = [](auto const &vec) { return fmt::format("{{{}}}", codegen::cpp_to_py_types(vec)); };
     code << fmt::format(", {{{}}}", util::join(param_types, join_f, ", "));
   }
   code << ");";
-
-  counter++;
 }

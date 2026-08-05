@@ -25,7 +25,8 @@ void codegen_synth_constructor(std::ostream &code, cls_info_t const &cls_info, s
   EXPECTS(!cls_info.fields.empty());
 
   logs.cls_details("Synthesize constructor from pydict");
-  static long counter = 0;
+  // One synth_constructor per class — hash the class alias (itself derived from the class's C++ FQN).
+  auto synth_id = codegen::id_hash(cls_alias);
 
   std::vector<std::string> non_default_const_params;
   std::vector<clang::FieldDecl *> simple_fields;
@@ -57,7 +58,7 @@ void codegen_synth_constructor(std::ostream &code, cls_info_t const &cls_info, s
       }}
       auto & self_c = *(((c2py::wrap<{0}> *)self)->_c);
  )RAW",
-                      cls_alias, counter, cls_full_name, join(non_default_const_params, ','));
+                      cls_alias, synth_id, cls_full_name, join(non_default_const_params, ','));
 
   for (auto *f : simple_fields)
     code << fmt::format(R"RAW( de("{0}", self_c.{0}, {1}); )RAW", f->getNameAsString(), (get_field_initializer(f) != nullptr));
@@ -68,29 +69,29 @@ void codegen_synth_constructor(std::ostream &code, cls_info_t const &cls_info, s
 
      template <> constexpr initproc c2py::tp_init<{}> = synth_constructor_{};
    )RAW",
-                      cls_alias, counter);
+                      cls_alias, synth_id);
 
   // doc string for synthesized constructor
   auto [doc, field_types] = pydoc_of_synthetized_constructor(cls_info);
   code << '\n'
        << fmt::format(R"RAW(template <> const std::string c2py::tp_ctor_doc<{0}> = c2py::replace_tags()RAW", cls_alias)
        << fmt::format(R"RAW(R"DOC({0})DOC", "par", {{{1}}});)RAW", doc, codegen::cpp_to_py_types(field_types));
-
-  ++counter;
 }
 
 // ===================================================================
 
 void codegen_synth___dict_attribute(std::ostream &code, std::ostream &table, cls_info_t const &cls_info, str_t const &cls_alias) {
 
-  static long counter = 0;
   if (cls_info.fields.empty()) return; // Nothing to return
+
+  // One synth dict getter per class.
+  auto dict_id = codegen::id_hash(cls_alias);
 
   code << '\n'
        << fmt::format(R"RAW( static PyObject *prop_get_dict_{0}(PyObject *self, void *) {{
                               auto & self_c = *(((c2py::wrap<{1}> *)self)->_c);
                               c2py::pydict dic; )RAW",
-                      counter, cls_alias);
+                      dict_id, cls_alias);
 
   for (auto *f : cls_info.fields) {
     //if (f->getAccess() != clang::AS_public) continue; // SHOULD BE USELESS
@@ -100,9 +101,7 @@ void codegen_synth___dict_attribute(std::ostream &code, std::ostream &table, cls
   code << "return dic.new_ref();} \n";
 
   table << fmt::format(R"RAW( {{"__dict__", (getter)prop_get_dict_{0}, nullptr, "", nullptr}},)RAW", //
-                       counter);
-
-  ++counter;
+                       dict_id);
 }
 
 // ===================================================================
@@ -110,7 +109,8 @@ void codegen_synth___dict_attribute(std::ostream &code, std::ostream &table, cls
 void codegen_getter_setter(std::ostream &table, std::ostream &doc, str_t const &prop_name, cls_info_t::property const &prop,
                            cls_info_t const &cls_info) {
 
-  static long counter = 0;
+  // One prop_doc per (class, property).
+  auto prop_id = codegen::id_hash(clu::get_fully_qualified_name(cls_info.ptr) + "::" + prop_name);
 
   bool has_setter     = !prop.setters.empty();
   auto *getter_method = prop.getter.as_method(); // null when getter is a free function
@@ -118,7 +118,7 @@ void codegen_getter_setter(std::ostream &table, std::ostream &doc, str_t const &
   auto gsdoc   = clu::doc_string_t{prop.getter.ptr};
   auto doc_str = gsdoc.brief_str;
   doc_str += gsdoc.details_str.empty() ? "" : (doc_str.empty() ? gsdoc.details_str : fmt::format("\n\n{}", gsdoc.details_str));
-  doc << fmt::format(R"RAW( static constexpr auto prop_doc_{0} = R"DOC({1})DOC"; )RAW", counter, doc_str);
+  doc << fmt::format(R"RAW( static constexpr auto prop_doc_{0} = R"DOC({1})DOC"; )RAW", prop_id, doc_str);
 
   // Returns {parent_fqn, is_inherited} for a method, where is_inherited is true iff
   // the method belongs to a strict base class of cls_info.ptr. Throws if unrelated.
@@ -167,18 +167,17 @@ void codegen_getter_setter(std::ostream &table, std::ostream &doc, str_t const &
     closure_entry = fmt::format(R"RAW((void*)"Cannot delete the attribute {}")RAW", prop_name);
   }
 
-  table << fmt::format(R"RAW( {{"{}", {}, {}, prop_doc_{}, {}}},)RAW", prop_name, getter_entry, setter_entry, counter, closure_entry);
-
-  counter++;
+  table << fmt::format(R"RAW( {{"{}", {}, {}, prop_doc_{}, {}}},)RAW", prop_name, getter_entry, setter_entry, prop_id, closure_entry);
 }
 
 // ===================================================================
 
 void codegen_getsetitem(std::ostream &code, cls_info_t const &cls_info, str_t const &cls_alias) {
 
-  static long counter = 0;
-
   if ((not cls_info.has_size_method) and cls_info.getitems.empty()) return;
+
+  // One getitem/setitem pair per class.
+  auto subscript_id = codegen::id_hash(cls_alias);
 
   auto get_ovs = [&cls_alias](auto &f_info) {
     auto *m = llvm::dyn_cast_or_null<clang::CXXMethodDecl>(f_info.ptr);
@@ -195,7 +194,7 @@ void codegen_getsetitem(std::ostream &code, cls_info_t const &cls_info, str_t co
   str_t setitem_code = "nullptr";
 
   if (not cls_info.getitems.empty()) {
-    getitem_code = fmt::format("getitem_{}", counter);
+    getitem_code = fmt::format("getitem_{}", subscript_id);
     code << fmt::format(R"RAW(
 
       static PyObject *getitem_{0}(PyObject *self, PyObject *key) {{
@@ -204,11 +203,11 @@ void codegen_getsetitem(std::ostream &code, cls_info_t const &cls_info, str_t co
       }}
 
    )RAW",
-                        counter, join(cls_info.getitems, get_ovs, ','));
+                        subscript_id, join(cls_info.getitems, get_ovs, ','));
 
     // yes, nested : no setitem if no getitems
     if (not cls_info.setitems.empty()) {
-      setitem_code = fmt::format("setitem_{}", counter);
+      setitem_code = fmt::format("setitem_{}", subscript_id);
 
       code << fmt::format(R"RAW(
 
@@ -219,7 +218,7 @@ void codegen_getsetitem(std::ostream &code, cls_info_t const &cls_info, str_t co
         }}
 
       )RAW",
-                          counter, join(cls_info.setitems, set_ovs, ','));
+                          subscript_id, join(cls_info.setitems, set_ovs, ','));
     }
   }
 
@@ -227,8 +226,6 @@ void codegen_getsetitem(std::ostream &code, cls_info_t const &cls_info, str_t co
            template <> PyMappingMethods c2py::tp_as_mapping<{0}> = {{ {1}, {2}, {3} }};
           )RAW",
                       cls_alias, size_code, getitem_code, setitem_code);
-
-  counter++;
 }
 
 // ===================================================================
@@ -295,9 +292,9 @@ str_t codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const
 
   logs.cls(fmt::format("{1} [Python: {0}]", cls_py_name, cls_full_name));
 
-  // -- emit using alias for this class
-  static int cls_counter = 0;
-  auto cls_alias         = fmt::format("_c2py_cls_{}", cls_counter++);
+  // -- emit using alias for this class.
+  // Stable id derived from the class's fully-qualified C++ name.
+  auto cls_alias = fmt::format("_c2py_cls_{}", codegen::id_hash(cls_full_name));
   code << '\n' << fmt::format("// --------- class {} -----------", cls_alias);
   code << '\n' << fmt::format("using {} = {};", cls_alias, cls_full_name);
   code << '\n' << fmt::format("template <> constexpr bool c2py::is_wrapped<{}> = true;", cls_alias);
@@ -349,8 +346,6 @@ str_t codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const
 
   // ---------- Members ------------
 
-  static long member_counter = 0;
-
   std::stringstream MembersDoc, Members;
   for (auto *f : cls_info.fields) {
 
@@ -363,18 +358,19 @@ str_t codegen_cls(std::ostream &code, str_t const &cls_py_name, cls_info_t const
     auto fdoc_str = fdoc.brief_str;
     fdoc_str += fdoc.details_str.empty() ? "" : (fdoc_str.empty() ? fdoc.details_str : fmt::format("\n\n{}", fdoc.details_str));
 
-    MembersDoc << fmt::format(R"RAW( constexpr auto _c2py_doc_member_{0} = R"DOC({1})DOC"; )RAW", member_counter, fdoc_str);
+    // One member doc per (class, field).
+    auto member_id = codegen::id_hash(cls_full_name + "::" + name);
+
+    MembersDoc << fmt::format(R"RAW( constexpr auto _c2py_doc_member_{0} = R"DOC({1})DOC"; )RAW", member_id, fdoc_str);
 
     if (is_const)
       Members << fmt::format(R"RAW(
                          {{"{0}", c2py::get_member<&{1}::{0}, {1}>, nullptr, _c2py_doc_member_{3}, nullptr}},
                           )RAW",
-                             name, cls_alias, type, member_counter);
+                             name, cls_alias, type, member_id);
     else
       // {{"{0}", c2py::get_member<&{1}::{0}>, c2py::set_member<&{1}::{0}>, _c2py_doc_member_{3}, nullptr}},
-      Members << fmt::format(R"RAW( c2py::getsetdef_from_member<&{1}::{0}, {1}>("{0}", _c2py_doc_member_{3}),)RAW", name, cls_alias, type,
-                             member_counter);
-    ++member_counter;
+      Members << fmt::format(R"RAW( c2py::getsetdef_from_member<&{1}::{0}, {1}>("{0}", _c2py_doc_member_{3}),)RAW", name, cls_alias, type, member_id);
   }
 
   code << MembersDoc.str();

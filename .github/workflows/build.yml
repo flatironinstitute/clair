@@ -31,7 +31,7 @@ jobs:
           - {os: ubuntu-24.04, llvm: 21, doc: OFF, apt_llvm_org: true }
           - {os: ubuntu-24.04, llvm: 22, doc: OFF, apt_llvm_org: true }
           - {os: ubuntu-24.04, llvm: 23, doc: OFF, apt_llvm_org: true }
-          - {os: macos-14, cc: clang, cxx: clang++, doc: OFF }
+          - {os: macos-26, cc: clang, cxx: clang++, doc: OFF }
 
     runs-on: ${{ matrix.os }}
 

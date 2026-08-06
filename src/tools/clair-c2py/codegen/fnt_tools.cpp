@@ -1,5 +1,4 @@
 #include "fnt_tools.hpp"
-#include <fmt/core.h>
 #include <fmt/format.h>
 using namespace fmt::literals;
 #include <itertools/itertools.hpp>

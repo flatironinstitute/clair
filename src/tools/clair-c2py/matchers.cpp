@@ -5,6 +5,7 @@
 #include <clang/Sema/Template.h>
 
 #include <algorithm>
+#include <fmt/format.h>
 #include "clu/misc.hpp"
 #include "clu/concept.hpp"
 #include "clu/inject_bool_vartempl_specialization.hpp"

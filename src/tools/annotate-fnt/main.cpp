@@ -1,3 +1,4 @@
+#include <fmt/format.h>
 #include "llvm/Support/Process.h"
 #include "clang/Tooling/CommonOptionsParser.h"
 

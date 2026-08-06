@@ -4,7 +4,6 @@
 #include <llvm/Support/raw_ostream.h>
 #include <filesystem>
 #include <ostream>
-#include "fmt/core.h"
 
 #include "clu/misc.hpp"
 #include "utility/logger.hpp"

@@ -3,7 +3,6 @@
 #include "fnt.hpp"
 #include "./utils.hpp"
 #include "../wdata.hpp"
-#include <fmt/core.h>
 #include <fmt/format.h>
 using namespace fmt::literals;
 #include <itertools/itertools.hpp>

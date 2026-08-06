@@ -1,7 +1,6 @@
 #include "./cls_tools.hpp"
 #include "./fnt.hpp"
 #include "./utils.hpp"
-#include <fmt/core.h>
 #include <fmt/format.h>
 using namespace fmt::literals;
 

@@ -3,7 +3,6 @@
 #include <iostream>
 #include <ostream>
 #include <utility>
-#include <fmt/core.h>
 #include <fmt/format.h>
 #include <llvm/ADT/StringRef.h>
 

@@ -2,7 +2,6 @@
 #include <set>
 #include <filesystem>
 #include <iostream>
-#include <fmt/core.h>
 #include <fmt/format.h>
 #include <toml++/toml.h>
 #include "llvm/Support/Regex.h"

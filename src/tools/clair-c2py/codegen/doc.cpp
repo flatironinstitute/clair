@@ -4,7 +4,6 @@
 #include "clu/fullqualifiedname.hpp"
 #include <clang/AST/DeclCXX.h>
 #include "clang/Lex/Lexer.h"
-#include <fmt/core.h>
 #include <fmt/format.h>
 #include <string>
 #include <itertools/itertools.hpp>

@@ -1,7 +1,6 @@
 #include "./custom_action.hpp"
 
 #include <fstream>
-#include <fmt/core.h>
 #include <fmt/format.h>
 
 #include "clang/Rewrite/Core/Rewriter.h"

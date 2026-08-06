@@ -26,7 +26,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {os: ubuntu-24.04, cc: clang-20, cxx: clang++-20, doc: ON }
+          # ubuntu builds with the versioned clang packages of matrix.llvm, macos with the unversioned clang of brew's llvm
+          - {os: ubuntu-24.04, llvm: 20, doc: ON }
+          - {os: ubuntu-24.04, llvm: 21, doc: OFF, apt_llvm_org: true }
+          - {os: ubuntu-24.04, llvm: 22, doc: OFF, apt_llvm_org: true }
+          - {os: ubuntu-24.04, llvm: 23, doc: OFF, apt_llvm_org: true }
           - {os: macos-14, cc: clang, cxx: clang++, doc: OFF }
 
     runs-on: ${{ matrix.os }}
@@ -37,9 +41,20 @@ jobs:
     - uses: actions/cache/restore@v4
       with:
         path: ${{ env.CCACHE_DIR }}
-        key: ccache-${{ matrix.os }}-${{ matrix.cc }}-${{ github.run_id }}
+        key: ccache-${{ matrix.os }}-${{ matrix.cc || matrix.llvm }}-${{ github.run_id }}
         restore-keys:
-          ccache-${{ matrix.os }}-${{ matrix.cc }}-
+          ccache-${{ matrix.os }}-${{ matrix.cc || matrix.llvm }}-
+
+    # LLVM releases newer than the one in the ubuntu repositories (currently 20) come from apt.llvm.org.
+    # The versioned suite is used rather than llvm.sh, whose unversioned "development" suite moves on to
+    # the next major version as soon as LLVM branches for release.
+    - name: Add the apt.llvm.org repository
+      if: ${{ matrix.apt_llvm_org }}
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y lsb-release wget software-properties-common gnupg
+        wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc > /dev/null
+        sudo add-apt-repository -y "deb https://apt.llvm.org/$(lsb_release -cs)/ llvm-toolchain-$(lsb_release -cs)-${{ matrix.llvm }} main"
 
     - name: Install ubuntu dependencies
       if: ${{ contains(matrix.os, 'ubuntu') }}
@@ -48,13 +63,13 @@ jobs:
         sudo apt-get install lsb-release wget software-properties-common &&
         sudo apt-get install
         ccache
-        clang-20
+        clang-${{ matrix.llvm }}
         g++
         doxygen
-        llvm-20-dev
-        libclang-20-dev
+        llvm-${{ matrix.llvm }}-dev
+        libclang-${{ matrix.llvm }}-dev
         libomp-dev
-        clang-format-20
+        clang-format-${{ matrix.llvm }}
         libgmp-dev
         libhdf5-dev
         libopenblas-dev
@@ -98,8 +113,8 @@ jobs:
 
     - name: Build clair
       env:
-        CC: ${{ matrix.cc }}
-        CXX: ${{ matrix.cxx }}
+        CC: ${{ matrix.cc || format('clang-{0}', matrix.llvm) }}
+        CXX: ${{ matrix.cxx || format('clang++-{0}', matrix.llvm) }}
       run: |
         cmake -B build -S. -DCMAKE_INSTALL_PREFIX=$HOME/install -DBuild_Documentation=${{ matrix.doc }}
         cd build && make -j2 || make -j1 VERBOSE=1
@@ -117,7 +132,7 @@ jobs:
       if: always()
       with:
         path: ${{ env.CCACHE_DIR }}
-        key: ccache-${{ matrix.os }}-${{ matrix.cc }}-${{ github.run_id }}
+        key: ccache-${{ matrix.os }}-${{ matrix.cc || matrix.llvm }}-${{ github.run_id }}
 
     - name: Deploy unstable documentation to website
       if: matrix.doc == 'ON' && github.ref == 'refs/heads/unstable'

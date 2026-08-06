@@ -60,7 +60,13 @@ namespace clu {
 
   str_t get_raw_comment(const clang::Decl *d) {
     auto &ctx = d->getASTContext();
-    if (const clang::RawComment *rc = ctx.getRawCommentForDeclNoCache(d)) {
+#if LLVM_VERSION_MAJOR >= 23
+    // getRawCommentForDeclNoCache was generalized to macros and renamed (llvm/llvm-project#198452)
+    const clang::RawComment *rc = ctx.getRawCommentNoCache(d);
+#else
+    const clang::RawComment *rc = ctx.getRawCommentForDeclNoCache(d);
+#endif
+    if (rc) {
       return str_t{rc->getRawText(ctx.getSourceManager())};
     } else
       return {}; // no comment is not an error

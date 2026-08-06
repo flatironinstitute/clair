@@ -28,7 +28,14 @@ bool custom_action::BeginInvocation(clang::CompilerInstance &CI) {
 
   // Force color diagnostics if requested via environment variables
   // This ensures colors work even when output is redirected to a pipe
-  if (std::getenv("CLICOLOR_FORCE") || std::getenv("LLVM_FORCE_COLOR")) { CI.getDiagnosticOpts().ShowColors = true; }
+  if (std::getenv("CLICOLOR_FORCE") || std::getenv("LLVM_FORCE_COLOR")) {
+#if LLVM_VERSION_MAJOR >= 23
+    // ShowColors became a tri-state enum option with accessors (llvm/llvm-project#202441)
+    CI.getDiagnosticOpts().setShowColors(clang::ShowColorsKind::On);
+#else
+    CI.getDiagnosticOpts().ShowColors = true;
+#endif
+  }
 
   return true;
 }

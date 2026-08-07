@@ -60,6 +60,7 @@
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Packages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#anaconda">Anaconda</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#os-x-brew">OS X (brew)</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#uninstalling">Uninstalling</a></li>
 </ul>
@@ -232,6 +233,16 @@
              
   <section id="packages">
 <span id="install-package"></span><h1>Packages<a class="headerlink" href="#packages" title="Link to this heading"></a></h1>
+<section id="anaconda">
+<h2>Anaconda<a class="headerlink" href="#anaconda" title="Link to this heading"></a></h2>
+<p>We provide Linux and OSX packages through the <a class="reference external" href="https://conda-forge.org/">conda-forge</a>
+repositories. After <a class="reference external" href="https://docs.conda.io/en/latest/miniconda.html">installing conda</a>
+you can install clair with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>clair-c2py
+</pre></div>
+</div>
+<p>See also <a class="reference external" href="https://github.com/conda-forge/clair-c2py-feedstock/">github.com/conda-forge/clair-c2py-feedstock</a>.</p>
+</section>
 <section id="os-x-brew">
 <h2>OS X (brew)<a class="headerlink" href="#os-x-brew" title="Link to this heading"></a></h2>
 <p>Experimental packages of <code class="docutils literal notranslate"><span class="pre">c2py</span></code> and <code class="docutils literal notranslate"><span class="pre">clair</span></code> are:</p>

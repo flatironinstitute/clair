@@ -61,10 +61,6 @@
 </li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Packages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#anaconda">Anaconda</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#os-x-brew">OS X (brew)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#uninstalling">Uninstalling</a></li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>
@@ -242,25 +238,6 @@ you can install clair with:</p>
 </pre></div>
 </div>
 <p>See also <a class="reference external" href="https://github.com/conda-forge/clair-c2py-feedstock/">github.com/conda-forge/clair-c2py-feedstock</a>.</p>
-</section>
-<section id="os-x-brew">
-<h2>OS X (brew)<a class="headerlink" href="#os-x-brew" title="Link to this heading"></a></h2>
-<p>Experimental packages of <code class="docutils literal notranslate"><span class="pre">c2py</span></code> and <code class="docutils literal notranslate"><span class="pre">clair</span></code> are:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>brew<span class="w"> </span>install<span class="w"> </span>parcollet/ccq/c2py<span class="w">  </span>parcollet/ccq/clair
-</pre></div>
-</div>
-<p>They are built from source from the GitHub parcollet/ccq repository.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The packages with tools are not yet available on the <cite>parcollet/ccq</cite> tap.</p>
-</div>
-<section id="uninstalling">
-<h3>Uninstalling<a class="headerlink" href="#uninstalling" title="Link to this heading"></a></h3>
-<p>In order to uninstall all formulas from the <cite>parcollet/ccq</cite> tap, you can use:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>brew<span class="w"> </span>uninstall<span class="w"> </span><span class="sb">`</span>brew<span class="w"> </span>list<span class="w"> </span>--full-name<span class="w"> </span>-1<span class="p">|</span>grep<span class="w"> </span>ccq<span class="sb">`</span>
-</pre></div>
-</div>
-</section>
 </section>
 </section>
 

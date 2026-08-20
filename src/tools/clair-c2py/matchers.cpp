@@ -52,6 +52,8 @@ template <> void matcher<mtch::Concept>::run(const MatchResult &Result) {
       wdata->concepts.IsConvertibleC2Py = {cpt, wdata->ci};
     else if (cname == "HasSerializeLikeBoost")
       wdata->concepts.HasSerializeLikeBoost = {cpt, wdata->ci};
+    else if (cname == "HasSerializeViaRepr")
+      wdata->concepts.HasSerializeViaRepr = {cpt, wdata->ci};
     else if (cname == "HasNonDeletedDefaultConstructor")
       wdata->concepts.HasNonDeletedDefaultConstructor = {cpt, wdata->ci};
     else if (cname == "Storable")

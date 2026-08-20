@@ -155,7 +155,9 @@ static void scan_class(wdata_t &wd, cls_info_t &cls_info) {
   cls_info.has_hdf5 = wd.concepts.HasHdf5.is_satisfied_by(cls_info.ptr);
 
   // Serialization
-  if (wd.concepts.HasSerializeLikeBoost.is_satisfied_by(cls_info.ptr))
+  if (wd.concepts.HasSerializeViaRepr.is_satisfied_by(cls_info.ptr))
+    cls_info.serialization = Serialization::Repr;
+  else if (wd.concepts.HasSerializeLikeBoost.is_satisfied_by(cls_info.ptr))
     cls_info.serialization = Serialization::Tuple;
   else if (cls_info.has_hdf5)
     cls_info.serialization = Serialization::H5;

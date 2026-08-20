@@ -109,6 +109,7 @@ struct wdata_t {
     clu::concept_holder IsConvertiblePy2C;
     clu::concept_holder IsConvertibleC2Py;
     clu::concept_holder HasSerializeLikeBoost;
+    clu::concept_holder HasSerializeViaRepr;
     clu::concept_holder HasHdf5;
     clu::concept_holder HasNonDeletedDefaultConstructor;
   } concepts;

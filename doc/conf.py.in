@@ -34,6 +34,7 @@ copybutton_exclude = '.linenos, .gp'
 import doctest
 doctest_default_flags = doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE  #
 doctest_test_doctest_blocks = ''  # Test all doctest blocks
+doctest_global_setup = 'nda_example_available = @CLAIR_HAVE_NDA_EXAMPLE@'
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'monokai'  # Set code highlighting style for Sphinx

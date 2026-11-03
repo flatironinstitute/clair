@@ -16,7 +16,9 @@ Here is an example:
 .. literalinclude:: ../examples/nda/CMakeLists.txt
    :language: cmake
    :caption: CMakeLists.txt
-   :lines: 1, 3-6
+
+The example is built when an installed NDA package is found. Otherwise its
+doctest is skipped; the other documentation examples still run.
 
 Python usage:
 
@@ -26,6 +28,7 @@ Python usage:
    sys.path.insert(0, os.path.abspath('examples/nda'))
 
 .. doctest::
+   :skipif: not nda_example_available
 
     >>> from nda_example1 import my_sum, make_array
     >>> import numpy as np

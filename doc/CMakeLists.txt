@@ -1,9 +1,6 @@
 # Override c2py's Update_Python_Bindings default (OFF) -- the getting_started example needs ON.
 set(Update_Python_Bindings ON)
 
-# Generate the sphinx config file
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in ${CMAKE_CURRENT_BINARY_DIR}/conf.py @ONLY)
-
 # ---------------------------------
 # Top Sphinx target
 # ---------------------------------
@@ -22,6 +19,13 @@ add_custom_command(
 # ---------------------------------
 add_subdirectory(examples)
 
+# Skip only the optional NDA doctest when its dependency was not found.
+set(CLAIR_HAVE_NDA_EXAMPLE 0)
+if(TARGET nda_example1)
+  set(CLAIR_HAVE_NDA_EXAMPLE 1)
+endif()
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in ${CMAKE_CURRENT_BINARY_DIR}/conf.py @ONLY)
+
 # ---------------------------------
 # Doctest target
 # ---------------------------------
@@ -30,6 +34,9 @@ add_custom_target(doctest
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   COMMENT "Running doctests in documentation"
 )
+if(TARGET nda_example1)
+  add_dependencies(doctest nda_example1)
+endif()
 
 # ---------------------------------
 # Install

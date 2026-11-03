@@ -22,7 +22,7 @@ FetchContent_MakeAvailable(c2py)
 add_subdirectory(gallery)
 add_subdirectory(getting_started)
 add_subdirectory(code_annotations)
-#add_subdirectory(nda)
+add_subdirectory(nda)
 
 c2py_add_module(fun1)
 c2py_add_module(function_template)

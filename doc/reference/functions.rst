@@ -63,7 +63,7 @@ In the following example, we define a function template ``add`` that adds two va
    import os
    # Add the examples build directory to Python path
    # This assumes doctest is run from the build/doc directory
-   sys.path.insert(0, os.path.abspath('../examples'))
+   sys.path.insert(0, os.path.abspath('examples'))
 
 .. doctest::
 
